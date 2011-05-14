@@ -1,0 +1,141 @@
+---------------------------------------------------------------------
+--------------------CLIENTE------------------------------------------
+---------------------------------------------------------------------
+CREATE TABLE [MAYUSCULAS_SIN_ESPACIOS].[Cliente](
+	[CLI_DNI] [nvarchar](255) PRIMARY KEY,
+	[CLI_NOMBRE] [nvarchar](255) NULL,
+	[CLI_APELLIDO] [nvarchar](255) NULL,
+	[CLI_MAIL] [nvarchar](255) NULL,
+	[CLI_TELEFONO] [nvarchar](255) NULL,
+	[CLI_DIRECCION] [nvarchar](100) NULL,
+	[CLI_PROVINCIA] [nvarchar](255) NULL
+)  
+
+INSERT INTO MAYUSCULAS_SIN_ESPACIOS.CLIENTE([CLI_DNI],[CLI_NOMBRE],[CLI_APELLIDO],[CLI_MAIL])
+(SELECT DISTINCT [CLI_DNI] ,[CLI_NOMBRE] ,[CLI_APELLIDO] ,[CLI_MAIL]
+FROM GD_ESQUEMA.MAESTRA
+WHERE CLI_DNI IS NOT NULL)
+
+
+---------------------------------------------------------------------
+--------------------SUCURSAL-----------------------------------------
+---------------------------------------------------------------------
+CREATE TABLE [MAYUSCULAS_SIN_ESPACIOS].[Sucursal](
+	[SUC_CODIGO] INT PRIMARY KEY IDENTITY,
+	[SUC_DIR] [nvarchar](255) NULL,
+	[SUC_TEL] [nvarchar](255) NULL,
+	[SUC_TIPO] [nvarchar](255) NULL,
+	[SUC_PROVINCIA] [nvarchar](255) NULL
+) 
+
+INSERT INTO MAYUSCULAS_SIN_ESPACIOS.SUCURSAL(
+		SUC_TIPO, SUC_DIR, SUC_TEL, SUC_PROVINCIA)
+(SELECT SUC_TIPO, SUC_DIR, SUC_TEL, SUC_PROVINCIA
+FROM GD_ESQUEMA.MAESTRA
+GROUP BY SUC_TIPO, SUC_DIR, SUC_TEL, SUC_PROVINCIA)
+
+---------------------------------------------------------------------
+--------------------CATEGORIA----------------------------------------
+---------------------------------------------------------------------
+CREATE TABLE [MAYUSCULAS_SIN_ESPACIOS].[Categoria](
+	[CATE_NOMBRE] [nvarchar](100) PRIMARY KEY,
+	[CATE_PADRE] [nvarchar](100) NULL
+)
+
+---------------------------------------------------------------------
+--------------------EMPLEADO-----------------------------------------
+---------------------------------------------------------------------
+CREATE TABLE [MAYUSCULAS_SIN_ESPACIOS].[Empleado](
+	[EMPLEADO_DNI] [numeric](8, 0) PRIMARY KEY,
+	[EMPLEADO_NOMBRE] [nvarchar](255) NULL,
+	[EMPLEADO_APELLIDO] [nvarchar](255) NULL,
+	[EMPLEADO_MAIL] [nvarchar](255) NULL,
+	[EMPLEADO_DIR] [nvarchar](255) NULL,
+	[EMPLEADO_TIPO] [nvarchar](100) NULL,
+	[EMPLEADO_PROVINCIA] [nvarchar](255) NULL,
+	[EMPLEADO_TELEFONO] [nvarchar](255) NULL,
+	[EMPLEADO_SUCURSAL] INT FOREIGN KEY 
+			REFERENCES MAYUSCULAS_SIN_ESPACIOS.SUCURSAL(SUC_CODIGO)
+) 
+
+INSERT INTO MAYUSCULAS_SIN_ESPACIOS.EMPLEADO(
+		[EMPLEADO_DNI],[EMPLEADO_NOMBRE],[EMPLEADO_APELLIDO],[EMPLEADO_MAIL],
+		[EMPLEADO_DIR],[EMPLEADO_TIPO],[EMPLEADO_PROVINCIA],[EMPLEADO_SUCURSAL])
+(SELECT DISTINCT [EMPLEADO_DNI],[EMPLEADO_NOMBRE],[EMPLEADO_APELLIDO],[EMPLEADO_MAIL],
+		[EMPLEADO_DIR],[EMPLEADO_TIPO],[EMPLEADO_PROVINCIA],[SUC_CODIGO]
+FROM GD_ESQUEMA.MAESTRA M JOIN MAYUSCULAS_SIN_ESPACIOS.SUCURSAL S ON (M.[EMPLEADO_PROVINCIA] = S.SUC_PROVINCIA))
+
+
+---------------------------------------------------------------------
+--------------------FACTURA------------------------------------------
+---------------------------------------------------------------------
+CREATE TABLE [MAYUSCULAS_SIN_ESPACIOS].[Factura](
+	[FACTURA_NRO] [int] PRIMARY KEY,
+	[FACTURA_DESCUENTO] [float] NULL,
+	[FACTURA_TOTAL] [float] NULL,
+	[FACTURA_TOTAL_DESCU] [float] NULL,
+	[FACTURA_FECHA] [datetime] NULL,
+	[FACTURA_CANT_COUTAS] [int] NULL,
+	[FACTURA_CLIENTE] [nvarchar](255) FOREIGN KEY 
+			REFERENCES MAYUSCULAS_SIN_ESPACIOS.CLIENTE(CLI_DNI),
+	[FACTURA_EMPLEADO] [numeric](8, 0) FOREIGN KEY 
+			REFERENCES MAYUSCULAS_SIN_ESPACIOS.EMPLEADO(EMPLEADO_DNI)
+)
+
+INSERT INTO [MAYUSCULAS_SIN_ESPACIOS].[Factura]([FACTURA_NRO],[FACTURA_DESCUENTO] ,[FACTURA_TOTAL] ,
+		[FACTURA_TOTAL_DESCU],[FACTURA_FECHA],[FACTURA_CANT_COUTAS],[FACTURA_CLIENTE],[FACTURA_EMPLEADO])
+(SELECT  distinct [FACTURA_NRO],[FACTURA_DESCUENTO],[FACTURA_TOTAL],[FACTURA_TOTAL_DESCU],[FACTURA_FECHA],
+		[FACTURA_CANT_COUTAS],[CLI_DNI],[EMPLEADO_DNI]
+FROM GD_ESQUEMA.MAESTRA
+WHERE FACTURA_NRO <> '0')
+
+
+---------------------------------------------------------------------
+--------------------PAGO---------------------------------------------
+---------------------------------------------------------------------
+CREATE TABLE [MAYUSCULAS_SIN_ESPACIOS].[Pago](
+	[PAGO_CODIGO] [INT] PRIMARY KEY IDENTITY,
+	[PAGO_FECHA] [datetime] NULL,
+	[PAGO_MONTO] [float] NULL,
+	[PAGO_EMPLEADO_DNI] [numeric](8, 0) FOREIGN KEY REFERENCES [MAYUSCULAS_SIN_ESPACIOS].EMPLEADO(EMPLEADO_DNI),
+	[PAGO_FACTURA_NRO] [int] FOREIGN KEY REFERENCES [MAYUSCULAS_SIN_ESPACIOS].FACTURA(FACTURA_NRO)
+)
+
+INSERT INTO [MAYUSCULAS_SIN_ESPACIOS].[Pago]([PAGO_FECHA] ,[PAGO_MONTO] ,[PAGO_EMPLEADO_DNI]
+			,[PAGO_FACTURA_NRO] )
+(SELECT [PAGO_FECHA] ,[PAGO_MONTO] ,[PAGO_EMPLEADO_DNI],[FACTURA_NRO]
+FROM GD_ESQUEMA.MAESTRA
+WHERE PAGO_FECHA IS NOT NULL)
+
+---------------------------------------------------------------------
+--------------------PRODUCTO-----------------------------------------
+---------------------------------------------------------------------
+CREATE TABLE [MAYUSCULAS_SIN_ESPACIOS].[Producto](
+	[PRODUCTO_CODIGO] [nvarchar](100) PRIMARY KEY,
+	[PRODUCTO_NOMBRE] [nvarchar](100) NULL,
+	[PRODUCTO_DESC] [nvarchar](100) NULL,
+	[PRODUCTO_PRECIO] [float] NULL,
+	[PRODUCTO_MARCA] [nvarchar](100) NULL,
+	[PRODUCTO_CATE] [nvarchar](100) NULL
+) 
+
+INSERT INTO [MAYUSCULAS_SIN_ESPACIOS].[Producto]([PRODUCTO_CODIGO],[PRODUCTO_NOMBRE] ,[PRODUCTO_DESC] ,
+			[PRODUCTO_PRECIO] ,[PRODUCTO_MARCA] ,[PRODUCTO_CATE])
+(SELECT  DISTINCT SUBSTRING(PRODUCTO_NOMBRE,LEN(PRODUCTO_NOMBRE)-9,10),
+			SUBSTRING(PRODUCTO_NOMBRE,1,LEN(PRODUCTO_NOMBRE)-11),[PRODUCTO_DESC],
+			[PRODUCTO_PRECIO],[PRODUCTO_MARCA],[PRODUCTO_CATE]
+FROM GD_ESQUEMA.MAESTRA
+WHERE PRODUCTO_PRECIO <> '0')
+
+
+
+---------------------------------------------------------------------
+--------------------ITEM_FACTURA-------------------------------------
+---------------------------------------------------------------------
+CREATE TABLE [MAYUSCULAS_SIN_ESPACIOS].[Item_Factura](
+	[ITEM_FACTURA] [int],
+	[ITEM_PRODUCTO] [INT],
+	[ITEM_PRECIO] [float] NULL,
+	[ITEM_CANT] [INT] NULL,
+) 
+
