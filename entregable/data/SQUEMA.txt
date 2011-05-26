@@ -236,19 +236,29 @@ FROM MAYUSCULAS_SIN_ESPACIOS.MOVS_STOCK MS
 GROUP BY MOVS_PRODUCTO,MOVS_SUCURSAL
 GO
 
+
+---------------------------------------------------------------------
+--------------------CATEGORIA----------------------------------------
+-----------------------81--------------------------------------------
+CREATE TABLE [MAYUSCULAS_SIN_ESPACIOS].[Categoria](
+	[CATE_CODIGO] INT IDENTITY PRIMARY KEY,
+	[CATE_NOMBRE] [nvarchar](100) NULL,
+	[CATE_PADRE] INT NULL
+)
+GO
 ---------------------------------------------------------------------
 ------------------------FUNCTION-PARSE-------------------------------
 ---------------------------------------------------------------------
-
-CREATE FUNCTION [MAYUSCULAS_SIN_ESPACIOS].[PARSE](@CateList varchar(8000))
-RETURNS @tblCate TABLE (Cate varchar(50), CatePadre varchar(50))
+CREATE PROCEDURE [MAYUSCULAS_SIN_ESPACIOS].[PARSE](@CateList varchar(8000))
 AS
 BEGIN
 	DECLARE @Delimeter varchar(1)
 	SET @Delimeter = '¦'
 	DECLARE @Cate varchar(50)
 	DECLARE @CatePadre varchar(50)
-	SET @CatePadre = null
+	SET @CatePadre = ''
+	DECLARE @CatePadreCod INT
+	SET @CatePadreCod = '0'
 	DECLARE @StartPos int, @Length int
 	WHILE LEN(@CateList) > 0
 	  BEGIN
@@ -266,8 +276,11 @@ BEGIN
 			SET @Cate = @CateList
 			SET @CateList = ''
 		  END
-		if not @Cate in (select cate_nombre from [MAYUSCULAS_SIN_ESPACIOS].Categoria)
-			INSERT @tblCate (Cate,CatePadre) VALUES(@Cate,@CatePadre)				
+		SET @CatePadreCod = (SELECT TOP (1) CATE_CODIGO FROM [MAYUSCULAS_SIN_ESPACIOS].Categoria WHERE @CATEPADRE = CATE_NOMBRE)
+		if not @Cate in (select cate_nombre from [MAYUSCULAS_SIN_ESPACIOS].Categoria WHERE (@CATEPADRECOD = CATE_PADRE OR CATE_PADRE IS NULL) AND @CATE <> @CATEPADRE)
+		  BEGIN	
+			INSERT INTO [MAYUSCULAS_SIN_ESPACIOS].Categoria(Cate_NOMBRE,Cate_Padre) VALUES(@Cate,@CatePadreCod)				
+		  END
 		SET @CatePadre = @Cate
 	  END
 	RETURN 
@@ -277,49 +290,12 @@ GO
 ---------------------------------------------------------------------
 --------------------CATEGORIA----------------------------------------
 ---------------------------------------------------------------------
-DROP TABLE [MAYUSCULAS_SIN_ESPACIOS].[Categoria]
-
-CREATE TABLE [MAYUSCULAS_SIN_ESPACIOS].[Categoria](
-	[CATE_NOMBRE] [nvarchar](100),
-	[CATE_PADRE] [nvarchar](100),
-	PRIMARY KEY([CATE_NOMBRE],[CATE_PADRE])
-)
-GO
 
 declare @au_id nvarchar(100)
-declare @tblCate TABLE (Cate varchar(50), CatePadre varchar(50))
 select @au_id =  min( producto_cate ) from [MAYUSCULAS_SIN_ESPACIOS].producto
 while @au_id is not null
 begin
-	declare @CateList varchar(8000)
-	set @CateList = @au_id
-	DECLARE @Delimeter varchar(1)
-	SET @Delimeter = '¦'
-	DECLARE @Cate varchar(50)
-	DECLARE @CatePadre varchar(50)
-	SET @CatePadre = ''
-	DECLARE @StartPos int, @Length int
-	WHILE LEN(@CateList) > 0
-	  BEGIN
-		SET @StartPos = CHARINDEX(@Delimeter, @CateList)
-		IF @StartPos < 0 SET @StartPos = 0
-		SET @Length = LEN(@CateList) - @StartPos - 1
-		IF @Length < 0 SET @Length = 0
-		IF @StartPos > 0
-		  BEGIN
-			SET @Cate = SUBSTRING(@CateList, 1, @StartPos - 1)
-			SET @CateList = SUBSTRING(@CateList, @StartPos + 1, LEN(@CateList) - @StartPos)
-		  END
-		ELSE
-		  BEGIN
-			SET @Cate = @CateList
-			SET @CateList = ''
-		  END
-		INSERT @tblCate (Cate,CatePadre) VALUES(@Cate,@catepadre)
-		SET @CatePadre = @Cate
-	  END
-select @au_id = min( producto_cate ) from [MAYUSCULAS_SIN_ESPACIOS].producto where producto_cate > @au_id
+	EXECUTE [MAYUSCULAS_SIN_ESPACIOS].[PARSE] @au_id    
+	select @au_id = min( producto_cate ) from [MAYUSCULAS_SIN_ESPACIOS].producto where producto_cate > @au_id
 end
-
-insert into [MAYUSCULAS_SIN_ESPACIOS].[Categoria](cate_nombre,cate_padre)
-select distinct CATE,CATEPADRE from @tblCate
+GO
