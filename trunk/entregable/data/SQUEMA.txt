@@ -299,3 +299,38 @@ begin
 	select @au_id = min( producto_cate ) from [MAYUSCULAS_SIN_ESPACIOS].producto where producto_cate > @au_id
 end
 GO
+
+---------------------------------------------------------------------
+--------------------USUARIOS----------------------------------------
+---------------------------------------------------------------------
+
+CREATE TABLE MAYUSCULAS_SIN_ESPACIOS.USUARIOS(
+		US_EMPLEADO NUMERIC(8,0) NULL,
+		US_USERNAME NVARCHAR(20) PRIMARY KEY ,
+		US_PASSWORD NVARCHAR(50) NULL
+)
+GO
+
+---------------------------------------------------------------------
+--------------------PROCEDURE-MODIF-INTENTOS-------------------------
+---------------------------------------------------------------------
+
+CREATE PROCEDURE [MAYUSCULAS_SIN_ESPACIOS].sp_MODIFINTENTOS (	@USERNAME NVARCHAR(20),
+								@INTENTOS INT)
+AS
+BEGIN
+	UPDATE 	[MAYUSCULAS_SIN_ESPACIOS].USUARIOS
+	SET US_INTENTOS = @INTENTOS
+	WHERE US_USERNAME = @USERNAME
+END
+GO
+
+---------------------------------------------------------------------
+----------------------ROLESS-Y-FUNCIONES-----------------------------
+---------------------------------------------------------------------
+
+CREATE TABLE MAYUSCULAS_SIN_ESPACIOS.ROLES(
+		ROL_NOMBRE NVARCHAR(50) NULL,
+		ROL_FUNCION NVARCHAR(20) NULL
+)
+GO
