@@ -1,0 +1,6 @@
+Hay que crear un usuario 'admin' con password 'w23e' de rol 'Administrador General' con todas las funcionalidades asignadas.
+
+Según el mail "Re: [GestionDeDatos] Duda usuario Administrador", hay que hashear la clave una vez en C# y después hardcodearla en el script.
+
+--------------------------
+"[GestionDeDatos] [TP] Dirección": Las direcciones en los ABMs se piden en un unico textbox obligatorio
