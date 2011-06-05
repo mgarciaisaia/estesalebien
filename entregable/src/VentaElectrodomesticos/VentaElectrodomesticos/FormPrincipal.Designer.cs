@@ -72,6 +72,7 @@
             // 
             // aBMToolStripMenuItem
             // 
+            this.aBMToolStripMenuItem.Enabled = false;
             this.aBMToolStripMenuItem.Name = "aBMToolStripMenuItem";
             this.aBMToolStripMenuItem.Size = new System.Drawing.Size(170, 22);
             this.aBMToolStripMenuItem.Text = "ABM de Empleado";
@@ -79,6 +80,7 @@
             // 
             // aBMDeRolToolStripMenuItem
             // 
+            this.aBMDeRolToolStripMenuItem.Enabled = false;
             this.aBMDeRolToolStripMenuItem.Name = "aBMDeRolToolStripMenuItem";
             this.aBMDeRolToolStripMenuItem.Size = new System.Drawing.Size(170, 22);
             this.aBMDeRolToolStripMenuItem.Text = "ABM de Rol";
@@ -86,6 +88,7 @@
             // 
             // aBMDeUsuarioToolStripMenuItem
             // 
+            this.aBMDeUsuarioToolStripMenuItem.Enabled = false;
             this.aBMDeUsuarioToolStripMenuItem.Name = "aBMDeUsuarioToolStripMenuItem";
             this.aBMDeUsuarioToolStripMenuItem.Size = new System.Drawing.Size(170, 22);
             this.aBMDeUsuarioToolStripMenuItem.Text = "ABM de Usuario";
@@ -93,6 +96,7 @@
             // 
             // aBMDeClienteToolStripMenuItem
             // 
+            this.aBMDeClienteToolStripMenuItem.Enabled = false;
             this.aBMDeClienteToolStripMenuItem.Name = "aBMDeClienteToolStripMenuItem";
             this.aBMDeClienteToolStripMenuItem.Size = new System.Drawing.Size(170, 22);
             this.aBMDeClienteToolStripMenuItem.Text = "ABM de Cliente";
@@ -100,6 +104,7 @@
             // 
             // aBMDeProductoToolStripMenuItem
             // 
+            this.aBMDeProductoToolStripMenuItem.Enabled = false;
             this.aBMDeProductoToolStripMenuItem.Name = "aBMDeProductoToolStripMenuItem";
             this.aBMDeProductoToolStripMenuItem.Size = new System.Drawing.Size(170, 22);
             this.aBMDeProductoToolStripMenuItem.Text = "ABM de Producto";
@@ -117,6 +122,7 @@
             // 
             // asignaciónDeStockToolStripMenuItem
             // 
+            this.asignaciónDeStockToolStripMenuItem.Enabled = false;
             this.asignaciónDeStockToolStripMenuItem.Name = "asignaciónDeStockToolStripMenuItem";
             this.asignaciónDeStockToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.asignaciónDeStockToolStripMenuItem.Text = "Asignación de Stock";
@@ -124,6 +130,7 @@
             // 
             // facturaciónToolStripMenuItem
             // 
+            this.facturaciónToolStripMenuItem.Enabled = false;
             this.facturaciónToolStripMenuItem.Name = "facturaciónToolStripMenuItem";
             this.facturaciónToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.facturaciónToolStripMenuItem.Text = "Facturación";
@@ -131,6 +138,7 @@
             // 
             // efectuarPagoToolStripMenuItem
             // 
+            this.efectuarPagoToolStripMenuItem.Enabled = false;
             this.efectuarPagoToolStripMenuItem.Name = "efectuarPagoToolStripMenuItem";
             this.efectuarPagoToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.efectuarPagoToolStripMenuItem.Text = "Efectuar Pago";
@@ -148,6 +156,7 @@
             // 
             // tableroDeControlToolStripMenuItem
             // 
+            this.tableroDeControlToolStripMenuItem.Enabled = false;
             this.tableroDeControlToolStripMenuItem.Name = "tableroDeControlToolStripMenuItem";
             this.tableroDeControlToolStripMenuItem.Size = new System.Drawing.Size(178, 22);
             this.tableroDeControlToolStripMenuItem.Text = "Tablero de Control";
@@ -155,6 +164,7 @@
             // 
             // clientesPremiumToolStripMenuItem
             // 
+            this.clientesPremiumToolStripMenuItem.Enabled = false;
             this.clientesPremiumToolStripMenuItem.Name = "clientesPremiumToolStripMenuItem";
             this.clientesPremiumToolStripMenuItem.Size = new System.Drawing.Size(178, 22);
             this.clientesPremiumToolStripMenuItem.Text = "Clientes Premium";
@@ -162,6 +172,7 @@
             // 
             // mejoresCategoriasToolStripMenuItem
             // 
+            this.mejoresCategoriasToolStripMenuItem.Enabled = false;
             this.mejoresCategoriasToolStripMenuItem.Name = "mejoresCategoriasToolStripMenuItem";
             this.mejoresCategoriasToolStripMenuItem.Size = new System.Drawing.Size(178, 22);
             this.mejoresCategoriasToolStripMenuItem.Text = "Mejores Categorias";
@@ -178,6 +189,7 @@
             this.Name = "FormPrincipal";
             this.Text = "Venta de Electrodomésticos - Gestión de Datos - 1C 2011";
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
+            this.Load += new System.EventHandler(this.FormPrincipal_Load);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
             this.ResumeLayout(false);
