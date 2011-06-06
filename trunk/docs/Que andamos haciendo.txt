@@ -1,0 +1,10 @@
+== SQLQueryBuilder ==
+La idea es que, idealmente, se encarge de sanitizar el código SQL que le llega, y, más prácticamente, que se le pueda patear a él la tarea de settear el Schema de la DB. Aunque creo que ninguno va a llegar a lograrse.
+
+== FormLogin ==
+En realidad, habría que hacer un único query pidiendo los datos que necesitemos (asumo que los roles) del usuario "WHERE username = 'txtUser.text' AND password = 'hashedPassword' AND active = 1" o algo así, sin tanto if ni tanta cosa.
+Cuando obtengo los roles, llamo al formulario que sigue pasándole la lista de roles.
+
+== Script inicial de carga de datos ==
+Falta hacer que los empleados tengan un usuario creado (en el checklist hay algunos datos al respecto), y falta crear el usuario "admin" con el pass que puse en el checklist. Lo que no se es a qué empleado corresponde ese usuario.
+Y creo que el tipo de datos del password debería cambiar. Son strings de ancho fijo, así que habría que contar cuántos hay en el pass ese y ya, o bien usar un BLOB o algún tipo de datos binario o algo así en el que podamos guardar un array de bytes.
