@@ -7,7 +7,9 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using System.Security.Cryptography;
 using VentaElectrodomesticos.MetodosSQL;
+using VentaElectrodomesticos.Utils;
 
 
 namespace VentaElectrodomesticos.Login
@@ -18,6 +20,7 @@ namespace VentaElectrodomesticos.Login
         private ClaseSQL sql;
         private int intentos = 0;
         private bool modif = false;
+        private Hasher hasher = new Hasher(new SHA256Managed());
 
 
         private bool correcto ;
@@ -46,10 +49,16 @@ namespace VentaElectrodomesticos.Login
 
         }
 
-
         private void btnLogin_Click(object sender, EventArgs e)
         {
             modif = false;
+            SQLQueryBuilder miQuery = new SQLQueryBuilder();
+            miQuery.select("1");
+            miQuery.from("[MAYUSCULAS_SIN_ESPACIOS].USUARIOS as Usuario");
+            miQuery.where("Usuario.US_USERNAME = '" + txtUser.Text.Trim() + "' AND Usuario.US_PASSWORD = '" + hasher.hash(txtPass.Text) + "'");
+            String blah = miQuery.ToString();
+            MessageBox.Show(blah);
+            return;
             if (txtUser.Text != "")
             {
                 sql.Open();
