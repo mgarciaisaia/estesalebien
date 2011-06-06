@@ -53,25 +53,33 @@ namespace VentaElectrodomesticos.Login
         {
             modif = false;
             SQLQueryBuilder miQuery = new SQLQueryBuilder();
-            miQuery.select("1");
+            miQuery.select("*");
             miQuery.from("[MAYUSCULAS_SIN_ESPACIOS].USUARIOS as Usuario");
-            miQuery.where("Usuario.US_USERNAME = '" + txtUser.Text.Trim() + "' AND Usuario.US_PASSWORD = '" + hasher.hash(txtPass.Text) + "'");
+            miQuery.where("Usuario.US_USERNAME = '" + txtUser.Text.Trim() + "'"); //AND Usuario.US_PASSWORD = '" + hasher.hash(txtPass.Text) + "'");
             String blah = miQuery.ToString();
-            MessageBox.Show(blah);
-            return;
+            //MessageBox.Show(blah);
+            
+            /* Usuarios disponibles
+             *  admin   w23e
+             *  prueba  prueba
+             *  otro    otro
+            */
+            //ESTA LINEA LA USO PARA SACAR EL HASH DE LA CONTRASEÑA PARA CREAR NUEVO USUARIO
+            //txtUser.Text = hasher.hash(txtPass.Text);
+            //return;
             if (txtUser.Text != "")
             {
                 sql.Open();
-                String defaultquery = " SELECT * FROM [MAYUSCULAS_SIN_ESPACIOS].USUARIOS ";
-                String query = " WHERE us_username = '" + txtUser.Text.ToString() + "'";
-                query = defaultquery + query;
-                SqlDataReader reader = sql.busquedaSQLDataReader(query);
+                //String defaultquery = " SELECT * FROM [MAYUSCULAS_SIN_ESPACIOS].USUARIOS ";
+                //String query = " WHERE us_username = '" + txtUser.Text.ToString() + "'";
+                //query = defaultquery + query;
+                SqlDataReader reader = sql.busquedaSQLDataReader(blah);
                 if (reader.Read())
                 {
                     intentos = System.Convert.ToInt16(reader[3].ToString());
                     if (intentos < 3)
                     {
-                        if ((txtUser.Text.ToLower() == reader[1].ToString()) && (txtPass.Text == reader[2].ToString()))
+                        if ((txtUser.Text.ToLower() == reader[1].ToString()) && (hasher.hash(txtPass.Text) == reader[2].ToString()))
                         {
                             correcto = true;
                             username = txtUser.Text.ToLower();
@@ -89,6 +97,7 @@ namespace VentaElectrodomesticos.Login
                             intentos++;
                             modif = true;
                         }
+                         
                     }else { MessageBox.Show("Usuario bloqueado"); }
                 }
                 else { MessageBox.Show(txtUser.Text.ToString() + " No existe en la base"); }
@@ -112,6 +121,11 @@ namespace VentaElectrodomesticos.Login
             if (correcto)
                 this.Close();
             
+        }
+
+        private void FormLogin_Load(object sender, EventArgs e)
+        {
+
         }
     }
 }
