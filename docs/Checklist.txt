@@ -2,5 +2,20 @@ Hay que crear un usuario 'admin' con password 'w23e' de rol 'Administrador Gener
 
 Según el mail "Re: [GestionDeDatos] Duda usuario Administrador", hay que hashear la clave una vez en C# y después hardcodearla en el script.
 
+E6B87050BFCB8143FCB8DB0170A4DC9ED00D904DDD3E2A4AD1B1E8DC0FDC9BE7
+
+--------------------------
+
+Mail: "[GestionDeDatos] [TP] Usuarios"
+
+TODOS los empleados tienen que tener un usuario creado de movida. Dijeron que el tema de la pass inicial es indistinto, así que creemos a todos con la misma pass encriptada (pero distinta a la del admin).
+Hay que documentar estas decisiones.
+
 --------------------------
 "[GestionDeDatos] [TP] Dirección": Las direcciones en los ABMs se piden en un unico textbox obligatorio
+
+--------------------------
+
+Mail: "Re: [GestionDeDatos] Dudas varias"
+
+Los numeros de factura son únicos en todo el sistema, aunque en algún lado dice que son por sucursal. Dicen que documentemos el cambio, y que usemos números únicos en todo el sistema.

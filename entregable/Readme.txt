@@ -3,4 +3,4 @@
 * Integrantes
 	- García Isaía, Matías Nahuel (134.436-5)
 	- Amoroso, Fernando (XXX.XXX-X)
-* Responsable: García Isaía, Matías <mgarciaisaia+gestiondedatos@gmail.com>
+* Responsable: García Isaía, Matías <mgarciaisaia+tpgestion@gmail.com>
