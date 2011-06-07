@@ -27,7 +27,7 @@ namespace VentaElectrodomesticos
     
     public partial class FormPrincipal : Form
     {
-        private ClaseSQL sql;
+        //private ClaseSQL sql;
         private string username;
         
         public FormPrincipal()
@@ -39,55 +39,42 @@ namespace VentaElectrodomesticos
             this.Text += " - " + username;
             foreach (string s in login.FUNCIONES)
             {
-                sql = ClaseSQL.getInstance();
-                sql.Open();
-                String defaultquery = " SELECT DISTINCT ROL_FUNCION FROM [MAYUSCULAS_SIN_ESPACIOS].ROLES ";
-                String query = " WHERE ROL_NOMBRE = '" + s + "'";
-                query = defaultquery + query;
-                SqlDataReader reader = sql.busquedaSQLDataReader(query);
-                while (reader.Read())
+                switch (s)
                 {
-                    //MessageBox.Show(reader[0].ToString());
-                    switch (reader[0].ToString())
-                    {
-                        case "ABM de Empleado":
-                            aBMToolStripMenuItem.Enabled = true;
-                            break;
-                        case "ABM de Rol":
-                            aBMDeRolToolStripMenuItem.Enabled = true;
-                            break;
-                        case "ABM de Usuario":
-                            aBMDeUsuarioToolStripMenuItem.Enabled = true;
-                            break;
-                        case "ABM de Cliente":
-                            aBMDeClienteToolStripMenuItem.Enabled=true;
-                            break;
-                        case "ABM de Producto":
-                            aBMDeProductoToolStripMenuItem.Enabled = true;
-                            break;
-                        case "Asignacion de stock":
-                            asignaciónDeStockToolStripMenuItem.Enabled=true;
-                            break;
-                        case "Facturacion":
-                            facturaciónToolStripMenuItem.Enabled = true;
-                            break;
-                        case "Efectuar Pago":
-                            efectuarPagoToolStripMenuItem.Enabled=true;
-                            break;
-                        case "Tablero de Control":
-                            tableroDeControlToolStripMenuItem.Enabled=true;
-                            break;
-                        case "Clientes Premium":
-                            clientesPremiumToolStripMenuItem.Enabled=true;
-                            break;
-                        case "Mejores Categorias":
-                            mejoresCategoriasToolStripMenuItem.Enabled = true;
-                            break;
-                    }
+                    case "ABM de Empleado":
+                        aBMToolStripMenuItem.Enabled = true;
+                        break;
+                    case "ABM de Rol":
+                        aBMDeRolToolStripMenuItem.Enabled = true;
+                        break;
+                    case "ABM de Usuario":
+                        aBMDeUsuarioToolStripMenuItem.Enabled = true;
+                        break;
+                    case "ABM de Cliente":
+                        aBMDeClienteToolStripMenuItem.Enabled=true;
+                        break;
+                    case "ABM de Producto":
+                        aBMDeProductoToolStripMenuItem.Enabled = true;
+                        break;
+                    case "Asignacion de stock":
+                        asignaciónDeStockToolStripMenuItem.Enabled=true;
+                        break;
+                    case "Facturacion":
+                        facturaciónToolStripMenuItem.Enabled = true;
+                        break;
+                    case "Efectuar Pago":
+                        efectuarPagoToolStripMenuItem.Enabled=true;
+                        break;
+                    case "Tablero de Control":
+                        tableroDeControlToolStripMenuItem.Enabled=true;
+                        break;
+                    case "Clientes Premium":
+                        clientesPremiumToolStripMenuItem.Enabled=true;
+                        break;
+                    case "Mejores Categorias":
+                        mejoresCategoriasToolStripMenuItem.Enabled = true;
+                        break;
                 }
-                reader.Close();
-                sql.Close();
-                
             }
         }
 

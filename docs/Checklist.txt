@@ -1,19 +1,26 @@
 Enunciado v1.1, pag 5:
-"A cada usuario del sistema se le puede asignar uno o varios roles, referidos a la seguridad informática. Cada rol está compuesto por un conjunto de funcionalidades. Existe una lista de funcionalidades fija en todo el sistema. Un usuario solo puede usar las funcionalidades que dictan sus roles."
+"A cada usuario del sistema se le puede asignar uno o varios roles, referidos a la seguridad informática.
+Cada rol está compuesto por un conjunto de funcionalidades. Existe una lista de funcionalidades fija en todo el sistema. 
+Un usuario solo puede usar las funcionalidades que dictan sus roles."
 
 Ergo, la DB quedaría algo como:
 
 Usuario >0---|< Rol >0---|< Funcionalidad
 
+NORMALIZACION COMPLETA!!! EN FUNCION A LO PLANTEADO
+
+
 --------------------------
 
 Hay que crear un usuario 'admin' con password 'w23e' de rol 'Administrador General' con todas las funcionalidades asignadas.
+USUARIO CREADO EN EL SCRIPT
 
 --------------------------
 
 Mail: "[GestionDeDatos] [TP] Usuarios"
 
-TODOS los empleados tienen que tener un usuario creado de movida. Dijeron que el tema de la pass inicial es indistinto, así que creemos a todos con la misma pass encriptada (pero distinta a la del admin).
+TODOS los empleados tienen que tener un usuario creado de movida. Dijeron que el tema de la pass inicial es indistinto,
+así que creemos a todos con la misma pass encriptada (pero distinta a la del admin).
 Hay que documentar estas decisiones.
 
 --------------------------
@@ -23,4 +30,5 @@ Hay que documentar estas decisiones.
 
 Mail: "Re: [GestionDeDatos] Dudas varias"
 
-Los numeros de factura son únicos en todo el sistema, aunque en algún lado dice que son por sucursal. Dicen que documentemos el cambio, y que usemos números únicos en todo el sistema.
+Los numeros de factura son únicos en todo el sistema, aunque en algún lado dice que son por sucursal. 
+Dicen que documentemos el cambio, y que usemos números únicos en todo el sistema.
