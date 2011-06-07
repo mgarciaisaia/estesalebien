@@ -32,12 +32,11 @@ namespace VentaElectrodomesticos.Login
         {
             get { return username; }
         }
-        private string[] funciones = { };
+        private string[] funciones;
         public string[] FUNCIONES
         {
             get { return funciones; }
         }
-
 
         public FormLogin()
         {
@@ -49,72 +48,43 @@ namespace VentaElectrodomesticos.Login
 
         private void btnLogin_Click(object sender, EventArgs e)
         {
-
-            String procedureName = "attemptLogin";
-            String[,] parameters = new String[2,2];
-            sql.ejecutarStoredProcedureConRetorno(procedureName, parameters, "string retorno");
-
-            /**
-             * Esto lo va a tener que hacer el Stock Procedure
-                miQuery.select("*");
-            miQuery.from("[MAYUSCULAS_SIN_ESPACIOS].USUARIOS as Usuario");
-            miQuery.where("Usuario.US_USERNAME = '" + txtUser.Text.Trim() + "'"); //AND Usuario.US_PASSWORD = '" + hasher.hash(txtPass.Text) + "'");
-            String blah = miQuery.ToString();
-             */
-            //MessageBox.Show(blah);
-
-            //ESTA LINEA LA USO PARA SACAR EL HASH DE LA CONTRASEÑA PARA CREAR NUEVO USUARIO
-            //txtUser.Text = hasher.hash(txtPass.Text);
-            //return;
             if (txtUser.Text != "")
             {
                 sql.Open();
-                //String defaultquery = " SELECT * FROM [MAYUSCULAS_SIN_ESPACIOS].USUARIOS ";
-                //String query = " WHERE us_username = '" + txtUser.Text.ToString() + "'";
-                //query = defaultquery + query;
-                SqlDataReader reader = sql.busquedaSQLDataReader(miQuery.ToString());
-                if (reader.Read())
+                
+                String procedureName = "[MAYUSCULAS_SIN_ESPACIOS].sp_LOGIN";
+                String[,] parametros = new String[2, 2];
+                parametros[0, 0] = "@USERNAME";
+                parametros[0, 1] = "@PASS";
+                parametros[1, 0] = txtUser.Text;
+                parametros[1, 1] = hasher.hash(txtPass.Text);
+
+                SqlDataReader otroReader = sql.ejecutarStoredProcedure(procedureName, parametros);
+                otroReader.Read();
+                switch (otroReader[0].ToString())
                 {
-                    intentos = System.Convert.ToInt16(reader[3].ToString());
-                    if (intentos < 3)
-                    {
-                        if ((txtUser.Text.ToLower() == reader[1].ToString()) && (hasher.hash(txtPass.Text) == reader[2].ToString()))
+                    case "USUARIO BLOQUEADO":
+                        MessageBox.Show("USUARIO BLOQUEADO");
+                        break;
+                    case "CONTRASEÑA INVALIDA":
+                        MessageBox.Show("CONTRASEÑA INVALIDA");
+                        break;
+                    case "NO EXISTE EN LA BASE":
+                        MessageBox.Show("NO EXISTE EN LA BASE");
+                        break;
+                    default:
+                        int i = 0;
+                        funciones = new string[15];
+                        do
                         {
+                            funciones[i] = otroReader[0].ToString();
+                            i++;
                             correcto = true;
                             username = txtUser.Text.ToLower();
-                            char[] delimiterChars = { '|' };
-                            funciones = reader[4].ToString().Split(delimiterChars);
-                            if (System.Convert.ToInt16(reader[3].ToString()) != 0)
-                            {
-                                intentos = 0;
-                                modif = true;
-                            }
-                        }
-                        else
-                        {
-                            MessageBox.Show("INCORRECTO ");
-                            intentos++;
-                            modif = true;
-                        }
-
-                    }
-                    else { MessageBox.Show("Usuario bloqueado"); }
+                        } while (otroReader.Read());
+                        break;               
                 }
-                else { MessageBox.Show(txtUser.Text.ToString() + " No existe en la base"); }
-                reader.Close();
-                ///Modifico en la base la cantidad de intentos////
-                if (modif)
-                {
-                    String[,] parametros = new String[2, 2];
-                    String sp = "[MAYUSCULAS_SIN_ESPACIOS].sp_MODIFINTENTOS";
-                    parametros[0, 0] = "@USERNAME";
-                    parametros[0, 1] = "@INTENTOS";
-                    parametros[1, 0] = txtUser.Text;
-                    parametros[1, 1] = intentos.ToString();
-                    SqlDataReader otroReader = sql.ejecutarStoredProcedure(sp, parametros);
-                    otroReader.Close();
-                }
-                ///////
+                otroReader.Close();
                 sql.Close();
             }
             else { MessageBox.Show("Campo Username Vacio"); }
@@ -124,9 +94,5 @@ namespace VentaElectrodomesticos.Login
 
         }
 
-        private void FormLogin_Load(object sender, EventArgs e)
-        {
-
-        }
     }
 }
