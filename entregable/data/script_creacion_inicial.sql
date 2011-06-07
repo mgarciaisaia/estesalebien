@@ -18,6 +18,7 @@ go
 
 
 print ' TABLA CLIENTE '
+GO
 ---------------------------------------------------------------------
 --------------------CLIENTE------------------------------------------
 ----------------------140--------------------------------------------
@@ -41,6 +42,7 @@ WHERE CLI_DNI IS NOT NULL)
 GO
 
 print ' TABLA SUCURSAL'
+GO
 ---------------------------------------------------------------------
 --------------------SUCURSAL-----------------------------------------
 ----------------------24---------------------------------------------
@@ -62,6 +64,7 @@ GROUP BY SUC_TIPO, SUC_DIR, SUC_TEL, SUC_PROVINCIA)
 GO
 
 print ' TABLA EMPLEADO'
+GO
 ---------------------------------------------------------------------
 --------------------EMPLEADO-----------------------------------------
 -----------------------53--------------------------------------------
@@ -89,6 +92,7 @@ FROM GD_ESQUEMA.MAESTRA M JOIN MAYUSCULAS_SIN_ESPACIOS.SUCURSAL S ON (M.[EMPLEAD
 GO
 
 print ' TABLA FACTURA'
+GO
 ---------------------------------------------------------------------
 --------------------FACTURA------------------------------------------
 ----------------------26855------------------------------------------
@@ -116,6 +120,7 @@ WHERE FACTURA_NRO <> '0')
 GO
 
 print ' TABLA PAGO'
+GO
 ---------------------------------------------------------------------
 --------------------PAGO---------------------------------------------
 -------------------142718--------------------------------------------
@@ -142,6 +147,7 @@ ORDER BY [FACTURA_NRO]
 GO
 
 print ' TABLA PRODUCTO'
+GO
 ---------------------------------------------------------------------
 --------------------PRODUCTO-----------------------------------------
 -----------------------99--------------------------------------------
@@ -165,10 +171,11 @@ WHERE PRODUCTO_PRECIO <> '0')
 GO
 
 print ' TABLA ITEM_FACTURA'
+GO
 ---------------------------------------------------------------------
 --------------------ITEM_FACTURA-------------------------------------
 ----------------------179238-----------------------------------------
-CREATE TABLE [MA1YUSCULAS_SIN_ESPACIOS].[Item_Factura](
+CREATE TABLE [MAYUSCULAS_SIN_ESPACIOS].[Item_Factura](
 	[ITEM_FACTURA] [int] FOREIGN KEY 
 			REFERENCES MAYUSCULAS_SIN_ESPACIOS.FACTURA(FACTURA_NRO),
 	[ITEM_PRODUCTO] [nvarchar](100) FOREIGN KEY 
@@ -186,7 +193,8 @@ WHERE PRODUCTO_NOMBRE IS NOT NULL AND CLI_DNI IS NOT NULL
 GROUP BY FACTURA_NRO, PRODUCTO_NOMBRE,PRODUCTO_PRECIO
 GO
 
-print ' TABLA MOVS_STOCK'
+print 'TABLA MOVS_STOCK'
+GO
 ---------------------------------------------------------------------
 --------------------MOVS_STOCK---------------------------------------
 ----------------------353662-----------------------------------------
@@ -216,7 +224,8 @@ WHERE PRODUCTO_NOMBRE IS NOT NULL AND CLI_DNI IS NOT NULL
 GROUP BY FACTURA_NRO, PRODUCTO_NOMBRE,PRODUCTO_PRECIO,FACTURA_FECHA,S.SUC_CODIGO)
 GO
 
-print ' TABLA STOCK '
+print 'TABLA STOCK '
+GO
 ---------------------------------------------------------------------
 -------------------------STOCK---------------------------------------
 --------------------------2376---------------------------------------
@@ -245,6 +254,7 @@ GROUP BY MOVS_PRODUCTO,MOVS_SUCURSAL
 GO
 
 print ' TABLA CATEGORIA '
+GO
 ---------------------------------------------------------------------
 --------------------CATEGORIA----------------------------------------
 -----------------------81--------------------------------------------
@@ -256,6 +266,7 @@ CREATE TABLE [MAYUSCULAS_SIN_ESPACIOS].[Categoria](
 GO
 
 print ' FUNCION PARSE '
+GO
 ---------------------------------------------------------------------
 ------------------------FUNCTION-PARSE-------------------------------
 ---------------------------------------------------------------------
@@ -298,6 +309,7 @@ END
 GO
 
 print ' CARGA TABLA CATEGORIA '
+GO
 ---------------------------------------------------------------------
 --------------------CATEGORIA----------------------------------------
 ---------------------------------------------------------------------
@@ -312,6 +324,7 @@ end
 GO
 
 print ' TABLA USUARIOS'
+GO
 ---------------------------------------------------------------------
 --------------------USUARIOS----------------------------------------
 ---------------------------------------------------------------------
@@ -319,26 +332,31 @@ print ' TABLA USUARIOS'
 CREATE TABLE MAYUSCULAS_SIN_ESPACIOS.USUARIOS(
 		US_EMPLEADO NUMERIC(8,0) NULL,
 		US_USERNAME NVARCHAR(20) PRIMARY KEY ,
-		US_PASSWORD NVARCHAR(50) NULL,
+		US_PASSWORD NVARCHAR(65) NULL,
 		US_INTENTOS INT NULL,
 		US_ROLES NVARCHAR(100) NULL
 )
 GO
 
-
+-- User: 'admin'; Pass: 'w23e'
 INSERT INTO [GD1C2011].[MAYUSCULAS_SIN_ESPACIOS].[USUARIOS]([US_EMPLEADO],[US_USERNAME],
 						[US_PASSWORD],[US_INTENTOS],[US_ROLES])
-VALUES(NULL,'admin','E6B87050BFCB8143FCB8DB0170A4DC9ED00D904DDD3E2A4AD1B1E8DC0FDC9BE7',0,'Administrador General')
+VALUES(NULL,'admin','E6B87050BFCB8143FCB8DB0170A4DC9ED00D904DDD3E2A4AD1B1E8DC0FDC9BE7',0,'Administrador General');
 
+-- User: 'prueba'; Pass: 'prueba'
 INSERT INTO [GD1C2011].[MAYUSCULAS_SIN_ESPACIOS].[USUARIOS]([US_EMPLEADO],[US_USERNAME],
 						[US_PASSWORD],[US_INTENTOS],[US_ROLES])
-VALUES(NULL,'prueba','655E786674D9D3E77BC05ED1DE37B4B6BC89F788829F9F3C679E7687B410C89B',0,'ABM')
+VALUES(NULL,'prueba','655E786674D9D3E77BC05ED1DE37B4B6BC89F788829F9F3C679E7687B410C89B',0,'ABM');
 
+-- User: 'otro'; Pass: 'otro'
 INSERT INTO [GD1C2011].[MAYUSCULAS_SIN_ESPACIOS].[USUARIOS]([US_EMPLEADO],[US_USERNAME],
 						[US_PASSWORD],[US_INTENTOS],[US_ROLES])
-VALUES(NULL,'otro','C63A855FCFEC62CC64A47280A4F51D052B67930873906AF30AA92DE2CE160C06',0,'Otros')
+VALUES(NULL,'otro','C63A855FCFEC62CC64A47280A4F51D052B67930873906AF30AA92DE2CE160C06',0,'Otros');
 
+GO
 
+print ' StockProcedure sp_MODIFINTENTOS'
+GO
 ---------------------------------------------------------------------
 --------------------PROCEDURE-MODIF-INTENTOS-------------------------
 ---------------------------------------------------------------------
@@ -354,6 +372,7 @@ END
 GO
 
 print ' TABLA ROLES Y FUNCIONES'
+GO
 ---------------------------------------------------------------------
 ----------------------ROLESS-Y-FUNCIONES-----------------------------
 ---------------------------------------------------------------------
@@ -426,3 +445,5 @@ VALUES('Otros','Tablero de Control')
 
 INSERT INTO [GD1C2011].[MAYUSCULAS_SIN_ESPACIOS].[ROLES]([ROL_NOMBRE],[ROL_FUNCION])
 VALUES('Otros','Clientes Premium')
+
+GO
