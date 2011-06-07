@@ -16,54 +16,53 @@ namespace VentaElectrodomesticos.Login
 {
     public partial class FormLogin : Form
     {
-        
+
         private ClaseSQL sql;
-        private int intentos = 0;
-        private bool modif = false;
         private Hasher hasher = new Hasher(new SHA256Managed());
 
 
-        private bool correcto ;
+        private bool correcto;
         public bool CORRECTO
         {
             get { return correcto; }
         }
-        
-        private string username="";
+
+        private string username = "";
         public string USERNAME
         {
-            get { return username; }            
+            get { return username; }
         }
-        private string[] funciones ={};
+        private string[] funciones = { };
         public string[] FUNCIONES
         {
             get { return funciones; }
         }
-        
+
 
         public FormLogin()
         {
             InitializeComponent();
-            sql = new ClaseSQL();
+            sql = ClaseSQL.getInstance();
             correcto = false;
 
         }
 
         private void btnLogin_Click(object sender, EventArgs e)
         {
-            modif = false;
-            SQLQueryBuilder miQuery = new SQLQueryBuilder();
-            miQuery.select("*");
+
+            String procedureName = "attemptLogin";
+            String[,] parameters = new String[2,2];
+            sql.ejecutarStoredProcedureConRetorno(procedureName, parameters, "string retorno");
+
+            /**
+             * Esto lo va a tener que hacer el Stock Procedure
+                miQuery.select("*");
             miQuery.from("[MAYUSCULAS_SIN_ESPACIOS].USUARIOS as Usuario");
             miQuery.where("Usuario.US_USERNAME = '" + txtUser.Text.Trim() + "'"); //AND Usuario.US_PASSWORD = '" + hasher.hash(txtPass.Text) + "'");
             String blah = miQuery.ToString();
+             */
             //MessageBox.Show(blah);
-            
-            /* Usuarios disponibles
-             *  admin   w23e
-             *  prueba  prueba
-             *  otro    otro
-            */
+
             //ESTA LINEA LA USO PARA SACAR EL HASH DE LA CONTRASEÑA PARA CREAR NUEVO USUARIO
             //txtUser.Text = hasher.hash(txtPass.Text);
             //return;
@@ -73,7 +72,7 @@ namespace VentaElectrodomesticos.Login
                 //String defaultquery = " SELECT * FROM [MAYUSCULAS_SIN_ESPACIOS].USUARIOS ";
                 //String query = " WHERE us_username = '" + txtUser.Text.ToString() + "'";
                 //query = defaultquery + query;
-                SqlDataReader reader = sql.busquedaSQLDataReader(blah);
+                SqlDataReader reader = sql.busquedaSQLDataReader(miQuery.ToString());
                 if (reader.Read())
                 {
                     intentos = System.Convert.ToInt16(reader[3].ToString());
@@ -97,8 +96,9 @@ namespace VentaElectrodomesticos.Login
                             intentos++;
                             modif = true;
                         }
-                         
-                    }else { MessageBox.Show("Usuario bloqueado"); }
+
+                    }
+                    else { MessageBox.Show("Usuario bloqueado"); }
                 }
                 else { MessageBox.Show(txtUser.Text.ToString() + " No existe en la base"); }
                 reader.Close();
@@ -116,11 +116,12 @@ namespace VentaElectrodomesticos.Login
                 }
                 ///////
                 sql.Close();
-            }else { MessageBox.Show("Campo Username Vacio"); }
+            }
+            else { MessageBox.Show("Campo Username Vacio"); }
             //Si el Login es correcto cierra el formulario y continua con el Formulario Principal
             if (correcto)
                 this.Close();
-            
+
         }
 
         private void FormLogin_Load(object sender, EventArgs e)

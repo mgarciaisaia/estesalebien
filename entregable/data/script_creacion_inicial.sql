@@ -3,13 +3,8 @@ USE [GD1C2011]
 GO
 
 -- Genero el Schema
-/**CREATE SCHEMA [MAYUSCULAS_SIN_ESPACIOS] AUTHORIZATION [gd]
-GO*/
-
 /**
- *
  * Chequeo la existencia del schema antes de crearlo. Deberia pensar en eliminar las tablas y otros objetos tambien.
- *
  */
 if not exists(select 1 from information_schema.schemata where
 schema_name='MAYUSCULAS_SIN_ESPACIOS')
@@ -374,7 +369,7 @@ GO
 print ' TABLA ROLES Y FUNCIONES'
 GO
 ---------------------------------------------------------------------
-----------------------ROLESS-Y-FUNCIONES-----------------------------
+-----------------------ROLES-Y-FUNCIONES-----------------------------
 ---------------------------------------------------------------------
 
 CREATE TABLE MAYUSCULAS_SIN_ESPACIOS.ROLES(

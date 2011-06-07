@@ -39,7 +39,7 @@ namespace VentaElectrodomesticos
             this.Text += " - " + username;
             foreach (string s in login.FUNCIONES)
             {
-                sql = new ClaseSQL();
+                sql = ClaseSQL.getInstance();
                 sql.Open();
                 String defaultquery = " SELECT DISTINCT ROL_FUNCION FROM [MAYUSCULAS_SIN_ESPACIOS].ROLES ";
                 String query = " WHERE ROL_NOMBRE = '" + s + "'";

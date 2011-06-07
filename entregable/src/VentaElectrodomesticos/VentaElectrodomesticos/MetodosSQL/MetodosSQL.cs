@@ -10,10 +10,20 @@ namespace VentaElectrodomesticos.MetodosSQL
     {
         private static string connectString = "Data Source=localhost\\SQLSERVER2005;Initial Catalog=GD1C2011; User ID=gd;Password=gd2011";
         private SqlConnection cnn;
+        private static ClaseSQL instance;
 
-        public ClaseSQL()
+        private ClaseSQL()
         {            
             cnn = new SqlConnection(connectString);
+        }
+
+        public static ClaseSQL getInstance()
+        {
+            if (instance == null)
+            {
+                instance = new ClaseSQL();
+            }
+            return instance;
         }
 
         public void Open()

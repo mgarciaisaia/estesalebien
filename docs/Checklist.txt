@@ -1,8 +1,13 @@
+Enunciado v1.1, pag 5:
+"A cada usuario del sistema se le puede asignar uno o varios roles, referidos a la seguridad informática. Cada rol está compuesto por un conjunto de funcionalidades. Existe una lista de funcionalidades fija en todo el sistema. Un usuario solo puede usar las funcionalidades que dictan sus roles."
+
+Ergo, la DB quedaría algo como:
+
+Usuario >0---|< Rol >0---|< Funcionalidad
+
+--------------------------
+
 Hay que crear un usuario 'admin' con password 'w23e' de rol 'Administrador General' con todas las funcionalidades asignadas.
-
-Según el mail "Re: [GestionDeDatos] Duda usuario Administrador", hay que hashear la clave una vez en C# y después hardcodearla en el script.
-
-E6B87050BFCB8143FCB8DB0170A4DC9ED00D904DDD3E2A4AD1B1E8DC0FDC9BE7
 
 --------------------------
 
