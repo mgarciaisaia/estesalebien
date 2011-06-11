@@ -6,10 +6,10 @@ GO
 /**
  * Chequeo la existencia del schema antes de crearlo. Deberia pensar en eliminar las tablas y otros objetos tambien.
  */
-if not exists(select 1 from information_schema.schemata where
+IF NOT EXISTS(SELECT 1 FROM information_schema.schemata WHERE
 schema_name='MAYUSCULAS_SIN_ESPACIOS')
 EXEC ('create schema MAYUSCULAS_SIN_ESPACIOS AUTHORIZATION gd');
-go
+GO
 
 
 print ' TABLA CLIENTE '
