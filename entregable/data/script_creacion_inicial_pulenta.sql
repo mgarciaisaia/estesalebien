@@ -148,6 +148,14 @@ GO
  * FIXME: el usuario 'admin' tiene pass 'E6B87050BFCB8143FCB8DB0170A4DC9ED00D904DDD3E2A4AD1B1E8DC0FDC9BE7'
  * FIXME: que Empleado le asignamos al admin?
  */
+ 
+ /*
+  * Para los username podria ser algo asi:
+  *
+  * SELECT REPLACE(LOWER(Nombre + Apellido), ' ','') AS Username
+  * FROM ESTELOCAMBIAMOS.Empleados
+  * ORDER BY Username
+  */
 
 PRINT 'Tabla Roles'
 GO
@@ -303,12 +311,46 @@ GO
  */
  
  
+ /*
+  * FIXME: aca falta agregarle INDEX a Precio y Nombre
+  */
  CREATE TABLE [ESTELOCAMBIAMOS].[Productos] (
 	[Codigo] [long] IDENTITY(1,1) PRIMARY KEY,
-	[Nombre] [nvarchar] (100) INDEX,
+	[Nombre] [nvarchar] (100),
 	[Descripcion] [nvarchar] (100),
 	[Categoria] [int] FOREIGN KEY REFERENCES [ESTELOCAMBIAMOS].[Categorias] (Codigo),
-	[Precio] [float] INDEX CONSTRAINT CHECK Precio > 0,
+	[Precio] [float] CONSTRAINT CHECK Precio > 0,
 	[Habilitado] [tinyint] DEFAULT 1,
 	[Marca] [int] FOREIGN KEY REFERENCES [ESTELOCAMBIAMOS].[Marcas]
  )
+ 
+ 
+ CREATE TABLE [ESTELOCAMBIAMOS].[Facturas] (
+	[Numero] [long] IDENTITY(1,1) PRIMARY KEY,
+	[Fecha] [datetime],
+	[Descuento] [float],
+	[Cuotas] [tinyint],
+	[Provincia] [tinyint] FOREIGN KEY REFERENCES [ESTELOCAMBIAMOS].[Provincias] (Codigo),
+	[Sucursal] [tinyint] FOREIGN KEY REFERENCES [ESTELOCAMBIAMOS].[Sucursales] (Codigo),
+	[Vendedor] [numeric] (8, 0) FOREIGN KEY REFERENCES [ESTELOCAMBIAMOS].[Empleados] (DNI),
+	[Cliente] [numeric] (8,0) FOREIGN KEY REFERENCES [ESTELOCAMBIAMOS].[Clientes] (DNI)
+ )
+
+
+ /*
+  * FIXME: agregar indices y esas cosas
+  */
+CREATE TABLE [ESTELOCAMBIAMOS].[ItemFactura] (
+	[Factura] [long] NOT NULL FOREIGN KEY REFERENCES [ESTELOCAMBIAMOS].[Facturas] (Numero),
+	[Producto] [long] NOT NULL FOREIGN KEY REFERENCES [ESTELOCAMBIAMOS].[Productos] (Codigo),
+	[PrecioUnitario] [float] CONSTRAINT CHECK PrecioUnitario > 0,
+	[Cantidad] [int]
+)
+
+
+CREATE TABLE [ESTELOCAMBIAMOS].[Pago] (
+	[Factura] [long] NOT NULL FOREIGN KEY REFERENCES [ESTELOCAMBIAMOS].[Facturas] (Numero),
+	[Cuotas] [tinyint], --CONSTRAINT menor a pendientes
+	[Fecha] [datetime],
+	[Cobrador] [numeric] (8, 0) FOREIGN KEY REFERENCES [ESTELOCAMBIAMOS].[Empleados] (DNI)
+)
