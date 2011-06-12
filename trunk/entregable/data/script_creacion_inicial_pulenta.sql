@@ -243,9 +243,7 @@ CREATE TABLE [ESTELOCAMBIAMOS].[FuncionalidadesRol] (
 INSERT INTO ESTELOCAMBIAMOS.FuncionalidadesRol ([Rol], [Funcionalidad])
 (SELECT Roles.Codigo, Funcionalidades.Codigo
 FROM ESTELOCAMBIAMOS.Roles, ESTELOCAMBIAMOS.Funcionalidades
-WHERE Roles.Nombre = 'Administrador Gen(SELECT Roles.Codigo, Funcionalidades.Codigo
-FROM ESTELOCAMBIAMOS.Roles, ESTELOCAMBIAMOS.Funcionalidades
-WHERE Roles.Nombre = 'Administrador General');eral');
+WHERE Roles.Nombre = 'Administrador General');
 
 GO
 
@@ -397,34 +395,60 @@ deallocate CURSORITO
 END
 SET IDENTITY_INSERT [ESTELOCAMBIAMOS].[Productos] OFF;
 GO
- 
- 
- CREATE TABLE [ESTELOCAMBIAMOS].[Facturas] (
-	[Numero] [long] IDENTITY(1,1) PRIMARY KEY,
+
+
+CREATE TABLE [ESTELOCAMBIAMOS].[Facturas] (
+	[Numero] [int] IDENTITY PRIMARY KEY,
 	[Fecha] [datetime],
 	[Descuento] [float],
 	[Cuotas] [tinyint],
-	[Provincia] [tinyint] FOREIGN KEY REFERENCES [ESTELOCAMBIAMOS].[Provincias] (Codigo),
-	[Sucursal] [tinyint] FOREIGN KEY REFERENCES [ESTELOCAMBIAMOS].[Sucursales] (Codigo),
+	[Sucursal] [tinyint] FOREIGN KEY REFERENCES [ESTELOCAMBIAMOS].[Sucursales] (Provincia),
 	[Vendedor] [numeric] (8, 0) FOREIGN KEY REFERENCES [ESTELOCAMBIAMOS].[Empleados] (DNI),
 	[Cliente] [numeric] (8,0) FOREIGN KEY REFERENCES [ESTELOCAMBIAMOS].[Clientes] (DNI)
- )
+)
+
+SET IDENTITY_INSERT [ESTELOCAMBIAMOS].[Facturas] ON;
+
+INSERT INTO [ESTELOCAMBIAMOS].[Facturas] (Numero, Fecha, Descuento, Cuotas, Sucursal, Vendedor, Cliente)
+(SELECT DISTINCT FACTURA_NRO, FACTURA_FECHA, FACTURA_DESCUENTO, FACTURA_CANT_COUTAS, Codigo, EMPLEADO_DNI, CONVERT(NUMERIC, CLI_DNI)
+FROM GD_ESQUEMA.MAESTRA LEFT JOIN ESTELOCAMBIAMOS.Provincias ON Provincias.Nombre = SUC_PROVINCIA
+WHERE FACTURA_NRO <> 0)
 
 
  /*
   * FIXME: agregar indices y esas cosas
   */
 CREATE TABLE [ESTELOCAMBIAMOS].[ItemFactura] (
-	[Factura] [long] NOT NULL FOREIGN KEY REFERENCES [ESTELOCAMBIAMOS].[Facturas] (Numero),
-	[Producto] [long] NOT NULL FOREIGN KEY REFERENCES [ESTELOCAMBIAMOS].[Productos] (Codigo),
+	[Factura] [int] NOT NULL FOREIGN KEY REFERENCES [ESTELOCAMBIAMOS].[Facturas] (Numero),
+	[Producto] [int] NOT NULL FOREIGN KEY REFERENCES [ESTELOCAMBIAMOS].[Productos] (Codigo),
 	[PrecioUnitario] [float] CONSTRAINT CHECK PrecioUnitario > 0,
 	[Cantidad] [int]
 )
 
 
 CREATE TABLE [ESTELOCAMBIAMOS].[Pago] (
-	[Factura] [long] NOT NULL FOREIGN KEY REFERENCES [ESTELOCAMBIAMOS].[Facturas] (Numero),
+	[Factura] [int] NOT NULL FOREIGN KEY REFERENCES [ESTELOCAMBIAMOS].[Facturas] (Numero),
+	[Sucursal] [tinyint] NOT NULL FOREIGN KEY REFERENCES [ESTELOCAMBIAMOS].[Sucursales] (Provincia),
 	[Cuotas] [tinyint], --CONSTRAINT menor a pendientes
 	[Fecha] [datetime],
 	[Cobrador] [numeric] (8, 0) FOREIGN KEY REFERENCES [ESTELOCAMBIAMOS].[Empleados] (DNI)
 )
+
+
+/*
+ * Un MovimientoStock con Cantidad negativa representa una salida
+ */
+CREATE TABLE [ESTELOCAMBIAMOS].[MovimientosStock] (
+	[Producto] [int] NOT NULL FOREIGN KEY REFERENCES [ESTELOCAMBIAMOS].[Productos] (Codigo),
+	[Sucursal] [tinyint] NOT NULL FOREIGN KEY REFERENCES [ESTELOCAMBIAMOS].[Sucursales] (Provincia),
+	[Auditor] [numeric](8,0) NOT NULL FOREIGN KEY REFERENCES [ESTELOCAMBIAMOS].[Empleados] (DNI), --CHECK Auditor.Tipo.Descripcion = Analista
+	[Cantidad] [int] NOT NULL,
+	[Fecha] [datetime]
+)
+
+
+
+CREATE VIEW [ESTELOCAMBIAMOS].[Stocks] AS
+SELECT Producto, Sucursal, SUM(Cantidad)
+FROM ESTELOCAMBIAMOS.MovimientosStock
+GROUP BY Producto, Sucursal
