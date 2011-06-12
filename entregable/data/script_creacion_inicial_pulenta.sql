@@ -243,7 +243,9 @@ CREATE TABLE [ESTELOCAMBIAMOS].[FuncionalidadesRol] (
 INSERT INTO ESTELOCAMBIAMOS.FuncionalidadesRol ([Rol], [Funcionalidad])
 (SELECT Roles.Codigo, Funcionalidades.Codigo
 FROM ESTELOCAMBIAMOS.Roles, ESTELOCAMBIAMOS.Funcionalidades
-WHERE Roles.Nombre = 'Administrador General');
+WHERE Roles.Nombre = 'Administrador Gen(SELECT Roles.Codigo, Funcionalidades.Codigo
+FROM ESTELOCAMBIAMOS.Roles, ESTELOCAMBIAMOS.Funcionalidades
+WHERE Roles.Nombre = 'Administrador General');eral');
 
 GO
 
@@ -259,8 +261,8 @@ GO
  */
 CREATE TABLE [ESTELOCAMBIAMOS].[Clientes] (
 	[DNI] [numeric] (8, 0) PRIMARY KEY,
-	[Nombre] [nvarchar] (30) INDEX,
-	[Apellido] [nvarchar] (30) INDEX,
+	[Nombre] [nvarchar] (30) not null, --index   Lo saco porqque sino rompe!
+	[Apellido] [nvarchar] (30) not null, --index
 	[Mail] [nvarchar] (255),
 	[Telefono] [nvarchar] (20),
 	[Direccion] [nvarchar] (255),
@@ -272,57 +274,129 @@ CREATE TABLE [ESTELOCAMBIAMOS].[Clientes] (
  * FIXME: aca va un constraint para que el dni no se repita con el de Empleados
  */
 
-/*
- * FIXME: Aca va el INSERT
- */
- 
- GO
+INSERT INTO [ESTELOCAMBIAMOS].[Clientes]([DNI],[NOMBRE],[APELLIDO],[MAIL],[Telefono],[Direccion],
+											[Provincia],[Habilitado])
+(SELECT DISTINCT [CLI_DNI] ,[CLI_NOMBRE] ,[CLI_APELLIDO] ,[CLI_MAIL],null,null,null,1
+FROM GD_ESQUEMA.MAESTRA
+WHERE CLI_DNI IS NOT NULL)
+GO
 
 
 PRINT 'TABLA CATEGORIAS'
 GO 
 
-/*
- * FIXME: aca va la funcion o procedure que parsee las categorias, pero tal vez habria que revisar la que habiamos hecho
- */
+CREATE PROCEDURE [ESTELOCAMBIAMOS].[PARSE](@CateList varchar(100))
+AS
+BEGIN
+	DECLARE @Delimeter varchar(1)
+	SET @Delimeter = '¦'
+	DECLARE @Cate varchar(50)
+	DECLARE @CatePadre varchar(50)
+	SET @CatePadre = ''
+	DECLARE @CatePadreCod INT
+	SET @CatePadreCod = NULL
+	DECLARE @StartPos int, @Length int
+	WHILE LEN(@CateList) > 0
+	  BEGIN
+		SET @StartPos = CHARINDEX(@Delimeter, @CateList)
+		IF @StartPos < 0 SET @StartPos = 0
+		SET @Length = LEN(@CateList) - @StartPos - 1
+		IF @Length < 0 SET @Length = 0
+		IF @StartPos > 0
+		  BEGIN
+			SET @Cate = SUBSTRING(@CateList, 1, @StartPos - 1)
+			SET @CateList = SUBSTRING(@CateList, @StartPos + 1, LEN(@CateList) - @StartPos)
+		  END
+		ELSE
+		  BEGIN
+			SET @Cate = @CateList
+			SET @CateList = ''
+		  END
+		if not @Cate in (select nombre from [ESTELOCAMBIAMOS].Categorias WHERE (@CATEPADRECOD = PADRE OR (@CATEPADRECOD IS NULL AND PADRE IS NULL)))
+		  BEGIN	
+			INSERT INTO [ESTELOCAMBIAMOS].Categorias(NOMBRE,Padre) VALUES(@Cate,@CatePadreCod)				
+		  END
+		SET @CatePadre = @Cate
+		SELECT @CatePadreCod = CODIGO FROM [ESTELOCAMBIAMOS].Categorias WHERE ( NOMBRE=@Cate AND (PADRE=@CatePadreCod OR PADRE IS NULL))
+	  END
+	RETURN @CATEPADRECOD
+END
+GO
  
  CREATE TABLE [ESTELOCAMBIAMOS].[Categorias] (
 	[Codigo] [int] IDENTITY(1,1) PRIMARY KEY,
 	[Nombre] [nvarchar](100) NULL,
 	[Padre] [int] NULL DEFAULT NULL FOREIGN KEY REFERENCES [ESTELOCAMBIAMOS].[Categorias] (Codigo)
  )
- 
-/*
- * FIXME: aca van los INSERT
+ /*
+ *  Inserta todas las categorias
  */
+declare @au_id nvarchar(100)
+select distinct @au_id =  min( producto_cate ) from gd_esquema.Maestra
+while @au_id is not null
+begin
+	EXECUTE [ESTELOCAMBIAMOS].[PARSE] @au_id    
+	select @au_id = min( producto_cate ) from gd_esquema.Maestra where producto_cate > @au_id
+end
+GO
  
 
- CREATE TABLE [ESTELOCAMBIAMOS].[Marcas] (
+CREATE TABLE [ESTELOCAMBIAMOS].[Marcas] (
 	[Codigo] [int] IDENTITY(1,1) PRIMARY KEY,
 	[Nombre] [nvarchar] (30) UNIQUE
  )
  
-/*
- * Aca va el insert
- *
- * SELECT DISTINCT PRODUCTO_MARCA
- * FROM gd_esquema.Maestra
- * WHERE PRODUCTO_MARCA IS NOT NULL
- */
+INSERT INTO [ESTELOCAMBIAMOS].[Marcas](NOMBRE)
+  SELECT DISTINCT PRODUCTO_MARCA
+  FROM gd_esquema.Maestra
+  WHERE PRODUCTO_MARCA IS NOT NULL
  
+ nombre
  
  /*
   * FIXME: aca falta agregarle INDEX a Precio y Nombre
+  * En la base maestra en el campo nombre los productos tienen un codigo al final, antes yo habia parseado ese codigo y lo puse como codigo de producto, me aprece que lo mejor es seguir haciendo eso y no generar otro codigo mas.
+  * si me das el OK lo hago como antes sino lo sigo como lo planteas vos
   */
- CREATE TABLE [ESTELOCAMBIAMOS].[Productos] (
-	[Codigo] [long] IDENTITY(1,1) PRIMARY KEY,
+CREATE TABLE [ESTELOCAMBIAMOS].[Productos] (
+	[Codigo] [INT] IDENTITY(1248681716,1) PRIMARY KEY,
 	[Nombre] [nvarchar] (100),
 	[Descripcion] [nvarchar] (100),
 	[Categoria] [int] FOREIGN KEY REFERENCES [ESTELOCAMBIAMOS].[Categorias] (Codigo),
-	[Precio] [float] CONSTRAINT CHECK Precio > 0,
+	[Precio] [float] CHECK (Precio > 0),
 	[Habilitado] [tinyint] DEFAULT 1,
 	[Marca] [int] FOREIGN KEY REFERENCES [ESTELOCAMBIAMOS].[Marcas]
  )
+GO
+SET IDENTITY_INSERT [ESTELOCAMBIAMOS].[Productos] ON;
+BEGIN
+declare @cod int
+DECLARE @CODIGO INT
+DECLARE @NOM [nvarchar] (100)
+DECLARE @DESC [nvarchar] (100)
+DECLARE @CATE [nvarchar] (100)
+DECLARE @PRECIO [float]
+DECLARE @MARCA [int]
+declare CURSORITO cursor for (SELECT  DISTINCT SUBSTRING(PRODUCTO_NOMBRE,LEN(PRODUCTO_NOMBRE)-9,10),
+						SUBSTRING(PRODUCTO_NOMBRE,1,LEN(PRODUCTO_NOMBRE)-11),PRODUCTO_DESC,PRODUCTO_CATE,[PRODUCTO_PRECIO],CODIGO
+				FROM GD_ESQUEMA.MAESTRA JOIN [ESTELOCAMBIAMOS].[MARCAS] ON (PRODUCTO_MARCA = NOMBRE)
+				WHERE PRODUCTO_PRECIO <> '0')
+open CURSORITO
+fetch next from CURSORITO
+into @CODIGO,@NOM,@DESC,@CATE,@PRECIO,@MARCA
+while @@fetch_status = 0
+  begin
+    EXECUTE @COD=[ESTELOCAMBIAMOS].[PARSE] @CATE
+    INSERT INTO [ESTELOCAMBIAMOS].[Productos](CODIGO,[NOMBRE],[DESCRIPCION],[CATEGORIA],[PRECIO],[HABILITADO],[MARCA])
+    VALUES(@CODIGO,@NOM,@DESC,@COD,@PRECIO,'1',@MARCA)
+    fetch next from CURSORITO
+    into @CODIGO,@NOM,@DESC,@CATE,@PRECIO,@MARCA
+  end
+close CURSORITO
+deallocate CURSORITO
+END
+SET IDENTITY_INSERT [ESTELOCAMBIAMOS].[Productos] OFF;
+GO
  
  
  CREATE TABLE [ESTELOCAMBIAMOS].[Facturas] (
