@@ -338,6 +338,8 @@ begin
 end
 GO
  
+PRINT 'TABLA Marcas'
+GO 
 
 CREATE TABLE [ESTELOCAMBIAMOS].[Marcas] (
 	[Codigo] [int] IDENTITY(1,1) PRIMARY KEY,
@@ -348,13 +350,13 @@ INSERT INTO [ESTELOCAMBIAMOS].[Marcas](NOMBRE)
   SELECT DISTINCT PRODUCTO_MARCA
   FROM gd_esquema.Maestra
   WHERE PRODUCTO_MARCA IS NOT NULL
- 
- nombre
- 
+
+
+PRINT 'TABLA PRODUCTOS'
+GO 
+
  /*
   * FIXME: aca falta agregarle INDEX a Precio y Nombre
-  * En la base maestra en el campo nombre los productos tienen un codigo al final, antes yo habia parseado ese codigo y lo puse como codigo de producto, me aprece que lo mejor es seguir haciendo eso y no generar otro codigo mas.
-  * si me das el OK lo hago como antes sino lo sigo como lo planteas vos
   */
 CREATE TABLE [ESTELOCAMBIAMOS].[Productos] (
 	[Codigo] [INT] IDENTITY(1248681716,1) PRIMARY KEY,
@@ -368,14 +370,14 @@ CREATE TABLE [ESTELOCAMBIAMOS].[Productos] (
 GO
 SET IDENTITY_INSERT [ESTELOCAMBIAMOS].[Productos] ON;
 BEGIN
-declare @cod int
+DECLARE @cod int
 DECLARE @CODIGO INT
 DECLARE @NOM [nvarchar] (100)
 DECLARE @DESC [nvarchar] (100)
 DECLARE @CATE [nvarchar] (100)
 DECLARE @PRECIO [float]
 DECLARE @MARCA [int]
-declare CURSORITO cursor for (SELECT  DISTINCT SUBSTRING(PRODUCTO_NOMBRE,LEN(PRODUCTO_NOMBRE)-9,10),
+DECLARE CURSORITO cursor for (SELECT  DISTINCT SUBSTRING(PRODUCTO_NOMBRE,LEN(PRODUCTO_NOMBRE)-9,10),
 						SUBSTRING(PRODUCTO_NOMBRE,1,LEN(PRODUCTO_NOMBRE)-11),PRODUCTO_DESC,PRODUCTO_CATE,[PRODUCTO_PRECIO],CODIGO
 				FROM GD_ESQUEMA.MAESTRA JOIN [ESTELOCAMBIAMOS].[MARCAS] ON (PRODUCTO_MARCA = NOMBRE)
 				WHERE PRODUCTO_PRECIO <> '0')
@@ -396,6 +398,8 @@ END
 SET IDENTITY_INSERT [ESTELOCAMBIAMOS].[Productos] OFF;
 GO
 
+PRINT 'TABLA FACTURAS'
+GO 
 
 CREATE TABLE [ESTELOCAMBIAMOS].[Facturas] (
 	[Numero] [int] IDENTITY PRIMARY KEY,
@@ -414,6 +418,10 @@ INSERT INTO [ESTELOCAMBIAMOS].[Facturas] (Numero, Fecha, Descuento, Cuotas, Sucu
 FROM GD_ESQUEMA.MAESTRA LEFT JOIN ESTELOCAMBIAMOS.Provincias ON Provincias.Nombre = SUC_PROVINCIA
 WHERE FACTURA_NRO <> 0)
 
+GO
+
+PRINT 'TABLA ITEM FACTURAS'
+GO 
 
  /*
   * FIXME: agregar indices y esas cosas
@@ -421,10 +429,13 @@ WHERE FACTURA_NRO <> 0)
 CREATE TABLE [ESTELOCAMBIAMOS].[ItemFactura] (
 	[Factura] [int] NOT NULL FOREIGN KEY REFERENCES [ESTELOCAMBIAMOS].[Facturas] (Numero),
 	[Producto] [int] NOT NULL FOREIGN KEY REFERENCES [ESTELOCAMBIAMOS].[Productos] (Codigo),
-	[PrecioUnitario] [float] CONSTRAINT CHECK PrecioUnitario > 0,
+	[PrecioUnitario] [float] CHECK (PrecioUnitario > 0),
 	[Cantidad] [int]
 )
+GO
 
+PRINT 'TABLA PAGOS'
+GO 
 
 CREATE TABLE [ESTELOCAMBIAMOS].[Pago] (
 	[Factura] [int] NOT NULL FOREIGN KEY REFERENCES [ESTELOCAMBIAMOS].[Facturas] (Numero),
@@ -433,8 +444,10 @@ CREATE TABLE [ESTELOCAMBIAMOS].[Pago] (
 	[Fecha] [datetime],
 	[Cobrador] [numeric] (8, 0) FOREIGN KEY REFERENCES [ESTELOCAMBIAMOS].[Empleados] (DNI)
 )
+GO
 
-
+PRINT 'TABLA MOVIMIENTOS STOCKS'
+GO 
 /*
  * Un MovimientoStock con Cantidad negativa representa una salida
  */
@@ -445,10 +458,14 @@ CREATE TABLE [ESTELOCAMBIAMOS].[MovimientosStock] (
 	[Cantidad] [int] NOT NULL,
 	[Fecha] [datetime]
 )
+GO
 
 
+PRINT 'VISTA STOCKS'
+GO 
 
 CREATE VIEW [ESTELOCAMBIAMOS].[Stocks] AS
-SELECT Producto, Sucursal, SUM(Cantidad)
+SELECT Producto, Sucursal, SUM(Cantidad) AS Cantidad
 FROM ESTELOCAMBIAMOS.MovimientosStock
 GROUP BY Producto, Sucursal
+GO
