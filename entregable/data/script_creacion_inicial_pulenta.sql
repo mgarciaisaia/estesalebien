@@ -133,10 +133,13 @@ GO
 PRINT 'Tabla Usuarios'
 GO
 
+/*
+ * El password default es 'password'
+ */
 CREATE TABLE [ESTELOCAMBIAMOS].[Usuarios] (
 	[Codigo] [int] IDENTITY(1,1) PRIMARY KEY,
 	[Nombre] [nvarchar] (30) UNIQUE,
-	[Password] [nvarchar] (64),
+	[Password] [nvarchar] (64) DEFAULT '5E884898DA28047151D0E56F8DC6292773603D0D6AABBDD62A11EF721D1542D8',
 	[Empleado] [numeric](8, 0) FOREIGN KEY REFERENCES ESTELOCAMBIAMOS.Empleados(DNI),
 	[Habilitado] [tinyint] DEFAULT 1,
 	[Intentos] [tinyint] DEFAULT 0
@@ -144,18 +147,17 @@ CREATE TABLE [ESTELOCAMBIAMOS].[Usuarios] (
 GO
 
 /*
- * FIXME: aca falta hacer INSERT de los Usuarios
- * FIXME: el usuario 'admin' tiene pass 'E6B87050BFCB8143FCB8DB0170A4DC9ED00D904DDD3E2A4AD1B1E8DC0FDC9BE7'
- * FIXME: que Empleado le asignamos al admin?
+ * El usuario 'admin' no tiene ningun empleado asignado
  */
  
- /*
-  * Para los username podria ser algo asi:
-  *
-  * SELECT REPLACE(LOWER(Nombre + Apellido), ' ','') AS Username
-  * FROM ESTELOCAMBIAMOS.Empleados
-  * ORDER BY Username
-  */
+INSERT INTO [ESTELOCAMBIAMOS].[Usuarios] (Nombre, Password, Empleado)
+VALUES ('admin', 'E6B87050BFCB8143FCB8DB0170A4DC9ED00D904DDD3E2A4AD1B1E8DC0FDC9BE7', null);
+
+INSERT INTO [ESTELOCAMBIAMOS].[Usuarios] (Nombre, Empleado)
+(SELECT REPLACE(LOWER(Nombre + Apellido), ' ','') AS Username, DNI
+FROM ESTELOCAMBIAMOS.Empleados)
+
+GO
 
 PRINT 'Tabla Roles'
 GO
@@ -190,10 +192,13 @@ CREATE TABLE [ESTELOCAMBIAMOS].[Asignaciones] (
 )
 
 /*
- * FIXME: aca va el insert de la asignacion del admin
  * FIXME: podriamos hacer algunas asignaciones mas (un rol por tipo de empleado?)
  */
 
+INSERT INTO [ESTELOCAMBIAMOS].[Asignaciones] (Usuario, Rol)
+(SELECT TOP 1 Usuarios.Codigo, Roles.Codigo
+FROM ESTELOCAMBIAMOS.Usuarios, ESTELOCAMBIAMOS.Roles
+WHERE Usuarios.Nombre = 'admin' AND Roles.Nombre = 'Administrador General')
 
 /*
  * Funcionalidades: las posibles funcionalidades que se le pueden asignar
@@ -283,6 +288,9 @@ GO
 PRINT 'TABLA CATEGORIAS'
 GO 
 
+--Garantizamos 'Make it work'. Las otras dos, veremos.
+PRINT 'TABLA CATEGORIAS'
+GO 
 CREATE PROCEDURE [ESTELOCAMBIAMOS].[PARSE](@CateList varchar(100))
 AS
 BEGIN
@@ -310,7 +318,7 @@ BEGIN
 			SET @Cate = @CateList
 			SET @CateList = ''
 		  END
-		if not @Cate in (select nombre from [ESTELOCAMBIAMOS].Categorias WHERE (@CATEPADRECOD = PADRE OR (@CATEPADRECOD IS NULL AND PADRE IS NULL)))
+		if not @Cate in (select Nombre from [ESTELOCAMBIAMOS].Categorias WHERE (@CATEPADRECOD = PADRE OR (@CATEPADRECOD IS NULL AND PADRE IS NULL)))
 		  BEGIN	
 			INSERT INTO [ESTELOCAMBIAMOS].Categorias(NOMBRE,Padre) VALUES(@Cate,@CatePadreCod)				
 		  END
@@ -359,7 +367,7 @@ GO
   * FIXME: aca falta agregarle INDEX a Precio y Nombre
   */
 CREATE TABLE [ESTELOCAMBIAMOS].[Productos] (
-	[Codigo] [INT] IDENTITY(1248681716,1) PRIMARY KEY,
+	[Codigo] [INT] IDENTITY PRIMARY KEY,
 	[Nombre] [nvarchar] (100),
 	[Descripcion] [nvarchar] (100),
 	[Categoria] [int] FOREIGN KEY REFERENCES [ESTELOCAMBIAMOS].[Categorias] (Codigo),
@@ -437,6 +445,10 @@ GO
 PRINT 'TABLA PAGOS'
 GO 
 
+INSERT INTO [ESTELOCAMBIAMOS].[ItemsFactura] (Factura, Producto, PrecioUnitario, Cantidad)
+(SELECT FACTURA_NRO, CONVERT(int, SUBSTRING(PRODUCTO_NOMBRE,LEN(PRODUCTO_NOMBRE)-9,10)), PRODUCTO_PRECIO, PRODUCTO_CANT
+FROM gd_esquema.Maestra
+WHERE FACTURA_NRO <> 0 AND PRODUCTO_NOMBRE IS NOT NULL)
 CREATE TABLE [ESTELOCAMBIAMOS].[Pago] (
 	[Factura] [int] NOT NULL FOREIGN KEY REFERENCES [ESTELOCAMBIAMOS].[Facturas] (Numero),
 	[Sucursal] [tinyint] NOT NULL FOREIGN KEY REFERENCES [ESTELOCAMBIAMOS].[Sucursales] (Provincia),
