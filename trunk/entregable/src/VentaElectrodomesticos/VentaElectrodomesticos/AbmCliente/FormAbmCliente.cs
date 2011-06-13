@@ -11,9 +11,21 @@ namespace VentaElectrodomesticos.AbmCliente
 {
     public partial class FormAbmCliente : Form
     {
+        private ClaseSQL sql;
+
+
+        
+        
         public FormAbmCliente()
         {
             InitializeComponent();
+            sql = ClaseSQL.getInstance();
+            
+        }
+
+        private void FormAbmCliente_Load(object sender, EventArgs e)
+        {
+
         }
     }
 }

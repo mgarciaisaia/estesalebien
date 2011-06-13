@@ -35,7 +35,7 @@ namespace VentaElectrodomesticos.Login
         private string[] funciones;
         public string[] FUNCIONES
         {
-            get { return funciones; }
+            get {return funciones;}
         }
 
         public FormLogin()
@@ -43,7 +43,8 @@ namespace VentaElectrodomesticos.Login
             InitializeComponent();
             sql = ClaseSQL.getInstance();
             correcto = false;
-
+            funciones = new string[15];
+            
         }
 
         private void btnLogin_Click(object sender, EventArgs e)
@@ -52,7 +53,7 @@ namespace VentaElectrodomesticos.Login
             {
                 sql.Open();
                 
-                String procedureName = "[MAYUSCULAS_SIN_ESPACIOS].sp_LOGIN";
+                String procedureName = "[ESTELOCAMBIAMOS].sp_LOGIN";
                 String[,] parametros = new String[2, 2];
                 parametros[0, 0] = "@USERNAME";
                 parametros[0, 1] = "@PASS";
@@ -60,29 +61,33 @@ namespace VentaElectrodomesticos.Login
                 parametros[1, 1] = hasher.hash(txtPass.Text);
 
                 SqlDataReader otroReader = sql.ejecutarStoredProcedure(procedureName, parametros);
-                otroReader.Read();
-                switch (otroReader[0].ToString())
+                if (otroReader.Read())
+                    switch (otroReader[0].ToString())
+                    {
+                        case "USUARIO BLOQUEADO":
+                            MessageBox.Show("USUARIO BLOQUEADO");
+                            break;
+                        case "CONTRASEÑA INVALIDA":
+                            MessageBox.Show("CONTRASEÑA INVALIDA");
+                            break;
+                        case "NO EXISTE EN LA BASE":
+                            MessageBox.Show("NO EXISTE EN LA BASE");
+                            break;
+                        default:
+                            int i = 0;
+                            do
+                            {
+                                funciones[i] = otroReader[0].ToString();
+                                i++;
+                                correcto = true;
+                                username = txtUser.Text.ToLower();
+                            } while (otroReader.Read());
+                            break;
+                    }
+                else
                 {
-                    case "USUARIO BLOQUEADO":
-                        MessageBox.Show("USUARIO BLOQUEADO");
-                        break;
-                    case "CONTRASEÑA INVALIDA":
-                        MessageBox.Show("CONTRASEÑA INVALIDA");
-                        break;
-                    case "NO EXISTE EN LA BASE":
-                        MessageBox.Show("NO EXISTE EN LA BASE");
-                        break;
-                    default:
-                        int i = 0;
-                        funciones = new string[15];
-                        do
-                        {
-                            funciones[i] = otroReader[0].ToString();
-                            i++;
-                            correcto = true;
-                            username = txtUser.Text.ToLower();
-                        } while (otroReader.Read());
-                        break;               
+                    correcto = true;
+                    username = txtUser.Text.ToLower();
                 }
                 otroReader.Close();
                 sql.Close();
