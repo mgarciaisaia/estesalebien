@@ -191,14 +191,15 @@ CREATE TABLE [ESTELOCAMBIAMOS].[Asignaciones] (
 	PRIMARY KEY (Usuario, Rol)
 )
 
-/*
- * FIXME: podriamos hacer algunas asignaciones mas (un rol por tipo de empleado?)
- */
-
 INSERT INTO [ESTELOCAMBIAMOS].[Asignaciones] (Usuario, Rol)
 (SELECT TOP 1 Usuarios.Codigo, Roles.Codigo
 FROM ESTELOCAMBIAMOS.Usuarios, ESTELOCAMBIAMOS.Roles
 WHERE Usuarios.Nombre = 'admin' AND Roles.Nombre = 'Administrador General')
+
+/*
+ * FIXME: podriamos hacer algunas asignaciones mas (un rol por tipo de empleado?)
+ */
+ 
 
 /*
  * Funcionalidades: las posibles funcionalidades que se le pueden asignar
@@ -428,38 +429,10 @@ WHERE FACTURA_NRO <> 0)
 
 GO
 
-PRINT 'TABLA ITEM FACTURAS'
-GO 
-
- /*
-  * FIXME: agregar indices y esas cosas
-  */
-CREATE TABLE [ESTELOCAMBIAMOS].[ItemFactura] (
-	[Factura] [int] NOT NULL FOREIGN KEY REFERENCES [ESTELOCAMBIAMOS].[Facturas] (Numero),
-	[Producto] [int] NOT NULL FOREIGN KEY REFERENCES [ESTELOCAMBIAMOS].[Productos] (Codigo),
-	[PrecioUnitario] [float] CHECK (PrecioUnitario > 0),
-	[Cantidad] [int]
-)
-GO
-
-PRINT 'TABLA PAGOS'
-GO 
-
-INSERT INTO [ESTELOCAMBIAMOS].[ItemsFactura] (Factura, Producto, PrecioUnitario, Cantidad)
-(SELECT FACTURA_NRO, CONVERT(int, SUBSTRING(PRODUCTO_NOMBRE,LEN(PRODUCTO_NOMBRE)-9,10)), PRODUCTO_PRECIO, PRODUCTO_CANT
-FROM gd_esquema.Maestra
-WHERE FACTURA_NRO <> 0 AND PRODUCTO_NOMBRE IS NOT NULL)
-CREATE TABLE [ESTELOCAMBIAMOS].[Pago] (
-	[Factura] [int] NOT NULL FOREIGN KEY REFERENCES [ESTELOCAMBIAMOS].[Facturas] (Numero),
-	[Sucursal] [tinyint] NOT NULL FOREIGN KEY REFERENCES [ESTELOCAMBIAMOS].[Sucursales] (Provincia),
-	[Cuotas] [tinyint], --CONSTRAINT menor a pendientes
-	[Fecha] [datetime],
-	[Cobrador] [numeric] (8, 0) FOREIGN KEY REFERENCES [ESTELOCAMBIAMOS].[Empleados] (DNI)
-)
-GO
 
 PRINT 'TABLA MOVIMIENTOS STOCKS'
 GO 
+
 /*
  * Un MovimientoStock con Cantidad negativa representa una salida
  */
@@ -473,6 +446,57 @@ CREATE TABLE [ESTELOCAMBIAMOS].[MovimientosStock] (
 GO
 
 
+INSERT INTO [ESTELOCAMBIAMOS].[MovimientosStock] (Producto, Sucursal, Auditor, Cantidad, Fecha)
+(SELECT CONVERT(INT, SUBSTRING(PRODUCTO_NOMBRE,LEN(PRODUCTO_NOMBRE)-9,10)), Provincias.Codigo, EMPLEADO_DNI, LLEGADA_STOCK_CANT, LLEGADA_STOCK_FECHA
+FROM gd_esquema.Maestra LEFT JOIN ESTELOCAMBIAMOS.Provincias ON Provincias.Nombre = SUC_PROVINCIA
+WHERE LLEGADA_STOCK_CANT IS NOT NULL AND LLEGADA_STOCK_CANT <> 0)
+
+
+
+PRINT 'TABLA ITEM FACTURAS'
+GO 
+
+ /*
+  * FIXME: agregar indices y esas cosas
+  */
+CREATE TABLE [ESTELOCAMBIAMOS].[ItemsFactura] (
+	[Factura] [int] NOT NULL FOREIGN KEY REFERENCES [ESTELOCAMBIAMOS].[Facturas] (Numero),
+	[Producto] [int] NOT NULL FOREIGN KEY REFERENCES [ESTELOCAMBIAMOS].[Productos] (Codigo),
+	[PrecioUnitario] [float] CHECK (PrecioUnitario > 0),
+	[Cantidad] [int]
+)
+GO
+
+
+CREATE TRIGGER [ESTELOCAMBIAMOS].[ItemVendido]
+ON ESTELOCAMBIAMOS.ItemsFactura
+AFTER INSERT
+AS
+BEGIN
+	INSERT INTO ESTELOCAMBIAMOS.[MovimientosStock] (Producto, Sucursal, Auditor, Cantidad, Fecha)
+	SELECT Producto, Sucursales.Provincia, Facturas.Vendedor, (-1) * Cantidad, Facturas.Fecha
+	FROM INSERTED	LEFT JOIN ESTELOCAMBIAMOS.Facturas ON Facturas.Numero = INSERTED.Factura
+					LEFT JOIN ESTELOCAMBIAMOS.Sucursales ON Sucursales.Provincia = Facturas.Sucursal
+END
+GO
+
+
+INSERT INTO [ESTELOCAMBIAMOS].[ItemsFactura] (Factura, Producto, PrecioUnitario, Cantidad)
+(SELECT FACTURA_NRO, CONVERT(int, SUBSTRING(PRODUCTO_NOMBRE,LEN(PRODUCTO_NOMBRE)-9,10)), PRODUCTO_PRECIO, PRODUCTO_CANT
+FROM gd_esquema.Maestra
+WHERE FACTURA_NRO <> 0 AND PRODUCTO_NOMBRE IS NOT NULL)
+GO
+
+/*
+ * FacturasCompletas muestra informacion "procesada" de las Facturas: Importe Base, Importe Final (incluye Descuento) y Valor de cada cuota
+ */
+CREATE VIEW [ESTELOCAMBIAMOS].[FacturasCompletas] AS
+SELECT Numero, Fecha, Descuento, Descuento * 100 AS PorcentajeDescuento, Cuotas, SUM(PrecioUnitario * Cantidad) AS MontoBase, SUM(PrecioUnitario * Cantidad) * (1 - Descuento) AS Importe, (SUM(PrecioUnitario * Cantidad) * (1 - Descuento)) / Cuotas AS ValorCuota
+FROM ESTELOCAMBIAMOS.Facturas LEFT JOIN ESTELOCAMBIAMOS.ItemsFactura ON ItemsFactura.Factura = Facturas.Numero
+GROUP BY Numero, Fecha, Descuento, Cuotas
+
+GO
+
 PRINT 'VISTA STOCKS'
 GO 
 
@@ -481,3 +505,39 @@ SELECT Producto, Sucursal, SUM(Cantidad) AS Cantidad
 FROM ESTELOCAMBIAMOS.MovimientosStock
 GROUP BY Producto, Sucursal
 GO
+
+
+PRINT 'TABLA PAGOS'
+GO
+
+/*
+ * FIXME: CONSTRAINT para que la sumatoria de cuotas pagadas no supere las cuotas de la factura (si un constraint no alcanza, tirarse por un trigger)
+ */
+CREATE TABLE [ESTELOCAMBIAMOS].[Pagos] (
+	[Factura] [int] NOT NULL FOREIGN KEY REFERENCES [ESTELOCAMBIAMOS].[Facturas] (Numero),
+	[Sucursal] [tinyint] NOT NULL FOREIGN KEY REFERENCES [ESTELOCAMBIAMOS].[Sucursales] (Provincia),
+	[Cuotas] [tinyint], --CONSTRAINT menor a pendientes
+	[Fecha] [datetime],
+	[Cobrador] [numeric] (8, 0) FOREIGN KEY REFERENCES [ESTELOCAMBIAMOS].[Empleados] (DNI)
+)
+GO
+
+
+INSERT INTO [ESTELOCAMBIAMOS].[Pagos] (Factura, Sucursal, Cuotas, Fecha, Cobrador)
+(SELECT FACTURA_NRO, Provincias.Codigo, PAGO_MONTO / FacturasCompletas.ValorCuota, PAGO_FECHA, PAGO_EMPLEADO_DNI
+FROM gd_esquema.Maestra	LEFT JOIN ESTELOCAMBIAMOS.Provincias ON Provincias.Nombre = SUC_PROVINCIA
+						LEFT JOIN ESTELOCAMBIAMOS.FacturasCompletas ON FacturasCompletas.Numero = FACTURA_NRO
+WHERE PAGO_MONTO IS NOT NULL AND PAGO_MONTO <> 0)
+
+GO
+
+/*
+ * FIXME: mirar por si sirve
+ */
+
+/*
+SELECT Facturas.Numero, Facturas.Cuotas, SUM(Pagos.Cuotas) AS CuotasPagas, Facturas.Cuotas - SUM(Pagos.Cuotas) AS CuotasPendientes
+FROM ESTELOCAMBIAMOS.Facturas LEFT JOIN ESTELOCAMBIAMOS.Pagos ON Pagos.Factura = Facturas.Numero
+GROUP BY Facturas.Numero, Facturas.Cuotas
+ORDER BY CuotasPendientes DESC
+*/
