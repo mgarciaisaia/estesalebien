@@ -21,6 +21,9 @@ CREATE TABLE [ESTELOCAMBIAMOS].[Provincias] (
 )
 GO
 
+PRINT 'Insert Provincias'
+GO
+
 INSERT INTO ESTELOCAMBIAMOS.Provincias ([Nombre])
 (SELECT DISTINCT SUC_PROVINCIA
 FROM gd_esquema.Maestra)
@@ -37,6 +40,9 @@ CREATE TABLE [ESTELOCAMBIAMOS].[TiposEmpleado] (
 )
 GO
 
+PRINT 'Insert TipoEmpleado'
+GO
+
 INSERT INTO ESTELOCAMBIAMOS.TiposEmpleado ([Descripcion])
 (SELECT DISTINCT EMPLEADO_TIPO
 FROM gd_esquema.Maestra)
@@ -51,6 +57,9 @@ CREATE TABLE [ESTELOCAMBIAMOS].[TiposSucursal] (
 	[Codigo] [tinyint] IDENTITY(1,1) PRIMARY KEY,
 	[Descripcion] [nvarchar] (12) UNIQUE
 )
+GO
+
+PRINT 'Insert TipoSucursal'
 GO
 
 INSERT INTO ESTELOCAMBIAMOS.TiposSucursal ([Descripcion])
@@ -71,6 +80,9 @@ CREATE TABLE [ESTELOCAMBIAMOS].[Sucursales] (
 )
 GO
 
+PRINT 'Insert Sucursales'
+GO
+
 INSERT INTO ESTELOCAMBIAMOS.Sucursales ([Provincia], [Tipo], [Direccion], [Telefono])
 (SELECT DISTINCT Provincias.Codigo, TiposSucursal.Codigo, SUC_DIR, SUC_TEL
 FROM gd_esquema.Maestra LEFT JOIN ESTELOCAMBIAMOS.Provincias ON Maestra.SUC_PROVINCIA = Provincias.Nombre
@@ -79,6 +91,8 @@ FROM gd_esquema.Maestra LEFT JOIN ESTELOCAMBIAMOS.Provincias ON Maestra.SUC_PROV
 GO
 
 
+PRINT 'Vista SucursalProvincia'
+GO
 
 CREATE VIEW [ESTELOCAMBIAMOS].[SucursalProvincia] AS
 SELECT Provincias.Codigo AS Codigo, Provincias.Nombre AS Provincia, TiposSucursal.Descripcion AS Tipo, Sucursales.Direccion AS Direccion, Sucursales.Telefono AS Telefono
@@ -86,6 +100,27 @@ FROM ESTELOCAMBIAMOS.Provincias LEFT JOIN ESTELOCAMBIAMOS.Sucursales ON Provinci
 		LEFT JOIN ESTELOCAMBIAMOS.TiposSucursal ON Sucursales.Tipo = TiposSucursal.Codigo
 GO
 
+
+PRINT 'Tabla Cliente'
+GO
+
+/*
+ * DNI como varchar no tiene sentido, por eso la declaro numeric (y, ademas, lo hago compartir tipo con
+ * el DNI del Empleado, para la restriccion de los duplicados).
+ *
+ * Lo de "respetar los tipos de datos" del enunciado pareciera que hablaba de tipos a nivel conceptual
+ * en lugar de nivel implementacion, segun el mail de Miguel Lopez del 28 de Mayo
+ */
+CREATE TABLE [ESTELOCAMBIAMOS].[Clientes] (
+	[DNI] [numeric] (8, 0) PRIMARY KEY,
+	[Nombre] [nvarchar] (30) not null, --index   Lo saco porqque sino rompe!
+	[Apellido] [nvarchar] (30) not null, --index
+	[Mail] [nvarchar] (255),
+	[Telefono] [nvarchar] (20),
+	[Direccion] [nvarchar] (255),
+	[Provincia] [tinyint] FOREIGN KEY REFERENCES [ESTELOCAMBIAMOS].[Provincias] (Codigo),
+	[Habilitado] [tinyint] DEFAULT 1
+)
 
 
 PRINT 'Tabla Empleados'
@@ -96,8 +131,8 @@ CREATE TABLE [ESTELOCAMBIAMOS].[Empleados] (
 	[Nombre] [nvarchar] (30),
 	[Apellido] [nvarchar] (30),
 	[Mail] [nvarchar] (255) NULL,
-	[Direccion] [nvarchar] (255),
 	[Telefono] [nvarchar] (20) NULL,
+	[Direccion] [nvarchar] (255),
 	[Provincia] [tinyint] REFERENCES [ESTELOCAMBIAMOS].[Provincias] (Codigo),
 	[Tipo] [tinyint] REFERENCES [ESTELOCAMBIAMOS].[TiposEmpleado] (Codigo),
 	[Sucursal] [tinyint] REFERENCES [ESTELOCAMBIAMOS].[Sucursales] (Provincia),
@@ -105,9 +140,64 @@ CREATE TABLE [ESTELOCAMBIAMOS].[Empleados] (
 )
 GO
 
+
+PRINT 'Trigger NuevoEmpleado'
+GO
+
 /*
- * FIXME: agregar un TRIGGER que de de baja al Cliente que tenga el mismo DNI cuando hago un INSERT aca
+ * Cuando hago un INSERT de Empleado, deshabilito el Cliente con el mismo DNI.
  */
+
+CREATE TRIGGER [ESTELOCAMBIAMOS].[NuevoEmpleado]
+ON ESTELOCAMBIAMOS.Empleados
+AFTER INSERT
+AS
+	UPDATE ESTELOCAMBIAMOS.Clientes
+	SET Habilitado = 0
+	FROM INSERTED
+	WHERE Clientes.DNI = INSERTED.DNI;
+GO
+
+
+PRINT 'Trigger LosEmpleadosNoPuedenHacerseClientes'
+GO
+
+/*
+ * Cuando hago INSERT de un Cliente, si ya existe un Empleado con ese DNI, prevengo el INSERT
+ */
+CREATE TRIGGER [ESTELOCAMBIAMOS].[LosEmpleadosNoPuedenHacerseClientes]
+ON ESTELOCAMBIAMOS.Clientes
+AFTER INSERT
+AS
+BEGIN
+	DECLARE @Existe int
+	DECLARE @DNIInsertado int
+	SELECT @DNIInsertado = INSERTED.DNI FROM INSERTED
+	SELECT @Existe = 1
+	FROM ESTELOCAMBIAMOS.Empleados
+	WHERE @DNIInsertado = Empleados.DNI
+	IF (@Existe > 0)
+		BEGIN
+			RAISERROR('Ya existe un empleado con DNI %d (los empleados no pueden ser clientes)', 15, 15, @DNIInsertado);
+			ROLLBACK TRANSACTION;
+		END
+END
+GO
+
+
+PRINT 'Insert Clientes'
+GO
+
+INSERT INTO [ESTELOCAMBIAMOS].[Clientes]([DNI],[NOMBRE],[APELLIDO],[MAIL],[Telefono],[Direccion],
+											[Provincia],[Habilitado])
+(SELECT DISTINCT [CLI_DNI] ,[CLI_NOMBRE] ,[CLI_APELLIDO] ,[CLI_MAIL],null,null,null,1
+FROM GD_ESQUEMA.MAESTRA
+WHERE CLI_DNI IS NOT NULL)
+GO
+
+
+PRINT 'Insert Empleados'
+GO
 
 /*
  * Este UNION lo cambiaria por una funcion que relacione empleado con sucursal, o por un CASE en el SELECT, pero el UNION es una locura
@@ -146,12 +236,19 @@ CREATE TABLE [ESTELOCAMBIAMOS].[Usuarios] (
 )
 GO
 
+
+PRINT 'Insert Usuario admin'
+GO
+
 /*
  * El usuario 'admin' no tiene ningun empleado asignado
  */
- 
 INSERT INTO [ESTELOCAMBIAMOS].[Usuarios] (Nombre, Password, Empleado)
 VALUES ('admin', 'E6B87050BFCB8143FCB8DB0170A4DC9ED00D904DDD3E2A4AD1B1E8DC0FDC9BE7', null);
+
+
+PRINT 'Insert Usuarios de los empleados'
+GO
 
 INSERT INTO [ESTELOCAMBIAMOS].[Usuarios] (Nombre, Empleado)
 (SELECT REPLACE(LOWER(Nombre + Apellido), ' ','') AS Username, DNI
@@ -168,6 +265,9 @@ CREATE TABLE [ESTELOCAMBIAMOS].[Roles] (
 	[Habilitado] [tinyint] DEFAULT 1
 )
 
+PRINT 'Insert Rol Administrador General'
+GO
+
 /*
  * Rol pre-creado ("Administrador General") para el usuario que crea el script ("admin")
  */
@@ -181,6 +281,9 @@ VALUES ('Administrador General');
 GO
 
 
+PRINT 'Tabla Asignaciones'
+GO
+
 /*
  * Jamas vamos a hacer una busqueda por la "PRIMARY KEY", pero un UNIQUE compuesto permitiria
  * que alguno de los dos valores sea nulo
@@ -190,6 +293,14 @@ CREATE TABLE [ESTELOCAMBIAMOS].[Asignaciones] (
 	[Rol] [int],
 	PRIMARY KEY (Usuario, Rol)
 )
+
+
+PRINT 'Insert Asignacion del usuario admin'
+GO
+
+/*
+ * El usuario admin tiene el rol Administrador General
+ */
 
 INSERT INTO [ESTELOCAMBIAMOS].[Asignaciones] (Usuario, Rol)
 (SELECT TOP 1 Usuarios.Codigo, Roles.Codigo
@@ -213,6 +324,10 @@ CREATE TABLE [ESTELOCAMBIAMOS].[Funcionalidades] (
 	[Codigo] [tinyint] IDENTITY(1,1) PRIMARY KEY,
 	[Descripcion] [nvarchar](19) UNIQUE
 )
+GO
+
+
+PRINT 'Inserts Funcionalidades'
 GO
 
 INSERT INTO ESTELOCAMBIAMOS.Funcionalidades ([Descripcion]) VALUES ('ABM de Empleado');
@@ -243,6 +358,10 @@ CREATE TABLE [ESTELOCAMBIAMOS].[FuncionalidadesRol] (
 	PRIMARY KEY (Rol, Funcionalidad)
 )
 
+
+PRINT 'Insert Funcionalidades del Rol Administrador General'
+GO
+
 /*
  * Le asignamos todas las funcionalidades al rol pre-creado
  */
@@ -253,45 +372,12 @@ WHERE Roles.Nombre = 'Administrador General');
 
 GO
 
-PRINT 'Tabla Cliente'
-GO
 
-/*
- * DNI como varchar no tiene sentido, por eso la declaro numeric (y, ademas, la hago compartir tipo con
- * el DNI del Empleado, al que le aplica el CONSTRAINT).
- *
- * Lo de "respetar los tipos de datos" del enunciado pareciera que hablaba de tipos a nivel conceptual
- * en lugar de nivel implementacion, segun el mail de Miguel Lopez del 28 de Mayo
- */
-CREATE TABLE [ESTELOCAMBIAMOS].[Clientes] (
-	[DNI] [numeric] (8, 0) PRIMARY KEY,
-	[Nombre] [nvarchar] (30) not null, --index   Lo saco porqque sino rompe!
-	[Apellido] [nvarchar] (30) not null, --index
-	[Mail] [nvarchar] (255),
-	[Telefono] [nvarchar] (20),
-	[Direccion] [nvarchar] (255),
-	[Provincia] [tinyint] FOREIGN KEY REFERENCES [ESTELOCAMBIAMOS].[Provincias] (Codigo),
-	[Habilitado] [tinyint] DEFAULT 1
-)
-
-/*
- * FIXME: aca va un constraint para que el dni no se repita con el de Empleados
- */
-
-INSERT INTO [ESTELOCAMBIAMOS].[Clientes]([DNI],[NOMBRE],[APELLIDO],[MAIL],[Telefono],[Direccion],
-											[Provincia],[Habilitado])
-(SELECT DISTINCT [CLI_DNI] ,[CLI_NOMBRE] ,[CLI_APELLIDO] ,[CLI_MAIL],null,null,null,1
-FROM GD_ESQUEMA.MAESTRA
-WHERE CLI_DNI IS NOT NULL)
-GO
-
-
-PRINT 'TABLA CATEGORIAS'
-GO 
 
 --Garantizamos 'Make it work'. Las otras dos, veremos.
-PRINT 'TABLA CATEGORIAS'
+PRINT 'Procedure Parse (categorias)'
 GO 
+
 CREATE PROCEDURE [ESTELOCAMBIAMOS].[PARSE](@CateList varchar(100))
 AS
 BEGIN
@@ -329,13 +415,21 @@ BEGIN
 	RETURN @CATEPADRECOD
 END
 GO
+
+
+PRINT 'Tabla Categorias'
+GO
  
- CREATE TABLE [ESTELOCAMBIAMOS].[Categorias] (
+CREATE TABLE [ESTELOCAMBIAMOS].[Categorias] (
 	[Codigo] [int] IDENTITY(1,1) PRIMARY KEY,
 	[Nombre] [nvarchar](100) NULL,
 	[Padre] [int] NULL DEFAULT NULL FOREIGN KEY REFERENCES [ESTELOCAMBIAMOS].[Categorias] (Codigo)
- )
- /*
+)
+
+PRINT 'Insert Categorias'
+GO
+
+/*
  *  Inserta todas las categorias
  */
 declare @au_id nvarchar(100)
@@ -355,6 +449,10 @@ CREATE TABLE [ESTELOCAMBIAMOS].[Marcas] (
 	[Nombre] [nvarchar] (30) UNIQUE
  )
  
+
+PRINT 'Insert Marcas'
+GO
+
 INSERT INTO [ESTELOCAMBIAMOS].[Marcas](NOMBRE)
   SELECT DISTINCT PRODUCTO_MARCA
   FROM gd_esquema.Maestra
@@ -377,7 +475,12 @@ CREATE TABLE [ESTELOCAMBIAMOS].[Productos] (
 	[Marca] [int] FOREIGN KEY REFERENCES [ESTELOCAMBIAMOS].[Marcas]
  )
 GO
+
 SET IDENTITY_INSERT [ESTELOCAMBIAMOS].[Productos] ON;
+
+PRINT 'INSERT Productos'
+GO
+
 BEGIN
 DECLARE @cod int
 DECLARE @CODIGO INT
@@ -404,6 +507,7 @@ while @@fetch_status = 0
 close CURSORITO
 deallocate CURSORITO
 END
+
 SET IDENTITY_INSERT [ESTELOCAMBIAMOS].[Productos] OFF;
 GO
 
@@ -421,6 +525,9 @@ CREATE TABLE [ESTELOCAMBIAMOS].[Facturas] (
 )
 
 SET IDENTITY_INSERT [ESTELOCAMBIAMOS].[Facturas] ON;
+
+PRINT 'Insert Facturas'
+GO
 
 INSERT INTO [ESTELOCAMBIAMOS].[Facturas] (Numero, Fecha, Descuento, Cuotas, Sucursal, Vendedor, Cliente)
 (SELECT DISTINCT FACTURA_NRO, FACTURA_FECHA, FACTURA_DESCUENTO, FACTURA_CANT_COUTAS, Codigo, EMPLEADO_DNI, CONVERT(NUMERIC, CLI_DNI)
@@ -445,6 +552,8 @@ CREATE TABLE [ESTELOCAMBIAMOS].[MovimientosStock] (
 )
 GO
 
+PRINT 'Insert MovimientosStock (entradas)'
+GO
 
 INSERT INTO [ESTELOCAMBIAMOS].[MovimientosStock] (Producto, Sucursal, Auditor, Cantidad, Fecha)
 (SELECT CONVERT(INT, SUBSTRING(PRODUCTO_NOMBRE,LEN(PRODUCTO_NOMBRE)-9,10)), Provincias.Codigo, EMPLEADO_DNI, LLEGADA_STOCK_CANT, LLEGADA_STOCK_FECHA
@@ -468,6 +577,13 @@ CREATE TABLE [ESTELOCAMBIAMOS].[ItemsFactura] (
 GO
 
 
+PRINT 'Trigger ItemVendido'
+GO
+
+/*
+ * Al vender un producto, registro la salida del stock correspondiente
+ */
+
 CREATE TRIGGER [ESTELOCAMBIAMOS].[ItemVendido]
 ON ESTELOCAMBIAMOS.ItemsFactura
 AFTER INSERT
@@ -481,10 +597,17 @@ END
 GO
 
 
+PRINT 'Insert ItemsFactura'
+GO
+
 INSERT INTO [ESTELOCAMBIAMOS].[ItemsFactura] (Factura, Producto, PrecioUnitario, Cantidad)
 (SELECT FACTURA_NRO, CONVERT(int, SUBSTRING(PRODUCTO_NOMBRE,LEN(PRODUCTO_NOMBRE)-9,10)), PRODUCTO_PRECIO, PRODUCTO_CANT
 FROM gd_esquema.Maestra
 WHERE FACTURA_NRO <> 0 AND PRODUCTO_NOMBRE IS NOT NULL)
+GO
+
+
+PRINT 'Vista FacturasCompletas'
 GO
 
 /*
@@ -544,10 +667,10 @@ ORDER BY CuotasPendientes DESC
 
 
 
-print ' PROCEDURE LOGIN '
+PRINT 'PROCEDURE LOGIN'
+GO
 
-CREATE PROCEDURE [ESTELOCAMBIAMOS].[sp_LOGIN] (@USERNAME NVARCHAR(20),
-														@PASS NVARCHAR(65))
+CREATE PROCEDURE [ESTELOCAMBIAMOS].[sp_LOGIN] (@USERNAME NVARCHAR(20), @PASS NVARCHAR(65))
 AS
 BEGIN
 
@@ -594,15 +717,12 @@ END
 
 
 PRINT 'PROCEDURE MODIFINTENTOS '
+GO
 
-CREATE PROCEDURE [ESTELOCAMBIAMOS].[sp_MODIFINTENTOS] (@USERNAME NVARCHAR(20),
-															 @INTENTOS INT)
+CREATE PROCEDURE [ESTELOCAMBIAMOS].[sp_MODIFINTENTOS] (@USERNAME NVARCHAR(20), @INTENTOS INT)
 AS
 BEGIN
 	UPDATE 	[ESTELOCAMBIAMOS].USUARIOS
 	SET INTENTOS = @INTENTOS
 	WHERE NOMBRE = @USERNAME
 END
-
-
-
