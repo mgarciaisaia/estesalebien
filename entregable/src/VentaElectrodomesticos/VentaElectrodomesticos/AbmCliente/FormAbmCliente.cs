@@ -6,12 +6,13 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using VentaElectrodomesticos.Utils;
 
 namespace VentaElectrodomesticos.AbmCliente
 {
     public partial class FormAbmCliente : Form
     {
-        private ClaseSQL sql;
+        //private ClaseSQL sql;
 
 
         
@@ -19,7 +20,7 @@ namespace VentaElectrodomesticos.AbmCliente
         public FormAbmCliente()
         {
             InitializeComponent();
-            sql = ClaseSQL.getInstance();
+            //sql = ClaseSQL.getInstance();
             
         }
 

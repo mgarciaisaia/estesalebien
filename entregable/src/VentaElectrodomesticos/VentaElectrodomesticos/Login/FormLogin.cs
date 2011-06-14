@@ -53,7 +53,7 @@ namespace VentaElectrodomesticos.Login
             {
                 sql.Open();
                 
-                String procedureName = "[ESTELOCAMBIAMOS].sp_LOGIN";
+                String procedureName = ClaseSQL.tableName("sp_LOGIN");
                 String[,] parametros = new String[2, 2];
                 parametros[0, 0] = "@USERNAME";
                 parametros[0, 1] = "@PASS";
