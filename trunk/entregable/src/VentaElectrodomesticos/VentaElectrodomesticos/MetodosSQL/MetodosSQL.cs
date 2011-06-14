@@ -8,6 +8,8 @@ namespace VentaElectrodomesticos.MetodosSQL
 {
     class ClaseSQL
     {
+        //FIXME: esto hay que parametrizarlo
+        private static String schema = "ESTELOCAMBIAMOS";
         private static string connectString = "Data Source=localhost\\SQLSERVER2005;Initial Catalog=GD1C2011; User ID=gd;Password=gd2011";
         private SqlConnection cnn;
         private static ClaseSQL instance;
@@ -37,6 +39,21 @@ namespace VentaElectrodomesticos.MetodosSQL
             {
                 cnn.Close();
             }
+        }
+
+        public static String getSchema()
+        {
+            return schema;
+        }
+
+        public static void setSchema(String schemaName)
+        {
+            schema = schemaName;
+        }
+
+        public static String tableName(String tableName)
+        {
+            return schema + "." + tableName;
         }
 
         public SqlDataReader busquedaSQLDataReader(String query)
