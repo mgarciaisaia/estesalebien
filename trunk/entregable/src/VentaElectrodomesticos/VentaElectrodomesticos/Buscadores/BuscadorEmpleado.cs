@@ -16,7 +16,7 @@ namespace VentaElectrodomesticos.Buscadores
     public partial class BuscadorEmpleado : Form
     {
         private Empleado empleado;
-        private Boolean buscarDeshabilitados;
+        private Boolean buscarDeshabilitados = true;
 
         public BuscadorEmpleado()
         {
@@ -84,6 +84,7 @@ namespace VentaElectrodomesticos.Buscadores
             DataTable tabla = new DataTable();
             tabla.Load(data);
             
+            
             /*
              * FIXME: Por algun lado lei que tal vez sea mas simple pasarle una
              * ArrayList de Empleados al dgEmpleados para despues recuperar los
@@ -99,14 +100,14 @@ namespace VentaElectrodomesticos.Buscadores
 
         }
 
-        //FIXME: cambiar este evento: tiene que ser en el doble click, o agregar un boton "OK" que haga esto
-        private void dgEmpleados_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        private void btnSeleccionar_Click(object sender, EventArgs e)
         {
             //FIXME: Ver como funciona el enumerator.
             IEnumerator enumerator = dgEmpleados.SelectedRows.GetEnumerator();
             enumerator.MoveNext();
-            empleado = new Empleado(enumerator.Current);
-
+            empleado = new Empleado((Object[])enumerator.Current);
+            //MessageBox.Show(empleado.dni + " " + empleado.apellido);
+            //empleado = new Empleado(enumerator.Current);
         }
 
     }
