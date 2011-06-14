@@ -74,6 +74,12 @@ namespace VentaElectrodomesticos.MetodosSQL
             //}
         }
 
+        public int insertQuery(String query)
+        {
+            SqlCommand command = new SqlCommand(query, cnn);
+            return command.ExecuteNonQuery();
+        }
+
         public SqlDataReader ejecutarStoredProcedure(string sp, String[,] parametros)
         {
             try

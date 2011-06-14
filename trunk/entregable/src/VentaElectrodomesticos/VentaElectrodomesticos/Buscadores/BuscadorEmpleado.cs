@@ -31,8 +31,45 @@ namespace VentaElectrodomesticos.Buscadores
 
         private void bBuscar_Click(object sender, EventArgs e)
         {
-            String query = "SELECT * FROM " + ClaseSQL.tableName("Empleados");
+            String query = this.generateQuery();
+            DataTable tabla = this.resultTable(query);
+            dgEmpleados.DataSource = tabla;
+            dgEmpleados.Show();
             
+            
+            
+            /*
+             * FIXME: Por algun lado lei que tal vez sea mas simple pasarle una
+             * ArrayList de Empleados al dgEmpleados para despues recuperar los
+             * objetos
+             * 
+             * 
+             * http://www.codeproject.com/KB/grid/dataGridview-DataReader.aspx
+             * 
+             */
+
+        }
+
+        private DataTable resultTable(String query)
+        {
+            ClaseSQL conexion = ClaseSQL.getInstance();
+            conexion.Open();
+            SqlDataReader data = conexion.busquedaSQLDataReader(query);
+            
+            DataTable tabla = new DataTable();
+            if (data.HasRows)
+            {
+                tabla.Load(data);
+            }
+            conexion.Close();
+            return tabla;
+        }
+
+        private String generateQuery()
+        {
+            String query = "SELECT DNI, Nombre, Apellido, Mail, Telefono, Direccion, Provincia, Tipo, Sucursal, Habilitado" +
+                " FROM " + ClaseSQL.tableName("Empleados");
+
             String where = "";
 
             if (!buscarDeshabilitados)
@@ -77,37 +114,33 @@ namespace VentaElectrodomesticos.Buscadores
             }
 
             query += " WHERE " + where;
-
-            ClaseSQL conexion = ClaseSQL.getInstance();
-            conexion.Open();
-            SqlDataReader data = conexion.busquedaSQLDataReader(query);
-            DataTable tabla = new DataTable();
-            tabla.Load(data);
-            
-            
-            /*
-             * FIXME: Por algun lado lei que tal vez sea mas simple pasarle una
-             * ArrayList de Empleados al dgEmpleados para despues recuperar los
-             * objetos
-             * 
-             * 
-             * http://www.codeproject.com/KB/grid/dataGridview-DataReader.aspx
-             * 
-             */
-            dgEmpleados.DataSource = tabla;
-            dgEmpleados.Show();
-            conexion.Close();
-
+            return query;
         }
 
         private void btnSeleccionar_Click(object sender, EventArgs e)
         {
-            //FIXME: Ver como funciona el enumerator.
-            IEnumerator enumerator = dgEmpleados.SelectedRows.GetEnumerator();
-            enumerator.MoveNext();
-            empleado = new Empleado((Object[])enumerator.Current);
-            //MessageBox.Show(empleado.dni + " " + empleado.apellido);
-            //empleado = new Empleado(enumerator.Current);
+            DataGridViewCellCollection cells = dgEmpleados.SelectedRows[0].Cells;
+            empleado = this.empleadoSeleccionado(cells);
+            this.Close();
+        }
+
+        private Empleado empleadoSeleccionado(DataGridViewCellCollection cells)
+        {
+            Empleado empleado = new Empleado();
+            empleado.dni = (decimal) cells[0].Value;
+            empleado.nombre = cells[1].Value.ToString();
+            empleado.apellido = cells[2].Value.ToString();
+            empleado.mail = cells[3].Value.ToString();
+            empleado.telefono = cells[4].Value.ToString();
+            empleado.direccion = cells[5].Value.ToString();
+            //FIXME: deberiamos mostrar los strings y guardar los códigos, usando a los DAOs como conversores
+            empleado.provincia = (byte) cells[6].Value;
+            empleado.tipo = (byte)cells[7].Value;
+            empleado.sucursal = (byte) cells[8].Value;
+            empleado.habilitado = (byte)cells[9].Value > 0;
+
+
+            return empleado;
         }
 
     }
