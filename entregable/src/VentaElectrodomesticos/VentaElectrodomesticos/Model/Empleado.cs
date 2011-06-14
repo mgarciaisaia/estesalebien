@@ -18,6 +18,8 @@ namespace VentaElectrodomesticos.Model
         public byte sucursal;
         public Boolean habilitado;
 
+        public Empleado() { }
+
         public Empleado(Object[] arrayFields)
         {
             this.dni = (decimal) arrayFields[0];

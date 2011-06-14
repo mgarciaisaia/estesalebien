@@ -65,6 +65,8 @@
             this.dgEmpleados.Location = new System.Drawing.Point(5, 70);
             this.dgEmpleados.MultiSelect = false;
             this.dgEmpleados.Name = "dgEmpleados";
+            this.dgEmpleados.ReadOnly = true;
+            this.dgEmpleados.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.dgEmpleados.Size = new System.Drawing.Size(663, 269);
             this.dgEmpleados.TabIndex = 44;
             // 
