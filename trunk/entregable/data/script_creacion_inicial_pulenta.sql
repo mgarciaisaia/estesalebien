@@ -113,14 +113,29 @@ GO
  */
 CREATE TABLE [ESTELOCAMBIAMOS].[Clientes] (
 	[DNI] [numeric] (8, 0) PRIMARY KEY,
-	[Nombre] [nvarchar] (30) not null, --index   Lo saco porqque sino rompe!
-	[Apellido] [nvarchar] (30) not null, --index
+	[Nombre] [nvarchar] (30) not null,
+	[Apellido] [nvarchar] (30) not null,
 	[Mail] [nvarchar] (255),
 	[Telefono] [nvarchar] (20),
 	[Direccion] [nvarchar] (255),
 	[Provincia] [tinyint] FOREIGN KEY REFERENCES [ESTELOCAMBIAMOS].[Provincias] (Codigo),
 	[Habilitado] [tinyint] DEFAULT 1
 )
+
+PRINT 'Indices Clientes'
+GO
+
+CREATE INDEX ClientesPorNombre
+    ON ESTELOCAMBIAMOS.Clientes (Nombre); 
+GO
+
+CREATE INDEX ClientesPorApellido
+    ON ESTELOCAMBIAMOS.Clientes (Apellido); 
+GO
+
+CREATE INDEX ClientesPorProvincia
+    ON ESTELOCAMBIAMOS.Clientes (Provincia);
+GO
 
 
 PRINT 'Tabla Empleados'
@@ -138,6 +153,29 @@ CREATE TABLE [ESTELOCAMBIAMOS].[Empleados] (
 	[Sucursal] [tinyint] REFERENCES [ESTELOCAMBIAMOS].[Sucursales] (Provincia),
 	[Habilitado] [tinyint] DEFAULT 1
 )
+GO
+
+PRINT 'Indices Empleados'
+GO
+
+CREATE INDEX EmpleadosPorNombre
+    ON ESTELOCAMBIAMOS.Empleados (Nombre);
+GO
+
+CREATE INDEX EmpleadosPorApellido
+    ON ESTELOCAMBIAMOS.Empleados (Apellido);
+GO
+
+CREATE INDEX EmpleadosPorProvincia
+    ON ESTELOCAMBIAMOS.Empleados (Provincia);
+GO
+
+CREATE INDEX EmpleadosPorSucursal
+    ON ESTELOCAMBIAMOS.Empleados (Sucursal);
+GO
+
+CREATE INDEX EmpleadosPorTipo
+    ON ESTELOCAMBIAMOS.Empleados (Tipo);
 GO
 
 
@@ -224,6 +262,8 @@ PRINT 'Tabla Usuarios'
 GO
 
 /*
+ * Agregamos un Codigo de usuario porque nos parece poco feliz tener una PRIMARY KEY que sea un String de 30 caracteres
+ *
  * El password default es 'password'
  */
 CREATE TABLE [ESTELOCAMBIAMOS].[Usuarios] (
@@ -235,6 +275,15 @@ CREATE TABLE [ESTELOCAMBIAMOS].[Usuarios] (
 	[Intentos] [tinyint] DEFAULT 0
 )
 GO
+
+CREATE INDEX UsuariosPorNombre
+    ON ESTELOCAMBIAMOS.Usuarios (Nombre);
+GO
+
+CREATE INDEX UsuariosPorEmpleado
+    ON ESTELOCAMBIAMOS.Usuarios (Empleado);
+GO
+
 
 
 PRINT 'Insert Usuario admin'
@@ -264,6 +313,15 @@ CREATE TABLE [ESTELOCAMBIAMOS].[Roles] (
 	[Nombre] [nvarchar] (60),
 	[Habilitado] [tinyint] DEFAULT 1
 )
+
+
+PRINT 'Indices Roles'
+GO
+
+CREATE INDEX RolesPorNombre
+    ON ESTELOCAMBIAMOS.Roles (Nombre);
+GO
+
 
 PRINT 'Insert Rol Administrador General'
 GO
@@ -373,6 +431,23 @@ WHERE Roles.Nombre = 'Administrador General');
 GO
 
 
+PRINT 'Tabla Categorias'
+GO
+ 
+CREATE TABLE [ESTELOCAMBIAMOS].[Categorias] (
+	[Codigo] [int] IDENTITY(1,1) PRIMARY KEY,
+	[Nombre] [nvarchar](100) NULL,
+	[Padre] [int] NULL DEFAULT NULL FOREIGN KEY REFERENCES [ESTELOCAMBIAMOS].[Categorias] (Codigo)
+)
+
+
+PRINT 'Indices Categoria'
+GO
+
+CREATE INDEX CategoriasPorNombre
+    ON ESTELOCAMBIAMOS.Categorias (Nombre);
+GO
+
 
 --Garantizamos 'Make it work'. Las otras dos, veremos.
 PRINT 'Procedure Parse (categorias)'
@@ -417,15 +492,6 @@ END
 GO
 
 
-PRINT 'Tabla Categorias'
-GO
- 
-CREATE TABLE [ESTELOCAMBIAMOS].[Categorias] (
-	[Codigo] [int] IDENTITY(1,1) PRIMARY KEY,
-	[Nombre] [nvarchar](100) NULL,
-	[Padre] [int] NULL DEFAULT NULL FOREIGN KEY REFERENCES [ESTELOCAMBIAMOS].[Categorias] (Codigo)
-)
-
 PRINT 'Insert Categorias'
 GO
 
@@ -448,7 +514,12 @@ CREATE TABLE [ESTELOCAMBIAMOS].[Marcas] (
 	[Codigo] [int] IDENTITY(1,1) PRIMARY KEY,
 	[Nombre] [nvarchar] (30) UNIQUE
  )
- 
+
+
+CREATE INDEX MarcasPorNombre
+    ON ESTELOCAMBIAMOS.Marcas (Nombre);
+GO
+
 
 PRINT 'Insert Marcas'
 GO
@@ -462,9 +533,7 @@ INSERT INTO [ESTELOCAMBIAMOS].[Marcas](NOMBRE)
 PRINT 'TABLA PRODUCTOS'
 GO 
 
- /*
-  * FIXME: aca falta agregarle INDEX a Precio y Nombre
-  */
+
 CREATE TABLE [ESTELOCAMBIAMOS].[Productos] (
 	[Codigo] [INT] IDENTITY PRIMARY KEY,
 	[Nombre] [nvarchar] (100),
@@ -477,6 +546,23 @@ CREATE TABLE [ESTELOCAMBIAMOS].[Productos] (
 GO
 
 SET IDENTITY_INSERT [ESTELOCAMBIAMOS].[Productos] ON;
+
+
+PRINT 'Indices Productos'
+GO
+
+CREATE INDEX ProductosPorNombre
+    ON ESTELOCAMBIAMOS.Productos (Nombre);
+GO
+
+CREATE INDEX ProductosPorCategoria
+    ON ESTELOCAMBIAMOS.Productos (Categoria);
+GO
+
+CREATE INDEX ProductosPorPrecio
+    ON ESTELOCAMBIAMOS.Productos (Precio);
+GO
+
 
 PRINT 'INSERT Productos'
 GO
@@ -526,6 +612,23 @@ CREATE TABLE [ESTELOCAMBIAMOS].[Facturas] (
 
 SET IDENTITY_INSERT [ESTELOCAMBIAMOS].[Facturas] ON;
 
+
+PRINT 'Indices Facturas'
+GO
+
+CREATE INDEX FacturasPorCliente
+    ON ESTELOCAMBIAMOS.Facturas (Cliente);
+GO
+
+CREATE INDEX FacturasPorFecha
+    ON ESTELOCAMBIAMOS.Facturas (Fecha);
+GO
+
+/*
+ * FIXME: seguramente falten indices para las consultas del final del TP
+ */
+
+
 PRINT 'Insert Facturas'
 GO
 
@@ -552,6 +655,23 @@ CREATE TABLE [ESTELOCAMBIAMOS].[MovimientosStock] (
 )
 GO
 
+
+PRINT 'Indices MovimientosStock'
+GO
+
+CREATE INDEX MovimientosPorProducto
+    ON ESTELOCAMBIAMOS.MovimientosStock (Producto);
+GO
+
+CREATE INDEX MovimientosPorSucursal
+    ON ESTELOCAMBIAMOS.MovimientosStock (Sucursal);
+GO
+
+CREATE INDEX MovimientosPorFecha
+    ON ESTELOCAMBIAMOS.MovimientosStock (Fecha);
+GO
+
+
 PRINT 'Insert MovimientosStock (entradas)'
 GO
 
@@ -565,15 +685,29 @@ WHERE LLEGADA_STOCK_CANT IS NOT NULL AND LLEGADA_STOCK_CANT <> 0)
 PRINT 'TABLA ITEM FACTURAS'
 GO 
 
- /*
-  * FIXME: agregar indices y esas cosas
-  */
 CREATE TABLE [ESTELOCAMBIAMOS].[ItemsFactura] (
 	[Factura] [int] NOT NULL FOREIGN KEY REFERENCES [ESTELOCAMBIAMOS].[Facturas] (Numero),
 	[Producto] [int] NOT NULL FOREIGN KEY REFERENCES [ESTELOCAMBIAMOS].[Productos] (Codigo),
 	[PrecioUnitario] [float] CHECK (PrecioUnitario > 0),
 	[Cantidad] [int]
 )
+GO
+
+
+PRINT 'Indices ItemsFacturas'
+GO
+
+
+CREATE INDEX ItemsPorFactura
+    ON ESTELOCAMBIAMOS.ItemsFactura (Factura);
+GO
+
+CREATE INDEX ItemsPorProducto
+    ON ESTELOCAMBIAMOS.ItemsFactura (Producto);
+GO
+
+CREATE INDEX ItemsPorPrecio
+    ON ESTELOCAMBIAMOS.ItemsFactura (PrecioUnitario);
 GO
 
 
@@ -633,16 +767,47 @@ GO
 PRINT 'TABLA PAGOS'
 GO
 
-/*
- * FIXME: CONSTRAINT para que la sumatoria de cuotas pagadas no supere las cuotas de la factura (si un constraint no alcanza, tirarse por un trigger)
- */
+
 CREATE TABLE [ESTELOCAMBIAMOS].[Pagos] (
 	[Factura] [int] NOT NULL FOREIGN KEY REFERENCES [ESTELOCAMBIAMOS].[Facturas] (Numero),
 	[Sucursal] [tinyint] NOT NULL FOREIGN KEY REFERENCES [ESTELOCAMBIAMOS].[Sucursales] (Provincia),
-	[Cuotas] [tinyint], --CONSTRAINT menor a pendientes
+	[Cuotas] [tinyint],
 	[Fecha] [datetime],
 	[Cobrador] [numeric] (8, 0) FOREIGN KEY REFERENCES [ESTELOCAMBIAMOS].[Empleados] (DNI)
 )
+GO
+
+
+CREATE TRIGGER [ESTELOCAMBIAMOS].[NoPagarMasCuotasDeLasQueHay]
+ON ESTELOCAMBIAMOS.Pagos
+AFTER INSERT
+AS
+BEGIN
+	DECLARE @FacturaQueSePaga int
+	DECLARE @CuotasQueSePagan tinyint
+	SELECT @FacturaQueSePaga = Factura, @CuotasQueSePagan = Cuotas
+	FROM INSERTED;
+	
+	DECLARE @CuotasFactura tinyint
+	SELECT @CuotasFactura = Cuotas
+	FROM ESTELOCAMBIAMOS.Facturas
+	WHERE Facturas.Numero = @FacturaQueSePaga;
+	
+	DECLARE @CuotasPagadas tinyint
+	SELECT @CuotasPagadas = SUM(Cuotas)
+	FROM ESTELOCAMBIAMOS.Pagos
+	WHERE Factura = @FacturaQueSePaga;
+	
+	IF (@CuotasPagadas > @CuotasFactura)
+		BEGIN
+			DECLARE @CuotasExtra tinyint
+			DECLARE @CuotasPrevias tinyint
+			SET @CuotasExtra = @CuotasPagadas - @CuotasFactura
+			SET @CuotasPrevias = @CuotasPagadas - @CuotasQueSePagan
+			RAISERROR('Se estan pagando %d cuotas de mas (ya se pagaron %d de las %d)', 15, 15, @CuotasExtra, @CuotasPrevias, @CuotasFactura);
+			ROLLBACK TRANSACTION;
+		END
+END
 GO
 
 
