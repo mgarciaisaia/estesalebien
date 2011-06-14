@@ -44,6 +44,7 @@
             this.label2 = new System.Windows.Forms.Label();
             this.tBusqApellido = new System.Windows.Forms.TextBox();
             this.cBusqProvincia = new System.Windows.Forms.ComboBox();
+            this.btnSeleccionar = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dgEmpleados)).BeginInit();
             this.SuspendLayout();
             // 
@@ -66,7 +67,6 @@
             this.dgEmpleados.Name = "dgEmpleados";
             this.dgEmpleados.Size = new System.Drawing.Size(663, 269);
             this.dgEmpleados.TabIndex = 44;
-            this.dgEmpleados.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgEmpleados_CellContentClick);
             // 
             // label10
             // 
@@ -190,12 +190,23 @@
             this.cBusqProvincia.Size = new System.Drawing.Size(121, 21);
             this.cBusqProvincia.TabIndex = 49;
             // 
+            // btnSeleccionar
+            // 
+            this.btnSeleccionar.Location = new System.Drawing.Point(590, 345);
+            this.btnSeleccionar.Name = "btnSeleccionar";
+            this.btnSeleccionar.Size = new System.Drawing.Size(75, 23);
+            this.btnSeleccionar.TabIndex = 50;
+            this.btnSeleccionar.Text = "Aceptar";
+            this.btnSeleccionar.UseVisualStyleBackColor = true;
+            this.btnSeleccionar.Click += new System.EventHandler(this.btnSeleccionar_Click);
+            // 
             // BuscadorEmpleado
             // 
             this.AcceptButton = this.bBuscar;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(677, 348);
+            this.ClientSize = new System.Drawing.Size(677, 374);
+            this.Controls.Add(this.btnSeleccionar);
             this.Controls.Add(this.cBusqProvincia);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.label2);
@@ -239,5 +250,6 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.TextBox tBusqApellido;
         private System.Windows.Forms.ComboBox cBusqProvincia;
+        private System.Windows.Forms.Button btnSeleccionar;
     }
 }
