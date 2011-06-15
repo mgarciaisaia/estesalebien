@@ -26,16 +26,12 @@ namespace VentaElectrodomesticos.AbmCliente
 
         ClaseSQL conexion;
         private string[] provincias;
-        private string[] tipos;
-        private string[] sucursales;
-
-
+        
         public FormAbmCliente()
         {
             InitializeComponent();
             conexion = ClaseSQL.getInstance();
             provincias = new string[25];
-            tipos = new string[3];
         }
 
         private void BuscarCliente_Click(object sender, EventArgs e)
@@ -156,7 +152,6 @@ namespace VentaElectrodomesticos.AbmCliente
                     parametros[1, TELEFONO] = tTelefono.Text;
                     parametros[1, PROVINCIA] = cProvincia.SelectedIndex.ToString();
                     parametros[1, HABILITADO] = System.Convert.ToInt32(cHabilitado.Checked).ToString();
-
 
                     SqlDataReader reader = conexion.ejecutarStoredProcedure(sp, parametros);
                     if (reader != null)
