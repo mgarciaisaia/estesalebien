@@ -21,6 +21,8 @@ namespace VentaElectrodomesticos.AbmUsuario
         private static int EMPLEADO = 3;
         private static int HABILITADO = 4;
         private static int INTENTOS = 5;
+        private static int ROLES = 6;
+        private string[] roles;
         
 		ClaseSQL conexion;
 		
@@ -29,8 +31,55 @@ namespace VentaElectrodomesticos.AbmUsuario
         {
             InitializeComponent();
 			conexion = ClaseSQL.getInstance();
+            roles = new string[25];
         }
-		
+
+        private void FormAbmUsuario_Load(object sender, EventArgs e)
+        {
+            this.rellenarTablaRoles();
+        }
+
+        private void rellenarTablaRoles()
+        {
+            try
+            {
+                conexion.Open();
+                SqlDataReader reader = conexion.busquedaSQLDataReader("SELECT codigo, Nombre FROM mayusculas_sin_espacios.Roles where habilitado='1' order by 1");
+                DataTable tabla = new DataTable();
+                if (reader.HasRows)
+                {
+                    tabla.Load(reader);
+                }
+
+                dgRoles.DataSource = tabla;
+                dgRoles.Show();
+                
+
+                while (reader.Read())
+                {
+                    String rol = reader[1].ToString().Trim();
+                    int codigo = System.Convert.ToInt32(reader[0].ToString());
+                    roles[codigo] = rol;
+                }
+                reader.Close();
+                
+
+            }
+            catch (SqlException ex)
+            {
+                MessageBox.Show(ex.Message, "Error!");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.StackTrace, "Error app");
+            }
+            finally
+            {
+                conexion.Close();
+            }
+        }
+        
+        /*
         private void BuscarUsuario_Click(object sender, EventArgs e)
         {
             BuscadorUsuario buscador = new BuscadorEmpleado();
@@ -310,7 +359,7 @@ namespace VentaElectrodomesticos.AbmUsuario
             
         }
 		
-		
+		*/
 		
     }
 }

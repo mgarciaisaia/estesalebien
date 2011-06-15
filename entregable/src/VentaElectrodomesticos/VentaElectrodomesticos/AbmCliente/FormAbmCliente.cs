@@ -198,17 +198,17 @@ namespace VentaElectrodomesticos.AbmCliente
                     parametros[0, NOMBRE] = "@Nombre";
                     parametros[0, APELLIDO] = "@Apellido";
                     parametros[0, MAIL] = "@Mail";
-                    parametros[0, DIRECCION] = "@direccion";
                     parametros[0, TELEFONO] = "@telefono";
-                    parametros[0, HABILITADO] = "@habilitado";
+                    parametros[0, DIRECCION] = "@direccion";
+                    parametros[0, 6] = "@habilitado";
 
                     parametros[1, DNI] = tDNI.Text;
                     parametros[1, NOMBRE] = tNombre.Text;
                     parametros[1, APELLIDO] = tApellido.Text;
                     parametros[1, MAIL] = tMail.Text;
-                    parametros[1, DIRECCION] = tDireccion.Text;
                     parametros[1, TELEFONO] = tTelefono.Text;
-                    parametros[1, HABILITADO] = System.Convert.ToInt32(cHabilitado.Checked).ToString();
+                    parametros[1, DIRECCION] = tDireccion.Text;
+                    parametros[1, 6] = System.Convert.ToInt32(cHabilitado.Checked).ToString();
 
 
                     SqlDataReader reader = conexion.ejecutarStoredProcedure(sp, parametros);
@@ -238,17 +238,29 @@ namespace VentaElectrodomesticos.AbmCliente
 
         private void bEliminar_Click(object sender, EventArgs e)
         {
-            String sql = "DELETE FROM [GD1C2011].[MAYUSCULAS_SIN_ESPACIOS].[Clientes] " +
-                        "WHERE dni=" + tDNI.Text;
-
             try
             {
                 conexion.Open();
-                if (conexion.insertQuery(sql) != 0)
+                if (tDNI.Text != "")
                 {
-                    MessageBox.Show("Se ha dado de Baja el cliente.", "Success!");
-                }
+                    String[,] parametros = new String[2, 2];
+                    String sp = "mayusculas_sin_espacios.sp_BajaClientes";
+                    parametros[0, DNI] = "@DNI";
+                    parametros[0, 1] = "@habilitado";
+                    parametros[1, DNI] = tDNI.Text;
+                    parametros[1, 1] = "0";
 
+                    SqlDataReader reader = conexion.ejecutarStoredProcedure(sp, parametros);
+                    if (reader != null)
+                    {
+                        MessageBox.Show("Se ha dado de baja el Cliente.", "Success!");
+                        cHabilitado.Checked = false;
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("Debe completar todos los campos", "Warning!");
+                }
             }
             catch (SqlException ex)
             {

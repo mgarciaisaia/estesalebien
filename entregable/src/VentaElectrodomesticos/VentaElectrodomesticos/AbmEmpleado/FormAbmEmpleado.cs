@@ -194,17 +194,28 @@ namespace VentaElectrodomesticos.AbmEmpleado
 
         private void bEliminar_Click(object sender, EventArgs e)
         {
-            String sql = "DELETE FROM [GD1C2011].[MAYUSCULAS_SIN_ESPACIOS].[Empleados] " +
-                        "WHERE dni=" + tDNI.Text;
-
             try
             {
                 conexion.Open();
-                if (conexion.insertQuery(sql) != 0 )
+                if (tDNI.Text !="")
                 {
-                    MessageBox.Show("Se ha dado de Baja el cliente.", "Success!");
+                    String[,] parametros = new String[2, 2];
+                    String sp = "mayusculas_sin_espacios.sp_BajaEmpleados";
+                    parametros[0, DNI] = "@DNI";
+                    parametros[0, 1] = "@habilitado";
+                    parametros[1, DNI] = tDNI.Text;
+                    parametros[1, 1] = "0";
+
+                    SqlDataReader reader = conexion.ejecutarStoredProcedure(sp, parametros);
+                    if (reader != null)
+                    {
+                        MessageBox.Show("Se ha dado de baja el Empleado.", "Success!");
+                    }
                 }
-                
+                else
+                {
+                    MessageBox.Show("Debe completar todos los campos", "Warning!");
+                }
             }
             catch (SqlException ex)
             {
