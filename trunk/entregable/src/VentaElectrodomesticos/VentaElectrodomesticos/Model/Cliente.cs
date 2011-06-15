@@ -5,7 +5,7 @@ using System.Text;
 
 namespace VentaElectrodomesticos.Model
 {
-    public class Empleado
+    public class Cliente
     {
         public decimal dni;
         public String nombre;
@@ -14,13 +14,11 @@ namespace VentaElectrodomesticos.Model
         public String telefono;
         public String direccion;
         public byte provincia;
-        public byte tipo;
-        public byte sucursal;
         public Boolean habilitado;
 
-        public Empleado() { }
+        public Cliente() { }
 
-        public Empleado(Object[] arrayFields)
+        public Cliente(Object[] arrayFields)
         {
             this.dni = (decimal)arrayFields[0];
             this.nombre = (String)arrayFields[1];
@@ -29,9 +27,7 @@ namespace VentaElectrodomesticos.Model
             this.telefono = (String)arrayFields[4];
             this.direccion = (String)arrayFields[5];
             this.provincia = (byte)arrayFields[6];
-            this.tipo = (byte)arrayFields[7];
-            this.sucursal = (byte)arrayFields[8];
-            this.habilitado = (byte)arrayFields[9] != 0;
+            this.habilitado = (byte)arrayFields[7] != 0;
         }
     }
 }

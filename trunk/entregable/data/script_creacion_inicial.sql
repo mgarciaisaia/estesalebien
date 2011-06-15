@@ -892,3 +892,65 @@ BEGIN
 			SELECT 'NO EXISTE EN LA BASE'
 		END
 END
+GO
+
+print ' Procedure Alta Empleado'
+GO
+
+create procedure mayusculas_sin_espacios.sp_altaEmpleado (@DNI numeric(8,0), @Nombre nvarchar(30),
+					@Apellido nvarchar(30), @Mail nvarchar(255), @Telefono nvarchar(20),
+					@Direccion nvarchar(255), @Provincia tinyint, @Tipo tinyint,@Sucursal tinyint,@habilitado tinyint)
+as
+begin
+
+INSERT INTO mayusculas_sin_espacios.Empleados(DNI, Nombre, Apellido, Mail, Telefono, Direccion, Provincia, Tipo, Sucursal,Habilitado)
+VALUES (@DNI,@Nombre,@Apellido,@Mail,@Telefono,@Direccion,@Provincia,@Tipo,@Sucursal,@habilitado)
+
+end
+GO
+
+
+print ' Procedure Modificacion Empleado'
+GO
+
+create procedure [MAYUSCULAS_SIN_ESPACIOS].[sp_ModifEmpleados](@DNI numeric(8,0), @Nombre nvarchar(30),
+					@Apellido nvarchar(30), @Mail nvarchar(255), @Telefono nvarchar(20),
+					@Direccion nvarchar(255), @habilitado tinyint)
+as
+begin
+UPDATE  mayusculas_sin_espacios.Empleados
+SET nombre=@Nombre, apellido=@Apellido, mail=@Mail, telefono=@Telefono, direccion=@Direccion, habilitado = @habilitado
+WHERE dni=@dni
+end
+GO
+
+print ' Procedure Alta Cliente'
+GO
+
+create procedure mayusculas_sin_espacios.sp_altaCliente (@DNI numeric(8,0), @Nombre nvarchar(30),
+					@Apellido nvarchar(30), @Mail nvarchar(255), @Telefono nvarchar(20),
+					@Direccion nvarchar(255), @Provincia tinyint, @habilitado tinyint)
+as
+begin
+
+INSERT INTO mayusculas_sin_espacios.Empleados(DNI, Nombre, Apellido, Mail, Telefono, Direccion, Provincia, Habilitado)
+VALUES (@DNI,@Nombre,@Apellido,@Mail,@Telefono,@Direccion,@Provincia,@habilitado)
+
+end
+GO
+
+
+print ' Procedure Modificacion Cliente'
+GO
+
+create procedure [MAYUSCULAS_SIN_ESPACIOS].[sp_ModifClientes](@DNI numeric(8,0), @Nombre nvarchar(30),
+					@Apellido nvarchar(30), @Mail nvarchar(255), @Telefono nvarchar(20),
+					@Direccion nvarchar(255), @habilitado tinyint)
+as
+begin
+UPDATE  mayusculas_sin_espacios.Empleados
+SET nombre=@Nombre, apellido=@Apellido, mail=@Mail, telefono=@Telefono, direccion=@Direccion, habilitado = @habilitado
+WHERE dni=@dni
+end
+GO
+

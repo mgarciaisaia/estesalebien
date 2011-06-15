@@ -9,7 +9,7 @@ namespace VentaElectrodomesticos.MetodosSQL
     class ClaseSQL
     {
         //FIXME: esto hay que parametrizarlo
-        private static String schema = "ESTELOCAMBIAMOS";
+        private static String schema = "mayusculas_sin_espacios";
         private static string connectString = "Data Source=localhost\\SQLSERVER2005;Initial Catalog=GD1C2011; User ID=gd;Password=gd2011";
         private SqlConnection cnn;
         private static ClaseSQL instance;

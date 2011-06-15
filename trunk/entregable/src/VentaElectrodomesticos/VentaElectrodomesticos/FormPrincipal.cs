@@ -34,8 +34,22 @@ namespace VentaElectrodomesticos
         {
             InitializeComponent();
             FormLogin login = new FormLogin();
-            login.ShowDialog(this);
-            username = login.USERNAME;
+            //login.ShowDialog(this);
+            //username = login.USERNAME;
+            
+            username = "admin";
+            aBMToolStripMenuItem.Enabled = true;
+            aBMDeRolToolStripMenuItem.Enabled = true;
+            aBMDeUsuarioToolStripMenuItem.Enabled = true;
+            aBMDeClienteToolStripMenuItem.Enabled=true;
+            aBMDeProductoToolStripMenuItem.Enabled = true;
+            asignaciónDeStockToolStripMenuItem.Enabled=true;
+            facturaciónToolStripMenuItem.Enabled = true;
+            efectuarPagoToolStripMenuItem.Enabled=true;
+            tableroDeControlToolStripMenuItem.Enabled=true;
+            clientesPremiumToolStripMenuItem.Enabled=true;
+            mejoresCategoriasToolStripMenuItem.Enabled = true;
+            
             this.Text += " - " + username;
             foreach (string s in login.FUNCIONES)
             {
