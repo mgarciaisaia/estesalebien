@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.BuscarEmpleado = new System.Windows.Forms.Button();
+            this.BuscarCliente = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.cHabilitado = new System.Windows.Forms.CheckBox();
             this.tDireccion = new System.Windows.Forms.TextBox();
@@ -52,15 +52,15 @@
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
-            // BuscarEmpleado
+            // BuscarCliente
             // 
-            this.BuscarEmpleado.Location = new System.Drawing.Point(6, 7);
-            this.BuscarEmpleado.Name = "BuscarEmpleado";
-            this.BuscarEmpleado.Size = new System.Drawing.Size(126, 23);
-            this.BuscarEmpleado.TabIndex = 48;
-            this.BuscarEmpleado.Text = "Buscar Cliente";
-            this.BuscarEmpleado.UseVisualStyleBackColor = true;
-            this.BuscarEmpleado.Click += new System.EventHandler(this.BuscarCliente_Click);
+            this.BuscarCliente.Location = new System.Drawing.Point(6, 7);
+            this.BuscarCliente.Name = "BuscarCliente";
+            this.BuscarCliente.Size = new System.Drawing.Size(126, 23);
+            this.BuscarCliente.TabIndex = 48;
+            this.BuscarCliente.Text = "Buscar Cliente";
+            this.BuscarCliente.UseVisualStyleBackColor = true;
+            this.BuscarCliente.Click += new System.EventHandler(this.BuscarCliente_Click);
             // 
             // groupBox1
             // 
@@ -265,7 +265,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(389, 215);
-            this.Controls.Add(this.BuscarEmpleado);
+            this.Controls.Add(this.BuscarCliente);
             this.Controls.Add(this.groupBox1);
             this.Name = "FormAbmCliente";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
@@ -279,7 +279,7 @@
 
         #endregion
 
-        private System.Windows.Forms.Button BuscarEmpleado;
+        private System.Windows.Forms.Button BuscarCliente;
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.CheckBox cHabilitado;
         private System.Windows.Forms.TextBox tDireccion;
