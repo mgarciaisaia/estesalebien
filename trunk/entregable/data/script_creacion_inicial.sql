@@ -933,7 +933,7 @@ create procedure mayusculas_sin_espacios.sp_altaCliente (@DNI numeric(8,0), @Nom
 as
 begin
 
-INSERT INTO mayusculas_sin_espacios.Empleados(DNI, Nombre, Apellido, Mail, Telefono, Direccion, Provincia, Habilitado)
+INSERT INTO mayusculas_sin_espacios.Clientes(DNI, Nombre, Apellido, Mail, Telefono, Direccion, Provincia, Habilitado)
 VALUES (@DNI,@Nombre,@Apellido,@Mail,@Telefono,@Direccion,@Provincia,@habilitado)
 
 end
@@ -948,9 +948,35 @@ create procedure [MAYUSCULAS_SIN_ESPACIOS].[sp_ModifClientes](@DNI numeric(8,0),
 					@Direccion nvarchar(255), @habilitado tinyint)
 as
 begin
-UPDATE  mayusculas_sin_espacios.Empleados
+UPDATE  mayusculas_sin_espacios.Clientes
 SET nombre=@Nombre, apellido=@Apellido, mail=@Mail, telefono=@Telefono, direccion=@Direccion, habilitado = @habilitado
 WHERE dni=@dni
 end
 GO
+
+print 'procedure baja empleado'
+go
+
+
+create procedure [MAYUSCULAS_SIN_ESPACIOS].[sp_BajaEmpleados](@DNI numeric(8,0), @habilitado tinyint)
+as
+begin
+UPDATE  mayusculas_sin_espacios.Empleados
+SET  habilitado = @habilitado
+WHERE dni=@dni
+end
+go
+
+print 'procedure baja Cliente '
+go
+
+create procedure [MAYUSCULAS_SIN_ESPACIOS].[sp_BajaClientes](@DNI numeric(8,0), @habilitado tinyint)
+as
+begin
+UPDATE  mayusculas_sin_espacios.Clientes
+SET  habilitado = @habilitado
+WHERE dni=@dni
+end
+go
+
 

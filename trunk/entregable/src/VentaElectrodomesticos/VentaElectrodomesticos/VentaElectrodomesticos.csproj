@@ -63,17 +63,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AbmCliente\Cliente.cs" />
     <Compile Include="AbmCliente\FormAbmCliente.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="AbmCliente\FormAbmCliente.Designer.cs">
       <DependentUpon>FormAbmCliente.cs</DependentUpon>
     </Compile>
-    <Compile Include="AbmEmpleado\Empleado.cs" />
-    <Compile Include="AbmProducto\Producto.cs" />
-    <Compile Include="AbmRol\Rol.cs" />
-    <Compile Include="AbmUsuario\Usuario.cs" />
     <Compile Include="Buscadores\BuscadorCliente.cs">
       <SubType>Form</SubType>
     </Compile>

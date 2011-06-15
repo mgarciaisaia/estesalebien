@@ -118,10 +118,11 @@ namespace VentaElectrodomesticos.Buscadores
             cliente.mail = cells[3].Value.ToString();
             cliente.telefono = cells[4].Value.ToString();
             cliente.direccion = cells[5].Value.ToString();
-            cliente.provincia = (byte) cells[6].Value;
+            if ( cells[6].Value.ToString() == "")
+                cliente.provincia = 0;
+            else
+                cliente.provincia = (byte)cells[6].Value ;
             cliente.habilitado = (byte) cells[7].Value > 0;
-
-
             return cliente;
         }
 
