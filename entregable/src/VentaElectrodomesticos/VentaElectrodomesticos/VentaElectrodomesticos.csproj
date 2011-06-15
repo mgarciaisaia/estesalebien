@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>9.0.30729</ProductVersion>
+    <ProductVersion>9.0.21022</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{A9C58301-4BDC-4332-9CCF-94D5F71B7978}</ProjectGuid>
     <OutputType>WinExe</OutputType>
@@ -63,11 +63,22 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AbmCliente\Cliente.cs" />
     <Compile Include="AbmCliente\FormAbmCliente.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="AbmCliente\FormAbmCliente.Designer.cs">
       <DependentUpon>FormAbmCliente.cs</DependentUpon>
+    </Compile>
+    <Compile Include="AbmEmpleado\Empleado.cs" />
+    <Compile Include="AbmProducto\Producto.cs" />
+    <Compile Include="AbmRol\Rol.cs" />
+    <Compile Include="AbmUsuario\Usuario.cs" />
+    <Compile Include="Buscadores\BuscadorCliente.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Buscadores\BuscadorCliente.Designer.cs">
+      <DependentUpon>BuscadorCliente.cs</DependentUpon>
     </Compile>
     <Compile Include="Buscadores\BuscadorEmpleado.cs">
       <SubType>Form</SubType>
@@ -142,11 +153,16 @@
       <DependentUpon>FormMejoresCategorias.cs</DependentUpon>
     </Compile>
     <Compile Include="MetodosSQL\MetodosSQL.cs" />
+    <Compile Include="Model\Cliente.cs" />
     <Compile Include="Model\Empleado.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="AbmCliente\FormAbmCliente.resx">
       <DependentUpon>FormAbmCliente.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Buscadores\BuscadorCliente.resx">
+      <DependentUpon>BuscadorCliente.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Buscadores\BuscadorEmpleado.resx">
@@ -211,6 +227,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <None Include="app.config" />
+    <None Include="ClassDiagram1.cd" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

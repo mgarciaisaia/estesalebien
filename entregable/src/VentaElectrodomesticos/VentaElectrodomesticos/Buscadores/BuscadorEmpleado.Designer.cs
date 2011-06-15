@@ -50,12 +50,13 @@
             // 
             // bLimpiarBusq
             // 
-            this.bLimpiarBusq.Location = new System.Drawing.Point(590, 35);
+            this.bLimpiarBusq.Location = new System.Drawing.Point(661, 35);
             this.bLimpiarBusq.Name = "bLimpiarBusq";
             this.bLimpiarBusq.Size = new System.Drawing.Size(75, 23);
             this.bLimpiarBusq.TabIndex = 39;
             this.bLimpiarBusq.Text = "Limpiar";
             this.bLimpiarBusq.UseVisualStyleBackColor = true;
+            this.bLimpiarBusq.Click += new System.EventHandler(this.bLimpiarBuscadorEmp_Click);
             // 
             // dgEmpleados
             // 
@@ -67,7 +68,7 @@
             this.dgEmpleados.Name = "dgEmpleados";
             this.dgEmpleados.ReadOnly = true;
             this.dgEmpleados.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.dgEmpleados.Size = new System.Drawing.Size(663, 269);
+            this.dgEmpleados.Size = new System.Drawing.Size(731, 269);
             this.dgEmpleados.TabIndex = 44;
             // 
             // label10
@@ -108,7 +109,7 @@
             // 
             // bBuscar
             // 
-            this.bBuscar.Location = new System.Drawing.Point(590, 9);
+            this.bBuscar.Location = new System.Drawing.Point(661, 9);
             this.bBuscar.Name = "bBuscar";
             this.bBuscar.Size = new System.Drawing.Size(75, 23);
             this.bBuscar.TabIndex = 38;
@@ -122,7 +123,7 @@
             this.cBusqSucursal.FormattingEnabled = true;
             this.cBusqSucursal.Location = new System.Drawing.Point(463, 36);
             this.cBusqSucursal.Name = "cBusqSucursal";
-            this.cBusqSucursal.Size = new System.Drawing.Size(121, 21);
+            this.cBusqSucursal.Size = new System.Drawing.Size(192, 21);
             this.cBusqSucursal.TabIndex = 37;
             // 
             // cBusqTipo
@@ -131,7 +132,7 @@
             this.cBusqTipo.FormattingEnabled = true;
             this.cBusqTipo.Location = new System.Drawing.Point(463, 9);
             this.cBusqTipo.Name = "cBusqTipo";
-            this.cBusqTipo.Size = new System.Drawing.Size(121, 21);
+            this.cBusqTipo.Size = new System.Drawing.Size(192, 21);
             this.cBusqTipo.TabIndex = 35;
             // 
             // tBusqDNI
@@ -194,7 +195,7 @@
             // 
             // btnSeleccionar
             // 
-            this.btnSeleccionar.Location = new System.Drawing.Point(590, 345);
+            this.btnSeleccionar.Location = new System.Drawing.Point(661, 345);
             this.btnSeleccionar.Name = "btnSeleccionar";
             this.btnSeleccionar.Size = new System.Drawing.Size(75, 23);
             this.btnSeleccionar.TabIndex = 50;
@@ -207,7 +208,8 @@
             this.AcceptButton = this.bBuscar;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(677, 374);
+            this.ClientSize = new System.Drawing.Size(748, 374);
+            this.Controls.Add(this.tBusqNombre);
             this.Controls.Add(this.btnSeleccionar);
             this.Controls.Add(this.cBusqProvincia);
             this.Controls.Add(this.label1);
@@ -223,11 +225,11 @@
             this.Controls.Add(this.cBusqSucursal);
             this.Controls.Add(this.cBusqTipo);
             this.Controls.Add(this.tBusqDNI);
-            this.Controls.Add(this.tBusqNombre);
             this.Controls.Add(this.label6);
             this.Name = "BuscadorEmpleado";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Buscar Empleado";
+            this.Load += new System.EventHandler(this.BuscadorEmpleado_Load);
             ((System.ComponentModel.ISupportInitialize)(this.dgEmpleados)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();

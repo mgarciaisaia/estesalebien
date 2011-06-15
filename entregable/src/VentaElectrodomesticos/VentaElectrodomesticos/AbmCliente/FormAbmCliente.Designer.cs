@@ -28,207 +28,279 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.button1 = new System.Windows.Forms.Button();
-            this.button2 = new System.Windows.Forms.Button();
-            this.button3 = new System.Windows.Forms.Button();
-            this.label1 = new System.Windows.Forms.Label();
-            this.label2 = new System.Windows.Forms.Label();
-            this.label3 = new System.Windows.Forms.Label();
-            this.label4 = new System.Windows.Forms.Label();
-            this.label5 = new System.Windows.Forms.Label();
+            this.BuscarEmpleado = new System.Windows.Forms.Button();
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.cHabilitado = new System.Windows.Forms.CheckBox();
+            this.tDireccion = new System.Windows.Forms.TextBox();
             this.label6 = new System.Windows.Forms.Label();
-            this.textBox1 = new System.Windows.Forms.TextBox();
-            this.textBox2 = new System.Windows.Forms.TextBox();
-            this.textBox3 = new System.Windows.Forms.TextBox();
-            this.comboBox1 = new System.Windows.Forms.ComboBox();
-            this.comboBox2 = new System.Windows.Forms.ComboBox();
-            this.comboBox3 = new System.Windows.Forms.ComboBox();
-            this.dataGridView1 = new System.Windows.Forms.DataGridView();
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
+            this.tTelefono = new System.Windows.Forms.TextBox();
+            this.label5 = new System.Windows.Forms.Label();
+            this.bLimpiarABM = new System.Windows.Forms.Button();
+            this.label12 = new System.Windows.Forms.Label();
+            this.bEliminar = new System.Windows.Forms.Button();
+            this.bModificar = new System.Windows.Forms.Button();
+            this.bAgregar = new System.Windows.Forms.Button();
+            this.cProvincia = new System.Windows.Forms.ComboBox();
+            this.tMail = new System.Windows.Forms.TextBox();
+            this.label4 = new System.Windows.Forms.Label();
+            this.tApellido = new System.Windows.Forms.TextBox();
+            this.label3 = new System.Windows.Forms.Label();
+            this.tNombre = new System.Windows.Forms.TextBox();
+            this.label2 = new System.Windows.Forms.Label();
+            this.tDNI = new System.Windows.Forms.TextBox();
+            this.label1 = new System.Windows.Forms.Label();
+            this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
-            // button1
+            // BuscarEmpleado
             // 
-            this.button1.Location = new System.Drawing.Point(253, 22);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(102, 38);
-            this.button1.TabIndex = 0;
-            this.button1.Text = "ALTA";
-            this.button1.UseVisualStyleBackColor = true;
+            this.BuscarEmpleado.Location = new System.Drawing.Point(6, 7);
+            this.BuscarEmpleado.Name = "BuscarEmpleado";
+            this.BuscarEmpleado.Size = new System.Drawing.Size(126, 23);
+            this.BuscarEmpleado.TabIndex = 48;
+            this.BuscarEmpleado.Text = "Buscar Cliente";
+            this.BuscarEmpleado.UseVisualStyleBackColor = true;
+            this.BuscarEmpleado.Click += new System.EventHandler(this.BuscarCliente_Click);
             // 
-            // button2
+            // groupBox1
             // 
-            this.button2.Location = new System.Drawing.Point(253, 76);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(102, 37);
-            this.button2.TabIndex = 1;
-            this.button2.Text = "BAJA";
-            this.button2.UseVisualStyleBackColor = true;
+            this.groupBox1.Controls.Add(this.cHabilitado);
+            this.groupBox1.Controls.Add(this.tDireccion);
+            this.groupBox1.Controls.Add(this.label6);
+            this.groupBox1.Controls.Add(this.tTelefono);
+            this.groupBox1.Controls.Add(this.label5);
+            this.groupBox1.Controls.Add(this.bLimpiarABM);
+            this.groupBox1.Controls.Add(this.label12);
+            this.groupBox1.Controls.Add(this.bEliminar);
+            this.groupBox1.Controls.Add(this.bModificar);
+            this.groupBox1.Controls.Add(this.bAgregar);
+            this.groupBox1.Controls.Add(this.cProvincia);
+            this.groupBox1.Controls.Add(this.tMail);
+            this.groupBox1.Controls.Add(this.label4);
+            this.groupBox1.Controls.Add(this.tApellido);
+            this.groupBox1.Controls.Add(this.label3);
+            this.groupBox1.Controls.Add(this.tNombre);
+            this.groupBox1.Controls.Add(this.label2);
+            this.groupBox1.Controls.Add(this.tDNI);
+            this.groupBox1.Controls.Add(this.label1);
+            this.groupBox1.Location = new System.Drawing.Point(6, 36);
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.Size = new System.Drawing.Size(373, 166);
+            this.groupBox1.TabIndex = 47;
+            this.groupBox1.TabStop = false;
+            this.groupBox1.Text = "ABM";
             // 
-            // button3
+            // cHabilitado
             // 
-            this.button3.Location = new System.Drawing.Point(253, 119);
-            this.button3.Name = "button3";
-            this.button3.Size = new System.Drawing.Size(102, 38);
-            this.button3.TabIndex = 2;
-            this.button3.Text = "MODIFICACION";
-            this.button3.UseVisualStyleBackColor = true;
+            this.cHabilitado.AutoSize = true;
+            this.cHabilitado.Location = new System.Drawing.Point(241, 106);
+            this.cHabilitado.Name = "cHabilitado";
+            this.cHabilitado.Size = new System.Drawing.Size(73, 17);
+            this.cHabilitado.TabIndex = 34;
+            this.cHabilitado.Text = "Habilitado";
+            this.cHabilitado.UseVisualStyleBackColor = true;
             // 
-            // label1
+            // tDireccion
             // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(12, 22);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(47, 13);
-            this.label1.TabIndex = 3;
-            this.label1.Text = "Nombre:";
-            // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(12, 51);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(47, 13);
-            this.label2.TabIndex = 4;
-            this.label2.Text = "Apellido:";
-            // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(12, 76);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(29, 13);
-            this.label3.TabIndex = 4;
-            this.label3.Text = "DNI:";
-            // 
-            // label4
-            // 
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(12, 101);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(54, 13);
-            this.label4.TabIndex = 4;
-            this.label4.Text = "Provincia:";
-            // 
-            // label5
-            // 
-            this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(12, 128);
-            this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(51, 13);
-            this.label5.TabIndex = 4;
-            this.label5.Text = "Sucursal:";
+            this.tDireccion.Enabled = false;
+            this.tDireccion.Location = new System.Drawing.Point(241, 51);
+            this.tDireccion.Name = "tDireccion";
+            this.tDireccion.Size = new System.Drawing.Size(120, 20);
+            this.tDireccion.TabIndex = 32;
             // 
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(12, 155);
+            this.label6.Location = new System.Drawing.Point(186, 54);
             this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(81, 13);
-            this.label6.TabIndex = 4;
-            this.label6.Text = "Tipo Empleado:";
+            this.label6.Size = new System.Drawing.Size(55, 13);
+            this.label6.TabIndex = 33;
+            this.label6.Text = "Dirección:";
             // 
-            // textBox1
+            // tTelefono
             // 
-            this.textBox1.Location = new System.Drawing.Point(107, 19);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(124, 20);
-            this.textBox1.TabIndex = 5;
+            this.tTelefono.Enabled = false;
+            this.tTelefono.Location = new System.Drawing.Point(241, 26);
+            this.tTelefono.Name = "tTelefono";
+            this.tTelefono.Size = new System.Drawing.Size(120, 20);
+            this.tTelefono.TabIndex = 30;
             // 
-            // textBox2
+            // label5
             // 
-            this.textBox2.Location = new System.Drawing.Point(107, 48);
-            this.textBox2.Name = "textBox2";
-            this.textBox2.Size = new System.Drawing.Size(124, 20);
-            this.textBox2.TabIndex = 5;
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(189, 28);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(52, 13);
+            this.label5.TabIndex = 31;
+            this.label5.Text = "Teléfono:";
             // 
-            // textBox3
+            // bLimpiarABM
             // 
-            this.textBox3.Location = new System.Drawing.Point(107, 73);
-            this.textBox3.Name = "textBox3";
-            this.textBox3.Size = new System.Drawing.Size(124, 20);
-            this.textBox3.TabIndex = 5;
+            this.bLimpiarABM.Location = new System.Drawing.Point(276, 130);
+            this.bLimpiarABM.Name = "bLimpiarABM";
+            this.bLimpiarABM.Size = new System.Drawing.Size(75, 23);
+            this.bLimpiarABM.TabIndex = 11;
+            this.bLimpiarABM.Text = "Limpiar";
+            this.bLimpiarABM.UseVisualStyleBackColor = true;
+            this.bLimpiarABM.Click += new System.EventHandler(this.bLimpiarCliente_Click);
             // 
-            // comboBox1
+            // label12
             // 
-            this.comboBox1.FormattingEnabled = true;
-            this.comboBox1.Location = new System.Drawing.Point(107, 98);
-            this.comboBox1.Name = "comboBox1";
-            this.comboBox1.Size = new System.Drawing.Size(124, 21);
-            this.comboBox1.TabIndex = 6;
+            this.label12.AutoSize = true;
+            this.label12.Location = new System.Drawing.Point(187, 80);
+            this.label12.Name = "label12";
+            this.label12.Size = new System.Drawing.Size(54, 13);
+            this.label12.TabIndex = 28;
+            this.label12.Text = "Provincia:";
             // 
-            // comboBox2
+            // bEliminar
             // 
-            this.comboBox2.FormattingEnabled = true;
-            this.comboBox2.Location = new System.Drawing.Point(107, 125);
-            this.comboBox2.Name = "comboBox2";
-            this.comboBox2.Size = new System.Drawing.Size(124, 21);
-            this.comboBox2.TabIndex = 6;
+            this.bEliminar.Location = new System.Drawing.Point(195, 130);
+            this.bEliminar.Name = "bEliminar";
+            this.bEliminar.Size = new System.Drawing.Size(75, 23);
+            this.bEliminar.TabIndex = 10;
+            this.bEliminar.Text = "Dar baja";
+            this.bEliminar.UseVisualStyleBackColor = true;
+            this.bEliminar.Click += new System.EventHandler(this.bEliminar_Click);
             // 
-            // comboBox3
+            // bModificar
             // 
-            this.comboBox3.FormattingEnabled = true;
-            this.comboBox3.Location = new System.Drawing.Point(107, 152);
-            this.comboBox3.Name = "comboBox3";
-            this.comboBox3.Size = new System.Drawing.Size(124, 21);
-            this.comboBox3.TabIndex = 6;
+            this.bModificar.Location = new System.Drawing.Point(114, 130);
+            this.bModificar.Name = "bModificar";
+            this.bModificar.Size = new System.Drawing.Size(75, 23);
+            this.bModificar.TabIndex = 9;
+            this.bModificar.Text = "Modificar";
+            this.bModificar.UseVisualStyleBackColor = true;
+            this.bModificar.Click += new System.EventHandler(this.bModificar_Click);
             // 
-            // dataGridView1
+            // bAgregar
             // 
-            this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridView1.Location = new System.Drawing.Point(15, 191);
-            this.dataGridView1.Name = "dataGridView1";
-            this.dataGridView1.Size = new System.Drawing.Size(337, 183);
-            this.dataGridView1.TabIndex = 7;
+            this.bAgregar.Location = new System.Drawing.Point(33, 130);
+            this.bAgregar.Name = "bAgregar";
+            this.bAgregar.Size = new System.Drawing.Size(75, 23);
+            this.bAgregar.TabIndex = 8;
+            this.bAgregar.Text = "Agregar";
+            this.bAgregar.UseVisualStyleBackColor = true;
+            this.bAgregar.Click += new System.EventHandler(this.bAgregar_Click);
+            // 
+            // cProvincia
+            // 
+            this.cProvincia.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cProvincia.Enabled = false;
+            this.cProvincia.FormattingEnabled = true;
+            this.cProvincia.Location = new System.Drawing.Point(241, 77);
+            this.cProvincia.Name = "cProvincia";
+            this.cProvincia.Size = new System.Drawing.Size(121, 21);
+            this.cProvincia.TabIndex = 6;
+            // 
+            // tMail
+            // 
+            this.tMail.Enabled = false;
+            this.tMail.Location = new System.Drawing.Point(55, 103);
+            this.tMail.Name = "tMail";
+            this.tMail.Size = new System.Drawing.Size(120, 20);
+            this.tMail.TabIndex = 5;
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(25, 106);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(29, 13);
+            this.label4.TabIndex = 9;
+            this.label4.Text = "Mail:";
+            // 
+            // tApellido
+            // 
+            this.tApellido.Enabled = false;
+            this.tApellido.Location = new System.Drawing.Point(55, 77);
+            this.tApellido.Name = "tApellido";
+            this.tApellido.Size = new System.Drawing.Size(120, 20);
+            this.tApellido.TabIndex = 4;
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(7, 80);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(47, 13);
+            this.label3.TabIndex = 7;
+            this.label3.Text = "Apellido:";
+            // 
+            // tNombre
+            // 
+            this.tNombre.Enabled = false;
+            this.tNombre.Location = new System.Drawing.Point(55, 51);
+            this.tNombre.Name = "tNombre";
+            this.tNombre.Size = new System.Drawing.Size(120, 20);
+            this.tNombre.TabIndex = 3;
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(7, 54);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(47, 13);
+            this.label2.TabIndex = 5;
+            this.label2.Text = "Nombre:";
+            // 
+            // tDNI
+            // 
+            this.tDNI.Location = new System.Drawing.Point(55, 25);
+            this.tDNI.Name = "tDNI";
+            this.tDNI.Size = new System.Drawing.Size(120, 20);
+            this.tDNI.TabIndex = 1;
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(25, 28);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(29, 13);
+            this.label1.TabIndex = 3;
+            this.label1.Text = "DNI:";
             // 
             // FormAbmCliente
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(364, 390);
-            this.Controls.Add(this.dataGridView1);
-            this.Controls.Add(this.comboBox3);
-            this.Controls.Add(this.comboBox2);
-            this.Controls.Add(this.comboBox1);
-            this.Controls.Add(this.textBox3);
-            this.Controls.Add(this.textBox2);
-            this.Controls.Add(this.textBox1);
-            this.Controls.Add(this.label6);
-            this.Controls.Add(this.label5);
-            this.Controls.Add(this.label4);
-            this.Controls.Add(this.label3);
-            this.Controls.Add(this.label2);
-            this.Controls.Add(this.label1);
-            this.Controls.Add(this.button3);
-            this.Controls.Add(this.button2);
-            this.Controls.Add(this.button1);
+            this.ClientSize = new System.Drawing.Size(389, 215);
+            this.Controls.Add(this.BuscarEmpleado);
+            this.Controls.Add(this.groupBox1);
             this.Name = "FormAbmCliente";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "ABM de Cliente";
             this.Load += new System.EventHandler(this.FormAbmCliente_Load);
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
+            this.groupBox1.ResumeLayout(false);
+            this.groupBox1.PerformLayout();
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
 
         #endregion
 
-        private System.Windows.Forms.Button button1;
-        private System.Windows.Forms.Button button2;
-        private System.Windows.Forms.Button button3;
-        private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.Label label4;
-        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.Button BuscarEmpleado;
+        private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.CheckBox cHabilitado;
+        private System.Windows.Forms.TextBox tDireccion;
         private System.Windows.Forms.Label label6;
-        private System.Windows.Forms.TextBox textBox1;
-        private System.Windows.Forms.TextBox textBox2;
-        private System.Windows.Forms.TextBox textBox3;
-        private System.Windows.Forms.ComboBox comboBox1;
-        private System.Windows.Forms.ComboBox comboBox2;
-        private System.Windows.Forms.ComboBox comboBox3;
-        private System.Windows.Forms.DataGridView dataGridView1;
+        private System.Windows.Forms.TextBox tTelefono;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.Button bLimpiarABM;
+        private System.Windows.Forms.Label label12;
+        private System.Windows.Forms.Button bEliminar;
+        private System.Windows.Forms.Button bModificar;
+        private System.Windows.Forms.Button bAgregar;
+        private System.Windows.Forms.ComboBox cProvincia;
+        private System.Windows.Forms.TextBox tMail;
+        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.TextBox tApellido;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.TextBox tNombre;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.TextBox tDNI;
+        private System.Windows.Forms.Label label1;
+
+
     }
 }
