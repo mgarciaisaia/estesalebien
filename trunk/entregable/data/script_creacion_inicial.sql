@@ -979,4 +979,74 @@ WHERE dni=@dni
 end
 go
 
+print 'procedure Asignacion roles'
+go
+
+create procedure [MAYUSCULAS_SIN_ESPACIOS].[sp_asignacion] 
+						(@user nvarchar(30),@rol int, @habilitado tinyint)
+as
+begin
+DECLARE @CODIGO INT
+DECLARE @codUser INT
+select @codUser=codigo from [MAYUSCULAS_SIN_ESPACIOS].[Usuarios] where @user =nombre
+
+if (not @rol in (select distinct Rol from [MAYUSCULAS_SIN_ESPACIOS].[Asignaciones]
+	 where usuario =@coduser))
+  begin
+  if (@habilitado>0)
+	insert into [MAYUSCULAS_SIN_ESPACIOS].[Asignaciones](Usuario,Rol)values(@coduser,@rol)
+  end
+else
+  begin
+  if (@habilitado=0)
+	delete from [MAYUSCULAS_SIN_ESPACIOS].[Asignaciones] where @rol=rol and @codUser=usuario
+  end
+end
+GO
+
+
+print 'procedure alta  Usuarios '
+go
+
+
+create procedure [MAYUSCULAS_SIN_ESPACIOS].[sp_altaUsuario] (@Nombre nvarchar(30),
+							@password nvarchar(64),@empleado numeric(8,0), @habilitado tinyint)
+as
+begin
+
+INSERT INTO mayusculas_sin_espacios.Usuarios(Nombre, password, empleado, Habilitado,intentos)
+VALUES (@Nombre,@password,@empleado,@habilitado,'0')
+
+end
+GO
+
+
+print 'procedure Modificacion Usuarios '
+go
+
+CREATE procedure [MAYUSCULAS_SIN_ESPACIOS].[sp_ModifUsuarios] (@Nombre nvarchar(30),
+							@password nvarchar(64), @habilitado tinyint)
+as
+begin
+
+UPDATE mayusculas_sin_espacios.Usuarios
+SET password=@Password, habilitado=@habilitado, intentos='0'
+where nombre=@nombre
+
+end
+GO
+
+
+print 'procedure BAja Usuarios '
+go
+
+create procedure [MAYUSCULAS_SIN_ESPACIOS].[sp_BajaUsuarios](@Nombre nvarchar(30), @habilitado tinyint)
+as
+begin
+UPDATE  mayusculas_sin_espacios.Usuarios
+SET  habilitado = @habilitado
+WHERE nombre = @Nombre
+end
+GO
+
 

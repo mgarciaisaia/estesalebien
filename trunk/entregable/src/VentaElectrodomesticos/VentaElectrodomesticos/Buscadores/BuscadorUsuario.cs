@@ -10,33 +10,23 @@ using VentaElectrodomesticos.Model;
 using VentaElectrodomesticos.MetodosSQL;
 using System.Data.SqlClient;
 using System.Collections;
-using VentaElectrodomesticos.DAO;
 
 namespace VentaElectrodomesticos.Buscadores
 {
-    public partial class BuscadorEmpleado : Form
+    public partial class BuscadorUsuario : Form
     {
         private Empleado empleado;
         private Boolean buscarDeshabilitados = true;
         ClaseSQL conexion;
         private string[] provincias;
         private string[] tipos;
-        private String tipoObligatorio;
         
-        public BuscadorEmpleado()
+        public BuscadorUsuario()
         {
-            // FIXME: aca hay que cargar los combos
             InitializeComponent();
             conexion = ClaseSQL.getInstance();
             provincias = new string[25];
             tipos = new string[3];
-
-        }
-
-        public BuscadorEmpleado(Boolean deshabilitados, String tipoEmpleado) : this()
-        {
-            buscarDeshabilitados = deshabilitados;
-            tipoObligatorio = tipoEmpleado;
         }
 
         public Empleado getEmpleado()
@@ -50,6 +40,7 @@ namespace VentaElectrodomesticos.Buscadores
             DataTable tabla = this.resultTable(query);
             dgEmpleados.DataSource = tabla;
             dgEmpleados.Show();
+            
         }
 
         private DataTable resultTable(String query)
@@ -69,14 +60,19 @@ namespace VentaElectrodomesticos.Buscadores
 
         private String generateQuery()
         {
-            String query = "SELECT DNI, Nombre, Apellido, Mail, Telefono, Direccion, Provincia, Tipo, Sucursal, Habilitado" +
-                " FROM " + ClaseSQL.tableName("Empleados");
+            String query = "SELECT us.nombre, emp.DNI, emp.Nombre, emp.Apellido, emp.Mail, emp.Telefono, emp.Direccion, emp.Provincia, emp.Tipo, emp.Sucursal, emp.Habilitado" +
+                " FROM " + ClaseSQL.tableName("Empleados") + " as emp left join "+ ClaseSQL.tableName("Usuarios") + " as us on (dni = us.empleado)";
 
             String where = "";
 
             if (!buscarDeshabilitados)
             {
                 where += " AND Habilitado = 1";
+            }
+
+            if (tBusqUser.Text.Length > 0)
+            {
+                where += " AND us.nombre LIKE '%" + tBusqUser.Text + "%'";
             }
 
             if (tBusqDNI.Text.Length > 0)
@@ -132,18 +128,17 @@ namespace VentaElectrodomesticos.Buscadores
         private Empleado empleadoSeleccionado(DataGridViewCellCollection cells)
         {
             Empleado empleado = new Empleado();
-            empleado.dni = (decimal) cells[0].Value;
-            empleado.nombre = cells[1].Value.ToString();
-            empleado.apellido = cells[2].Value.ToString();
-            empleado.mail = cells[3].Value.ToString();
-            empleado.telefono = cells[4].Value.ToString();
-            empleado.direccion = cells[5].Value.ToString();
-            //FIXME: deberiamos mostrar los strings y guardar los códigos, usando a los DAOs como conversores
-            empleado.provincia = (byte) cells[6].Value;
-            empleado.tipo = (byte)cells[7].Value;
-            empleado.sucursal = (byte) cells[8].Value;
+            empleado.dni = (decimal) cells[1].Value;
+            empleado.nombre = cells[2].Value.ToString();
+            empleado.apellido = cells[3].Value.ToString();
+            empleado.mail = cells[4].Value.ToString();
+            empleado.telefono = cells[5].Value.ToString();
+            empleado.direccion = cells[6].Value.ToString();
+            empleado.provincia = (byte) cells[7].Value;
+            empleado.tipo = (byte)cells[8].Value;
+            empleado.sucursal = (byte) cells[9].Value;
             
-            empleado.habilitado = (byte)cells[9].Value > 0;
+            empleado.habilitado = (byte)cells[10].Value > 0;
 
 
             return empleado;
@@ -161,11 +156,6 @@ namespace VentaElectrodomesticos.Buscadores
             cBusqTipo.Items.Add("");
             cBusqTipo.Items.Add("Vendedor");
             cBusqTipo.Items.Add("Analista");
-            if (tipoObligatorio != null)
-            {
-                cBusqTipo.SelectedItem = tipoObligatorio;
-                cBusqTipo.Enabled = false;
-            }
             tipos[1] = "Vendedor";
             tipos[2] = "Analista";
             
@@ -173,10 +163,34 @@ namespace VentaElectrodomesticos.Buscadores
         
         private void rellenarComboBoxProvincia()
         {
-            cBusqProvincia.Items.Add("");
-            foreach(Provincia provincia in Provincias.getInstance().list()) {
-               cBusqProvincia.Items.Add(provincia.nombre);
-               provincias[provincia.codigo] = provincia.nombre;
+            try
+            {
+                cBusqProvincia.Items.Add("");
+                conexion.Open();
+                SqlDataReader reader = conexion.busquedaSQLDataReader("SELECT codigo, Nombre FROM mayusculas_sin_espacios.provincias order by 1");
+                
+                while (reader.Read())
+                {
+                    String prov = reader[1].ToString().Trim();
+                    int codigo = System.Convert.ToInt32(reader[0].ToString());
+                    cBusqProvincia.Items.Add(prov);
+                    provincias[codigo] = prov;
+                    
+                }
+                reader.Close();
+                
+            }
+            catch (SqlException ex)
+            {
+                MessageBox.Show(ex.Message, "Error!");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.StackTrace, "Error app");
+            }
+            finally
+            {
+                conexion.Close();
             }
         }
         private void rellenarComboBoxSucursal()
@@ -212,6 +226,7 @@ namespace VentaElectrodomesticos.Buscadores
         private void bLimpiarBuscadorEmp_Click(object sender, EventArgs e)
         {
             tBusqDNI.Clear();
+            tBusqUser.Clear();
             tBusqNombre.Clear();
             tBusqApellido.Clear();
             cBusqProvincia.Items.Clear();

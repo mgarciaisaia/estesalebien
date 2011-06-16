@@ -15,13 +15,10 @@ namespace VentaElectrodomesticos.AbmUsuario
 {
     public partial class FormAbmUsuario : Form
     {
-        private static int CODIGO = 0;
-        private static int NOMBRE = 1;
-        private static int PASSWORD = 2;
-        private static int EMPLEADO = 3;
-        private static int HABILITADO = 4;
-        private static int INTENTOS = 5;
-        private static int ROLES = 6;
+        private static int NOMBRE = 0;
+        private static int PASSWORD = 1;
+        private static int EMPLEADO = 2;
+        private static int HABILITADO = 3;
         private string codigoUser ="";
         
 		ClaseSQL conexion;
@@ -57,14 +54,6 @@ namespace VentaElectrodomesticos.AbmUsuario
                 dgRoles.Columns["Codigo"].Visible = false;
                 dgRoles.Show();
                 
-                
-                /*
-                 * while (reader.Read())
-                {
-                    String rol = reader[1].ToString().Trim();
-                    int codigo = System.Convert.ToInt32(reader[0].ToString());
-                    roles[codigo] = rol;
-                }*/
                 reader.Close();
                 
 
@@ -85,8 +74,9 @@ namespace VentaElectrodomesticos.AbmUsuario
 
         private void BuscarEmpleado_Click(object sender, EventArgs e)
         {
-            BuscadorEmpleado buscador = new BuscadorEmpleado();
+            BuscadorUsuario buscador = new BuscadorUsuario();
             buscador.ShowDialog(this);
+            this.rellenarTablaRoles();
             this.cargarEmpleado(buscador.getEmpleado());
         }
 
@@ -102,24 +92,29 @@ namespace VentaElectrodomesticos.AbmUsuario
                 SqlDataReader reader = conexion.busquedaSQLDataReader(sql);
                 if (reader.Read())
                 {
-                    tNombre.Text=reader["nombre"].ToString();
+                    tNombre.Text = reader["nombre"].ToString();
                     tNombre.Enabled = false;
                     tPassword.Text = reader["Password"].ToString();
                     cHabilitado.Checked = System.Convert.ToBoolean(reader["habilitado"]);
                     codigoUser = reader["codigo"].ToString();
 
                 }
+                
                 reader.Close();
-                String query = "SELECT rol,nombre FROM [GD1C2011].[MAYUSCULAS_SIN_ESPACIOS].[Asignaciones] " +
-                        "left join MAYUSCULAS_SIN_ESPACIOS.roles on(rol=codigo) WHERE usuario=" + codigoUser;
-                SqlDataReader rolUser = conexion.busquedaSQLDataReader(query);
-                int i = 0;
-                while (rolUser.Read())
+                if (codigoUser != "")
                 {
-                    i = System.Convert.ToInt32( rolUser["rol"]);
-                    dgRoles.Rows[i-1].Cells["Seleccion"].Value = true;
+
+                    String query = "SELECT rol,nombre FROM [GD1C2011].[MAYUSCULAS_SIN_ESPACIOS].[Asignaciones] " +
+                            "left join MAYUSCULAS_SIN_ESPACIOS.roles on(rol=codigo) WHERE usuario=" + codigoUser;
+                    SqlDataReader rolUser = conexion.busquedaSQLDataReader(query);
+                    int i = 0;
+                    while (rolUser.Read())
+                    {
+                        i = System.Convert.ToInt32(rolUser["rol"]);
+                        dgRoles.Rows[i - 1].Cells["Seleccion"].Value = true;
+                    }
+                    rolUser.Close();
                 }
-                rolUser.Close();
                 conexion.Close();
             }
 
@@ -131,54 +126,95 @@ namespace VentaElectrodomesticos.AbmUsuario
             tNombre.Enabled = true;
             tPassword.Clear();
             tEmpleado.Clear();
+            tEmpleado.Enabled = true;
             cHabilitado.Checked = false;
             this.rellenarTablaRoles();
             
         }
 
-        private void bAgregar_Click(object sender, EventArgs e)
+        private void actualizarRoles()
+        {
+            for (int i = 0; i < dgRoles.RowCount; i++)
+            {
+                    String[,] parametros = new String[2, 3];
+                    String sp = "mayusculas_sin_espacios.[sp_asignacion]";
+                    parametros[0, 0] = "@user";
+                    parametros[0, 1] = "@rol";
+                    parametros[0, 2] = "@habilitado";
+
+                    parametros[1, 0] = tNombre.Text.ToString();
+                    parametros[1, 1] = dgRoles.Rows[i].Cells["Codigo"].Value.ToString();
+                    parametros[1, 2] = (System.Convert.ToInt32(dgRoles.Rows[i].Cells["Seleccion"].Value)).ToString();
+
+                    SqlDataReader reader = conexion.ejecutarStoredProcedure(sp, parametros);
+                    reader.Close();
+            }
+        }
+
+        private void bModificar_Click(object sender, EventArgs e)
         {
             try
             {
                 conexion.Open();
                 if (!this.hayAlgunTextboxVacio(tNombre, tPassword, tEmpleado, cHabilitado))
                 {
-                    String[,] parametros = new String[2, 4];
-                    String sp = "mayusculas_sin_espacios.sp_altaUsuario";
-                    //parametros[0, CODIGO ] = "@Codigo";
-                    parametros[0, 0] = "@Nombre";
-                    parametros[0, 1] = "@Password";
-                    parametros[0, 2] = "@Empleado";
-                    parametros[0, 3] = "@Habilitado";
+                    String[,] parametros = new String[2, 3];
+                    String sp = "mayusculas_sin_espacios.sp_ModifUsuarios";
+                    parametros[0, NOMBRE] = "@Nombre";
+                    parametros[0, PASSWORD] = "@Password";
+                    parametros[0, 2] = "@habilitado";
 
-                    //parametros[1, CODIGO] = empleado;
-                    parametros[1, 0] = tNombre.Text;
-                    parametros[1, 1] = tPassword.Text;
-                    parametros[1, 2] = tEmpleado.Text;
-                    parametros[1, 3] = System.Convert.ToInt32(cHabilitado.Checked).ToString();
-
+                    parametros[1, NOMBRE] = tNombre.Text.ToString();
+                    parametros[1, PASSWORD] = tPassword.Text.ToString();
+                    parametros[1, 2] = System.Convert.ToInt32(cHabilitado.Checked).ToString();
 
                     SqlDataReader reader = conexion.ejecutarStoredProcedure(sp, parametros);
                     if (reader != null)
                     {
-                        for(int i=0;i<dgRoles.RowCount;i++)
-                        {
-                            if (System.Convert.ToInt32(dgRoles.Rows[i].Cells["Seleccion"].Value) == 1)
-                            {
-                                string query = "insert into mayusculas_sin_espacios.asignaciones(Usuario,Rol) " +
-                                        " select codigo," + dgRoles.Rows[i].Cells["Codigo"].Value.ToString() +
-                                        " from mayusculas_sin_espacios.usuarios where nombre =" + tNombre.Text.ToString();
-                                //MessageBox.Show(dgRoles.Rows[i].Cells[2].Value.ToString() + "   " + query);
-                                if (conexion.insertQuery(query) != 0)
-                                {
-                                    MessageBox.Show("Se ha Modificado las asignaciones!", "Success!");
-                                }
-                            }
-                        }
+                        reader.Close();
+                        this.actualizarRoles();
+                        MessageBox.Show("Se ha Modificado el Usuario.", "Success!");
+                    }
+                    
 
+                }
+                else
+                {
+                    MessageBox.Show("Debe completar todos los campos", "Warning!");
+                }
+            }
+            catch (SqlException ex)
+            {
+                MessageBox.Show(ex.Message, "Error!");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.StackTrace, "Error app");
+            }
+            finally
+            {
+                conexion.Close();
+            }
+        }
 
-                        MessageBox.Show("Se ha dado de alta el cliente.", "Success!");
+        private void bEliminar_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                conexion.Open();
+                if (tNombre.Text != "")
+                {
+                    String[,] parametros = new String[2, 2];
+                    String sp = "mayusculas_sin_espacios.sp_BajaUsuarios";
+                    parametros[0, NOMBRE] = "@Nombre";
+                    parametros[0, 1] = "@habilitado";
+                    parametros[1, NOMBRE] = tNombre.Text;
+                    parametros[1, 1] = "0";
 
+                    SqlDataReader reader = conexion.ejecutarStoredProcedure(sp, parametros);
+                    if (reader != null)
+                    {
+                        MessageBox.Show("Se ha dado de baja el Usuario.", "Success!");
                     }
                 }
                 else
@@ -200,53 +236,59 @@ namespace VentaElectrodomesticos.AbmUsuario
             }
         }
 
-        private void bModificar_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void bEliminar_Click(object sender, EventArgs e)
-        {
-
-        }
-
         private bool hayAlgunTextboxVacio(TextBox tNombre, TextBox tPasswprd, TextBox tEmpleado,  CheckBox chHabilitado)
         {
             return tNombre.Text.Equals("") || tPasswprd.Text.Equals("") || tEmpleado.Text.Equals("") ;
         }
 
-        private void button2_Click(object sender, EventArgs e)
+        private void bAgregar_Click(object sender, EventArgs e)
         {
-            for(int i=0;i<dgRoles.RowCount;i++)
-                        {
-                            string query = "insert into mayusculas_sin_espacios.asignaciones(Usuario,Rol) " +
-                                        "((select codigo,"+ dgRoles.Rows[i].Cells["Codigo"].Value.ToString() +
-                                        " from mayusculas_sin_espacios.usuarios where nombre ='" + tNombre.Text.ToString()+"' )"+
-                                        " except (select usuario, rol from mayusculas_sin_espacios.asignaciones left join "+
-	                                        "mayusculas_sin_espacios.usuarios on (codigo=usuario) "+
-                                        "where nombre ='" + tNombre.Text.ToString()+"'))";
-                            try
-                            {
-                                conexion.Open();
-                                if (conexion.insertQuery(query) != 0)
-                                {
-                                    MessageBox.Show("Se ha modificado las asignaciones.", "Success!");
-                                }
+            try
+            {
+                conexion.Open();
+                if (!this.hayAlgunTextboxVacio(tNombre, tPassword, tEmpleado, cHabilitado))
+                {
+                    String[,] parametros = new String[2, 4];
+                    String sp = "mayusculas_sin_espacios.sp_altaUsuario";
+                    parametros[0, NOMBRE] = "@Nombre";
+                    parametros[0, PASSWORD] = "@Password";
+                    parametros[0, EMPLEADO] = "@Empleado";
+                    parametros[0, HABILITADO] = "@habilitado";
+                    
+                    parametros[1, NOMBRE] = tNombre.Text.ToString();
+                    parametros[1, PASSWORD] = tPassword.Text.ToString();
+                    parametros[1, EMPLEADO] = tEmpleado.Text.ToString();
+                    parametros[1, HABILITADO] = System.Convert.ToInt32(cHabilitado.Checked).ToString();
+                   
+                    SqlDataReader reader = conexion.ejecutarStoredProcedure(sp, parametros);
+                    if (reader != null)
+                    {
+                        MessageBox.Show("Se ha dado de alta el Usuario.", "Success!");
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("Debe completar todos los campos", "Warning!");
+                }
+            }
+            catch (SqlException ex)
+            {
+                MessageBox.Show(ex.Message, "Error!");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.StackTrace, "Error app");
+            }
+            finally
+            {
+                conexion.Close();
+            }
+        }
 
-                            }
-                            catch (SqlException ex)
-                            {
-                                MessageBox.Show(ex.Message, "Error!");
-                            }
-                            catch (Exception ex)
-                            {
-                                MessageBox.Show(ex.StackTrace, "Error app");
-                            }
-                            finally
-                            {
-                                conexion.Close();
-                            }
-                        }
+        private void button2_Click_1(object sender, EventArgs e)
+        {
+            this.actualizarRoles();
+        
         }
     }
 }
@@ -272,15 +314,7 @@ namespace VentaElectrodomesticos.AbmUsuario
 
         }
 
-        private void bAgregar_Click(object sender, EventArgs e)
-        {
-            
-        }
-
-
-
-        
-
+     
         private void bModificar_Click(object sender, EventArgs e)
         {
             try

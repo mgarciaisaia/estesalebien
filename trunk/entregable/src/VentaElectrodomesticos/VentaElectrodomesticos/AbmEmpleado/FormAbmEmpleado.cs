@@ -33,6 +33,9 @@ namespace VentaElectrodomesticos.AbmEmpleado
         private string[] sucursales;
 
 
+
+
+
         public FormAbmEmpleado()
         {
             InitializeComponent();

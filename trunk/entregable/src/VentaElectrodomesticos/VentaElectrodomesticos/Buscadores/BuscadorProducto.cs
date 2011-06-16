@@ -36,7 +36,6 @@ namespace VentaElectrodomesticos.Buscadores
         ClaseSQL conexion;
         private string[] provincias;
         private string[] tipos;
-        private string[] sucursales;
         private String tipoObligatorio;
         
         public BuscadorProducto()

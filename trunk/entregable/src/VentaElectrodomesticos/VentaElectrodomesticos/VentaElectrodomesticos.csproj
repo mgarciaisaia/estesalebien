@@ -111,11 +111,11 @@
     <Compile Include="AsignacionStock\FormAsignacionStock.Designer.cs">
       <DependentUpon>FormAsignacionStock.cs</DependentUpon>
     </Compile>
-    <Compile Include="Buscadores\BuscadorProducto.cs">
+    <Compile Include="Buscadores\BuscadorUsuario.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Buscadores\BuscadorProducto.Designer.cs">
-      <DependentUpon>BuscadorProducto.cs</DependentUpon>
+    <Compile Include="Buscadores\BuscadorUsuario.Designer.cs">
+      <DependentUpon>BuscadorUsuario.cs</DependentUpon>
     </Compile>
     <Compile Include="ClientesPremium\FormClientesPremium.cs">
       <SubType>Form</SubType>
@@ -198,8 +198,8 @@
       <DependentUpon>FormAsignacionStock.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Buscadores\BuscadorProducto.resx">
-      <DependentUpon>BuscadorProducto.cs</DependentUpon>
+    <EmbeddedResource Include="Buscadores\BuscadorUsuario.resx">
+      <DependentUpon>BuscadorUsuario.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="ClientesPremium\FormClientesPremium.resx">
