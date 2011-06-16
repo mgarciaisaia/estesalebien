@@ -15,7 +15,7 @@ namespace VentaElectrodomesticos.MetodosSQL
         private static ClaseSQL instance;
 
         private ClaseSQL()
-        {            
+        {
             cnn = new SqlConnection(connectString);
         }
 
@@ -58,25 +58,30 @@ namespace VentaElectrodomesticos.MetodosSQL
 
         public SqlDataReader busquedaSQLDataReader(String query)
         {
-            //try
-            //{
-                SqlCommand command = new SqlCommand();
-                command.Connection = cnn;
-                command.CommandType = System.Data.CommandType.Text;
-                command.CommandText = query;
-                SqlDataReader reader = command.ExecuteReader();
+            SqlCommand command = new SqlCommand();
+            command.Connection = cnn;
+            command.CommandType = System.Data.CommandType.Text;
+            command.CommandText = query;
+            SqlDataReader reader = command.ExecuteReader();
 
-                return reader;
-            //}
-            //catch (SqlException ex)
-            //{
-            //    throw ex;
-            //}
+            return reader;
+        }
+
+        public Object scalarQuery(String query)
+        {
+            SqlCommand command = new SqlCommand(query, cnn);
+            return command.ExecuteScalar();
         }
 
         public int insertQuery(String query)
         {
             SqlCommand command = new SqlCommand(query, cnn);
+            return command.ExecuteNonQuery();
+        }
+
+        public int insertQuery(SqlCommand command)
+        {
+            command.Connection = cnn;
             return command.ExecuteNonQuery();
         }
 
@@ -135,7 +140,7 @@ namespace VentaElectrodomesticos.MetodosSQL
                 SqlCommand command = new SqlCommand();
                 command.Connection = cnn;
                 command.CommandType = System.Data.CommandType.Text;
-                command.CommandText = "SELECT "+func+"as functionresult";
+                command.CommandText = "SELECT " + func + "as functionresult";
                 command.CommandTimeout = 10;
 
                 for (int i = 0; i < parametros.GetLength(1); i++)
