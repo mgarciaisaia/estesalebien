@@ -18,7 +18,7 @@ namespace VentaElectrodomesticos.DAO
                 return instance;
         }
         private Provincias() { this.initialize(); }
-        private Dictionary<int, Provincia> provincias = new Dictionary<int, Provincia>();
+        private Dictionary<byte, Provincia> provincias = new Dictionary<byte, Provincia>();
         protected override String listQuery()
         {
             return "SELECT Codigo, Nombre FROM " + ClaseSQL.tableName("Provincias");
@@ -35,6 +35,11 @@ namespace VentaElectrodomesticos.DAO
         public List<Provincia> list()
         {
             return provincias.Values.ToList();
+        }
+
+        public Provincia provincia(byte codigo)
+        {
+            return provincias[codigo];
         }
     }
 }

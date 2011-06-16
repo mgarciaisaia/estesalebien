@@ -37,7 +37,7 @@ namespace VentaElectrodomesticos.DAO
         
         public TipoEmpleado tipoEmpleado(int codigo)
         {
-            return tipos.Values.ElementAt(codigo);
+            return tipos[codigo];
         }
 
         public TipoEmpleado tipoEmpleado(String descripcion)
