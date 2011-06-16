@@ -37,11 +37,13 @@
             this.bProducto = new System.Windows.Forms.Button();
             this.tProducto = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
+            this.bBuscarProducto = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.bBuscarProducto);
             this.groupBox1.Controls.Add(this.cSucursal);
             this.groupBox1.Controls.Add(this.bAuditor);
             this.groupBox1.Controls.Add(this.tAuditor);
@@ -52,16 +54,19 @@
             this.groupBox1.Controls.Add(this.label1);
             this.groupBox1.Location = new System.Drawing.Point(7, 9);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(289, 102);
+            this.groupBox1.Size = new System.Drawing.Size(290, 120);
             this.groupBox1.TabIndex = 0;
             this.groupBox1.TabStop = false;
+            this.groupBox1.Text = "Filtros";
             // 
             // cSucursal
             // 
+            this.cSucursal.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cSucursal.FormattingEnabled = true;
             this.cSucursal.Location = new System.Drawing.Point(64, 67);
             this.cSucursal.Name = "cSucursal";
             this.cSucursal.Size = new System.Drawing.Size(135, 21);
+            this.cSucursal.Sorted = true;
             this.cSucursal.TabIndex = 9;
             // 
             // bAuditor
@@ -127,6 +132,16 @@
             this.label1.TabIndex = 0;
             this.label1.Text = "Producto";
             // 
+            // bBuscarProducto
+            // 
+            this.bBuscarProducto.Location = new System.Drawing.Point(205, 94);
+            this.bBuscarProducto.Name = "bBuscarProducto";
+            this.bBuscarProducto.Size = new System.Drawing.Size(72, 20);
+            this.bBuscarProducto.TabIndex = 10;
+            this.bBuscarProducto.Text = "OK";
+            this.bBuscarProducto.UseVisualStyleBackColor = true;
+            this.bBuscarProducto.Click += new System.EventHandler(this.bBuscarProducto_Click);
+            // 
             // FormAsignacionStock
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -154,5 +169,6 @@
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Button bProducto;
+        private System.Windows.Forms.Button bBuscarProducto;
     }
 }
