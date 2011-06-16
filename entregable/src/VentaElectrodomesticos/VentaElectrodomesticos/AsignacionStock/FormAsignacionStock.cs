@@ -31,9 +31,9 @@ namespace VentaElectrodomesticos.AsignacionStock
 
         private void bProducto_Click(object sender, EventArgs e)
         {
-            BuscadorProducto buscadorProductos = new BuscadorProducto();
-            buscadorProductos.ShowDialog(this);
-            producto = buscadorProductos.getProducto();
+            //BuscadorProducto buscadorProductos = new BuscadorProducto();
+            //buscadorProductos.ShowDialog(this);
+            //producto = buscadorProductos.getProducto();
         }
 
         private void FormAsignacionStock_Load(object sender, EventArgs e)
