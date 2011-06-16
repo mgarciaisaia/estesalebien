@@ -20,6 +20,7 @@ using VentaElectrodomesticos.TableroControl;
 using VentaElectrodomesticos.ClientesPremium;
 using VentaElectrodomesticos.MejoresCategorias;
 using VentaElectrodomesticos.MetodosSQL;
+using VentaElectrodomesticos.DAO;
 
 namespace VentaElectrodomesticos
 {
@@ -36,6 +37,7 @@ namespace VentaElectrodomesticos
             FormLogin login = new FormLogin();
             //login.ShowDialog(this);
             //username = login.USERNAME;
+            TiposEmpleado.getInstance();
             
             username = "admin";
             aBMToolStripMenuItem.Enabled = true;

@@ -10,6 +10,7 @@ using VentaElectrodomesticos.Model;
 using VentaElectrodomesticos.MetodosSQL;
 using System.Data.SqlClient;
 using System.Collections;
+using VentaElectrodomesticos.DAO;
 
 namespace VentaElectrodomesticos.Buscadores
 {
@@ -21,6 +22,7 @@ namespace VentaElectrodomesticos.Buscadores
         private string[] provincias;
         private string[] tipos;
         private string[] sucursales;
+        private String tipoObligatorio;
         
         public BuscadorEmpleado()
         {
@@ -30,6 +32,12 @@ namespace VentaElectrodomesticos.Buscadores
             provincias = new string[25];
             tipos = new string[3];
 
+        }
+
+        public BuscadorEmpleado(Boolean deshabilitados, String tipoEmpleado) : this()
+        {
+            buscarDeshabilitados = deshabilitados;
+            tipoObligatorio = tipoEmpleado;
         }
 
         public Empleado getEmpleado()
@@ -43,19 +51,6 @@ namespace VentaElectrodomesticos.Buscadores
             DataTable tabla = this.resultTable(query);
             dgEmpleados.DataSource = tabla;
             dgEmpleados.Show();
-            
-            
-            
-            /*
-             * FIXME: Por algun lado lei que tal vez sea mas simple pasarle una
-             * ArrayList de Empleados al dgEmpleados para despues recuperar los
-             * objetos
-             * 
-             * 
-             * http://www.codeproject.com/KB/grid/dataGridview-DataReader.aspx
-             * 
-             */
-
         }
 
         private DataTable resultTable(String query)
@@ -167,6 +162,11 @@ namespace VentaElectrodomesticos.Buscadores
             cBusqTipo.Items.Add("");
             cBusqTipo.Items.Add("Vendedor");
             cBusqTipo.Items.Add("Analista");
+            if (tipoObligatorio != null)
+            {
+                cBusqTipo.SelectedItem = tipoObligatorio;
+                cBusqTipo.Enabled = false;
+            }
             tipos[1] = "Vendedor";
             tipos[2] = "Analista";
             
@@ -174,34 +174,10 @@ namespace VentaElectrodomesticos.Buscadores
         
         private void rellenarComboBoxProvincia()
         {
-            try
-            {
-                cBusqProvincia.Items.Add("");
-                conexion.Open();
-                SqlDataReader reader = conexion.busquedaSQLDataReader("SELECT codigo, Nombre FROM mayusculas_sin_espacios.provincias order by 1");
-                
-                while (reader.Read())
-                {
-                    String prov = reader[1].ToString().Trim();
-                    int codigo = System.Convert.ToInt32(reader[0].ToString());
-                    cBusqProvincia.Items.Add(prov);
-                    provincias[codigo] = prov;
-                    
-                }
-                reader.Close();
-                
-            }
-            catch (SqlException ex)
-            {
-                MessageBox.Show(ex.Message, "Error!");
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.StackTrace, "Error app");
-            }
-            finally
-            {
-                conexion.Close();
+            cBusqProvincia.Items.Add("");
+            foreach(Provincia provincia in Provincias.getInstance().list()) {
+               cBusqProvincia.Items.Add(provincia.nombre);
+               provincias[provincia.codigo] = provincia.nombre;
             }
         }
         private void rellenarComboBoxSucursal()

@@ -15,9 +15,9 @@ namespace VentaElectrodomesticos.Model
 		public Boolean habilitado;
 		public int marca;
         
-        public Usuario() { }
+        public Producto() { }
 
-        public Usuario(Object[] arrayFields)
+        public Producto(Object[] arrayFields)
         {
             this.codigo = (int)arrayFields[0];
             this.nombre = (String)arrayFields[1];
@@ -25,7 +25,7 @@ namespace VentaElectrodomesticos.Model
             this.categoria = (int)arrayFields[3];
             this.precio = (float)arrayFields[4];
 			this.habilitado = (byte)arrayFields[5] != 0;
-            this.marcas = (int)arrayFields[6];
+            this.marca = (int)arrayFields[6];
         }
     }
 }
