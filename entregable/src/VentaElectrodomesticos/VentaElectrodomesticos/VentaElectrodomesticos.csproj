@@ -124,6 +124,7 @@
       <DependentUpon>FormClientesPremium.cs</DependentUpon>
     </Compile>
     <Compile Include="DAO\DAO.cs" />
+    <Compile Include="DAO\Stocks.cs" />
     <Compile Include="Model\Provincia.cs" />
     <Compile Include="DAO\Provincias.cs" />
     <Compile Include="DAO\Sucursales.cs" />

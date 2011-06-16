@@ -39,5 +39,10 @@ namespace VentaElectrodomesticos.DAO
         {
             return sucursales.Values.ToList();
         }
+
+        public Sucursal sucursal(byte provincia)
+        {
+            return sucursales[provincia];
+        }
     }
 }

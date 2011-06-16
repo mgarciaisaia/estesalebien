@@ -16,6 +16,8 @@ namespace VentaElectrodomesticos.AsignacionStock
     {
         private Empleado auditor = null;
         private Producto producto = null;
+        private Dictionary<String, byte> sucursales = new Dictionary<String, byte>();
+        private int stockActual;
 
         public FormAsignacionStock()
         {
@@ -77,9 +79,13 @@ namespace VentaElectrodomesticos.AsignacionStock
         {
             cSucursal.Items.Clear();
             cSucursal.Items.Add("");
+            sucursales.Clear();
+            Provincias provincias = Provincias.getInstance();
             foreach (Sucursal sucursal in Sucursales.getInstance().list())
             {
-                cSucursal.Items.Add(Provincias.getInstance().provincia(sucursal.provincia).nombre);
+                String nombreProvincia = provincias.provincia(sucursal.provincia).nombre;
+                cSucursal.Items.Add(nombreProvincia);
+                sucursales.Add(nombreProvincia, sucursal.provincia);
             }
         }
 
@@ -117,9 +123,22 @@ namespace VentaElectrodomesticos.AsignacionStock
             }
         }
 
-        private void mostrarProducto()
+        private void mostrarStock()
         {
+            tProductoSeleccionado.Text = producto.nombre;
+            tSucursalSeleccionada.Text = cSucursal.Text;
+            tAuditorSeleccionado.Text = auditor.apellido.ToUpper() + ", " + auditor.nombre;
+            stockActual = Stocks.getInstance().stock(producto, Sucursales.getInstance().sucursal(sucursales[cSucursal.Text]));
+            tStock.Text = stockActual.ToString();
+            cNuevoStock.Value = stockActual;
+            groupStock.Enabled = true;
+        }
 
+        private void button1_Click(object sender, EventArgs e)
+        {
+            groupStock.Enabled = false;
+            Stocks.getInstance().nuevoMovimiento(producto, auditor, sucursales[tSucursalSeleccionada.Text], cNuevoStock.Value - stockActual);
+            mostrarStock();
         }
 
     }
