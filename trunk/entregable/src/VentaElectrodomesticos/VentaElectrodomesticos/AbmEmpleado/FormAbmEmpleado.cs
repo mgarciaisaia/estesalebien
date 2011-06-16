@@ -10,6 +10,7 @@ using System.Windows.Forms;
 using VentaElectrodomesticos.Buscadores;
 using VentaElectrodomesticos.Model;
 using VentaElectrodomesticos.MetodosSQL;
+using VentaElectrodomesticos.DAO;
 
 namespace VentaElectrodomesticos.AbmEmpleado
 {
@@ -38,6 +39,7 @@ namespace VentaElectrodomesticos.AbmEmpleado
             conexion = ClaseSQL.getInstance();
             provincias = new string[25];
             tipos = new string[3];
+            sucursales = new string[25];
         }
 
         private void BuscarEmpleado_Click(object sender, EventArgs e)
@@ -236,74 +238,31 @@ namespace VentaElectrodomesticos.AbmEmpleado
         private void rellenarComboBoxTipo()
         {
             cTipo.Items.Add("");
-            cTipo.Items.Add("Vendedor");
-            cTipo.Items.Add("Analista");
-            tipos[1] = "Vendedor";
-            tipos[2] = "Analista";
+            foreach (TipoEmpleado tipo in TiposEmpleado.getInstance().tiposEmpleado())
+            {
+                cTipo.Items.Add(tipo.descripcion);
+                tipos[tipo.codigo] = tipo.descripcion;
+            }
         }
 
         private void rellenarComboBoxProvincia()
         {
-            try
+            cProvincia.Items.Add("");
+            foreach (Provincia provincia in Provincias.getInstance().list())
             {
-                cProvincia.Items.Add("");
-                conexion.Open();
-                SqlDataReader reader = conexion.busquedaSQLDataReader("SELECT codigo, Nombre FROM mayusculas_sin_espacios.provincias order by 1");
-
-                while (reader.Read())
-                {
-                    String prov = reader[1].ToString().Trim();
-                    int codigo = System.Convert.ToInt32(reader[0].ToString());
-                    cProvincia.Items.Add(prov);
-                    provincias[codigo] = prov;
-
-                }
-                reader.Close();
-
-            }
-            catch (SqlException ex)
-            {
-                MessageBox.Show(ex.Message, "Error!");
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.StackTrace, "Error app");
-            }
-            finally
-            {
-                conexion.Close();
+                cProvincia.Items.Add(provincia.nombre);
+                provincias[provincia.codigo] = provincia.nombre;
             }
         }
 
 
         private void rellenarComboBoxSucursal()
         {
-            try
+            cSucursal.Items.Add("");
+            foreach (Sucursal sucursal in Sucursales.getInstance().list())
             {
-                cSucursal.Items.Add("");
-                conexion.Open();
-                SqlDataReader reader = conexion.busquedaSQLDataReader("SELECT nombre, direccion FROM mayusculas_sin_espacios.sucursales left join mayusculas_sin_espacios.provincias on(codigo=provincia) order by provincia");
-
-                while (reader.Read())
-                {
-                    String suc = reader[0].ToString().Trim() + " - " + reader[1].ToString().Trim();
-                    cSucursal.Items.Add(suc);
-
-                }
-                reader.Close();
-
-            }
-            catch (SqlException ex)
-            {
-                MessageBox.Show(ex.Message, "Error!");
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.StackTrace, "Error app");
-            }
-            finally
-            {
-                conexion.Close();
+                cSucursal.Items.Add(provincias[sucursal.provincia]);
+                sucursales[sucursal.provincia] = provincias[sucursal.provincia];
             }
         }
 
