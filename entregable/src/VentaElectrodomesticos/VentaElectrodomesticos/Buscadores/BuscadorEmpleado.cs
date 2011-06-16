@@ -247,6 +247,5 @@ namespace VentaElectrodomesticos.Buscadores
             this.rellenarComboBoxTipo();
             dgEmpleados.DataSource=null;
         }
-        
     }
 }

@@ -22,7 +22,7 @@ namespace VentaElectrodomesticos.AbmUsuario
         private static int HABILITADO = 4;
         private static int INTENTOS = 5;
         private static int ROLES = 6;
-        private string[] roles;
+        private string codigoUser ="";
         
 		ClaseSQL conexion;
 		
@@ -31,7 +31,7 @@ namespace VentaElectrodomesticos.AbmUsuario
         {
             InitializeComponent();
 			conexion = ClaseSQL.getInstance();
-            roles = new string[25];
+            
         }
 
         private void FormAbmUsuario_Load(object sender, EventArgs e)
@@ -44,7 +44,7 @@ namespace VentaElectrodomesticos.AbmUsuario
             try
             {
                 conexion.Open();
-                SqlDataReader reader = conexion.busquedaSQLDataReader("SELECT codigo, Nombre FROM mayusculas_sin_espacios.Roles where habilitado='1' order by 1");
+                SqlDataReader reader = conexion.busquedaSQLDataReader("SELECT Codigo, Nombre FROM mayusculas_sin_espacios.Roles where habilitado='1' order by 1");
                 DataTable tabla = new DataTable();
                 if (reader.HasRows)
                 {
@@ -52,15 +52,19 @@ namespace VentaElectrodomesticos.AbmUsuario
                 }
 
                 dgRoles.DataSource = tabla;
+                dgRoles.Columns["Nombre"].Width = 158;
+                dgRoles.Columns["Nombre"].ReadOnly = true;
+                dgRoles.Columns["Codigo"].Visible = false;
                 dgRoles.Show();
                 
-
-                while (reader.Read())
+                
+                /*
+                 * while (reader.Read())
                 {
                     String rol = reader[1].ToString().Trim();
                     int codigo = System.Convert.ToInt32(reader[0].ToString());
                     roles[codigo] = rol;
-                }
+                }*/
                 reader.Close();
                 
 
@@ -78,24 +82,58 @@ namespace VentaElectrodomesticos.AbmUsuario
                 conexion.Close();
             }
         }
-        
-        /*
-        private void BuscarUsuario_Click(object sender, EventArgs e)
+
+        private void BuscarEmpleado_Click(object sender, EventArgs e)
         {
-            BuscadorUsuario buscador = new BuscadorEmpleado();
+            BuscadorEmpleado buscador = new BuscadorEmpleado();
             buscador.ShowDialog(this);
-            this.cargarUsuario(buscador.getEmpleado());
+            this.cargarEmpleado(buscador.getEmpleado());
         }
 
-        private void cargarUsuario(Model.Empleado empleado)
+        private void cargarEmpleado(Model.Empleado empleado)
         {
             if (empleado != null)
             {
                 tEmpleado.Text = empleado.dni.ToString();
                 tEmpleado.Enabled = false;
-                cHabilitado.Checked = usuario.habilitado;
+                String sql = "SELECT codigo,nombre, password, habilitado FROM [GD1C2011].[MAYUSCULAS_SIN_ESPACIOS].[Usuarios] " +
+                        "WHERE empleado=" + tEmpleado.Text;
+                conexion.Open();
+                SqlDataReader reader = conexion.busquedaSQLDataReader(sql);
+                if (reader.Read())
+                {
+                    tNombre.Text=reader["nombre"].ToString();
+                    tNombre.Enabled = false;
+                    tPassword.Text = reader["Password"].ToString();
+                    cHabilitado.Checked = System.Convert.ToBoolean(reader["habilitado"]);
+                    codigoUser = reader["codigo"].ToString();
+
+                }
+                reader.Close();
+                String query = "SELECT rol,nombre FROM [GD1C2011].[MAYUSCULAS_SIN_ESPACIOS].[Asignaciones] " +
+                        "left join MAYUSCULAS_SIN_ESPACIOS.roles on(rol=codigo) WHERE usuario=" + codigoUser;
+                SqlDataReader rolUser = conexion.busquedaSQLDataReader(query);
+                int i = 0;
+                while (rolUser.Read())
+                {
+                    i = System.Convert.ToInt32( rolUser["rol"]);
+                    dgRoles.Rows[i-1].Cells["Seleccion"].Value = true;
+                }
+                rolUser.Close();
+                conexion.Close();
             }
 
+        }
+
+        private void bLimpiarABM_Click(object sender, EventArgs e)
+        {
+            tNombre.Clear();
+            tNombre.Enabled = true;
+            tPassword.Clear();
+            tEmpleado.Clear();
+            cHabilitado.Checked = false;
+            this.rellenarTablaRoles();
+            
         }
 
         private void bAgregar_Click(object sender, EventArgs e)
@@ -103,37 +141,44 @@ namespace VentaElectrodomesticos.AbmUsuario
             try
             {
                 conexion.Open();
-                if (!this.hayAlgunTextboxVacio(tDNI, tNombre, tApellido, tMail,tDireccion,tTelefono, cProvincia, cTipo, cSucursal, cHabilitado))
+                if (!this.hayAlgunTextboxVacio(tNombre, tPassword, tEmpleado, cHabilitado))
                 {
-                    String[,] parametros = new String[2, 10];
+                    String[,] parametros = new String[2, 4];
                     String sp = "mayusculas_sin_espacios.sp_altaUsuario";
-                    parametros[0, DNI] = "@DNI";
-                    parametros[0, NOMBRE] = "@Nombre";
-                    parametros[0, APELLIDO] = "@Apellido";
-                    parametros[0, MAIL] = "@Mail";
-                    parametros[0, DIRECCION] = "@direccion";
-                    parametros[0, TELEFONO] = "@telefono";
-                    parametros[0, PROVINCIA] = "@provincia";
-                    parametros[0, TIPO] = "@tipo";
-                    parametros[0, SUCURSAL] = "@sucursal"; 
-                    parametros[0, HABILITADO] = "@habilitado";
-                    
-                    parametros[1, DNI] = tDNI.Text;
-                    parametros[1, NOMBRE] = tNombre.Text;
-                    parametros[1, APELLIDO] = tApellido.Text;
-                    parametros[1, MAIL] = tMail.Text;
-                    parametros[1, DIRECCION] = tDireccion.Text;
-                    parametros[1, TELEFONO] = tTelefono.Text;
-                    parametros[1, PROVINCIA] = cProvincia.SelectedIndex.ToString();
-                    parametros[1, TIPO] = cTipo.SelectedIndex.ToString();
-                    parametros[1, SUCURSAL] = cSucursal.SelectedIndex.ToString();
-                    parametros[1, HABILITADO] = System.Convert.ToInt32(cHabilitado.Checked).ToString();
-                    
-                    
+                    //parametros[0, CODIGO ] = "@Codigo";
+                    parametros[0, 0] = "@Nombre";
+                    parametros[0, 1] = "@Password";
+                    parametros[0, 2] = "@Empleado";
+                    parametros[0, 3] = "@Habilitado";
+
+                    //parametros[1, CODIGO] = empleado;
+                    parametros[1, 0] = tNombre.Text;
+                    parametros[1, 1] = tPassword.Text;
+                    parametros[1, 2] = tEmpleado.Text;
+                    parametros[1, 3] = System.Convert.ToInt32(cHabilitado.Checked).ToString();
+
+
                     SqlDataReader reader = conexion.ejecutarStoredProcedure(sp, parametros);
                     if (reader != null)
                     {
+                        for(int i=0;i<dgRoles.RowCount;i++)
+                        {
+                            if (System.Convert.ToInt32(dgRoles.Rows[i].Cells["Seleccion"].Value) == 1)
+                            {
+                                string query = "insert into mayusculas_sin_espacios.asignaciones(Usuario,Rol) " +
+                                        " select codigo," + dgRoles.Rows[i].Cells["Codigo"].Value.ToString() +
+                                        " from mayusculas_sin_espacios.usuarios where nombre =" + tNombre.Text.ToString();
+                                //MessageBox.Show(dgRoles.Rows[i].Cells[2].Value.ToString() + "   " + query);
+                                if (conexion.insertQuery(query) != 0)
+                                {
+                                    MessageBox.Show("Se ha Modificado las asignaciones!", "Success!");
+                                }
+                            }
+                        }
+
+
                         MessageBox.Show("Se ha dado de alta el cliente.", "Success!");
+
                     }
                 }
                 else
@@ -155,12 +200,86 @@ namespace VentaElectrodomesticos.AbmUsuario
             }
         }
 
-
-
-        private bool hayAlgunTextboxVacio(TextBox tDNI, TextBox tNombre, TextBox tApellido, TextBox tMail, TextBox tDireccion, TextBox tTelefono, ComboBox cProvincia, ComboBox cTipo, ComboBox cSucursal, CheckBox chHabilitado)
+        private void bModificar_Click(object sender, EventArgs e)
         {
-            return tDNI.Text.Equals("") || tNombre.Text.Equals("") || tApellido.Text.Equals("") || tMail.Text.Equals("") || tDireccion.Text.Equals("") || tTelefono.Text.Equals("") || cProvincia.Text.Equals("")|| cTipo.Text.Equals("")|| cSucursal.Text.Equals("");
+
         }
+
+        private void bEliminar_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private bool hayAlgunTextboxVacio(TextBox tNombre, TextBox tPasswprd, TextBox tEmpleado,  CheckBox chHabilitado)
+        {
+            return tNombre.Text.Equals("") || tPasswprd.Text.Equals("") || tEmpleado.Text.Equals("") ;
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            for(int i=0;i<dgRoles.RowCount;i++)
+                        {
+                            string query = "insert into mayusculas_sin_espacios.asignaciones(Usuario,Rol) " +
+                                        "((select codigo,"+ dgRoles.Rows[i].Cells["Codigo"].Value.ToString() +
+                                        " from mayusculas_sin_espacios.usuarios where nombre ='" + tNombre.Text.ToString()+"' )"+
+                                        " except (select usuario, rol from mayusculas_sin_espacios.asignaciones left join "+
+	                                        "mayusculas_sin_espacios.usuarios on (codigo=usuario) "+
+                                        "where nombre ='" + tNombre.Text.ToString()+"'))";
+                            try
+                            {
+                                conexion.Open();
+                                if (conexion.insertQuery(query) != 0)
+                                {
+                                    MessageBox.Show("Se ha modificado las asignaciones.", "Success!");
+                                }
+
+                            }
+                            catch (SqlException ex)
+                            {
+                                MessageBox.Show(ex.Message, "Error!");
+                            }
+                            catch (Exception ex)
+                            {
+                                MessageBox.Show(ex.StackTrace, "Error app");
+                            }
+                            finally
+                            {
+                                conexion.Close();
+                            }
+                        }
+        }
+    }
+}
+
+
+
+        /*
+        private void BuscarUsuario_Click(object sender, EventArgs e)
+        {
+            BuscadorUsuario buscador = new BuscadorEmpleado();
+            buscador.ShowDialog(this);
+            this.cargarUsuario(buscador.getEmpleado());
+        }
+
+        private void cargarUsuario(Model.Empleado empleado)
+        {
+            if (empleado != null)
+            {
+                tEmpleado.Text = empleado.dni.ToString();
+                tEmpleado.Enabled = false;
+                cHabilitado.Checked = usuario.habilitado;
+            }
+
+        }
+
+        private void bAgregar_Click(object sender, EventArgs e)
+        {
+            
+        }
+
+
+
+        
 
         private void bModificar_Click(object sender, EventArgs e)
         {
@@ -217,6 +336,7 @@ namespace VentaElectrodomesticos.AbmUsuario
         {
             String sql = "DELETE FROM [GD1C2011].[MAYUSCULAS_SIN_ESPACIOS].[Usuarios] " +
                         "WHERE dni=" + tDNI.Text;
+         
 
             try
             {
@@ -240,52 +360,8 @@ namespace VentaElectrodomesticos.AbmUsuario
                 conexion.Close();
             }
         }
-
         
-
-        private void rellenarComboBoxTipo()
-        {
-            cTipo.Items.Add("");
-            cTipo.Items.Add("Vendedor");
-            cTipo.Items.Add("Analista");
-            tipos[1] = "Vendedor";
-            tipos[2] = "Analista";
-        }
-
-        private void rellenarComboBoxProvincia()
-        {
-            try
-            {
-                cProvincia.Items.Add("");
-                conexion.Open();
-                SqlDataReader reader = conexion.busquedaSQLDataReader("SELECT codigo, Nombre FROM mayusculas_sin_espacios.provincias order by 1");
-
-                while (reader.Read())
-                {
-                    String prov = reader[1].ToString().Trim();
-                    int codigo = System.Convert.ToInt32(reader[0].ToString());
-                    cProvincia.Items.Add(prov);
-                    provincias[codigo] = prov;
-
-                }
-                reader.Close();
-
-            }
-            catch (SqlException ex)
-            {
-                MessageBox.Show(ex.Message, "Error!");
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.StackTrace, "Error app");
-            }
-            finally
-            {
-                conexion.Close();
-            }
-        }
-
-
+        
         private void rellenarComboBoxSucursal()
         {
             try
@@ -337,29 +413,4 @@ namespace VentaElectrodomesticos.AbmUsuario
 
         }
 
-        private void bLimpiarUsuario_Click(object sender, EventArgs e)
-        {
-            tDNI.Clear();
-            tDNI.Enabled = true;
-            tNombre.Clear();
-            tApellido.Clear();
-            tMail.Clear();
-            tTelefono.Clear();
-            tDireccion.Clear();
-            cProvincia.Items.Clear();
-            cProvincia.Enabled = true;
-            this.rellenarComboBoxProvincia();
-            cSucursal.Items.Clear();
-            cSucursal.Enabled = true;
-            this.rellenarComboBoxSucursal();
-            cTipo.Items.Clear();
-            cTipo.Enabled = true;
-            this.rellenarComboBoxTipo();
-            cHabilitado.Checked = false;
-            
-        }
-		
-		*/
-		
-    }
-}
+        */
