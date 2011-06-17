@@ -1065,3 +1065,26 @@ from mayusculas_sin_espacios.facturas
 where (@fecha=fecha and @descuento=descuento and @sucursal=sucursal and @vendedor =vendedor and @cliente =cliente))
 
 end
+
+
+create procedure mayusculas_sin_espacios.sp_faltanCuotas(@factura int)
+as
+begin
+declare @pagas int
+declare @total int
+set @pagas = (select count(*)+1 from mayusculas_sin_espacios.pagos where factura = @factura)
+set @total = (select cuotas FROM mayusculas_sin_espacios.facturascompletas where numero=@factura)
+
+select (@total-@pagas)
+return
+end
+
+create procedure mayusculas_sin_espacios.sp_Pagar(@factura int, @sucursal int,@cuotas int,
+												 @fecha datetime, @cobrador int)
+as
+begin
+
+insert into mayusculas_sin_espacios.pagos (factura,sucursal,cuotas,fecha,cobrador) 
+values (@factura,@sucursal,@cuotas,@factura,@cobrador)
+
+end
