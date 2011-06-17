@@ -11,7 +11,7 @@ schema_name='MAYUSCULAS_SIN_ESPACIOS')
 EXEC ('create schema MAYUSCULAS_SIN_ESPACIOS AUTHORIZATION gd');
 GO
 
-
+--------------------------------------------------------
 PRINT 'Tabla Provincias'
 GO
 
@@ -21,6 +21,7 @@ CREATE TABLE [MAYUSCULAS_SIN_ESPACIOS].[Provincias] (
 )
 GO
 
+--------------------------------------------------------
 PRINT 'Insert Provincias'
 GO
 
@@ -30,7 +31,7 @@ FROM gd_esquema.Maestra)
 
 GO
 
-
+--------------------------------------------------------
 PRINT 'Tabla TipoEmpleado'
 GO
 
@@ -40,6 +41,7 @@ CREATE TABLE [MAYUSCULAS_SIN_ESPACIOS].[TiposEmpleado] (
 )
 GO
 
+--------------------------------------------------------
 PRINT 'Insert TipoEmpleado'
 GO
 
@@ -49,7 +51,7 @@ FROM gd_esquema.Maestra)
 
 GO
 
-
+--------------------------------------------------------
 PRINT 'Tabla TipoSucursal'
 GO
 
@@ -59,6 +61,7 @@ CREATE TABLE [MAYUSCULAS_SIN_ESPACIOS].[TiposSucursal] (
 )
 GO
 
+--------------------------------------------------------
 PRINT 'Insert TipoSucursal'
 GO
 
@@ -68,7 +71,7 @@ FROM gd_esquema.Maestra)
 
 GO
 
-
+--------------------------------------------------------
 PRINT 'Tabla Sucursales'
 GO
 
@@ -80,6 +83,7 @@ CREATE TABLE [MAYUSCULAS_SIN_ESPACIOS].[Sucursales] (
 )
 GO
 
+--------------------------------------------------------
 PRINT 'Insert Sucursales'
 GO
 
@@ -90,7 +94,7 @@ FROM gd_esquema.Maestra LEFT JOIN MAYUSCULAS_SIN_ESPACIOS.Provincias ON Maestra.
 
 GO
 
-
+--------------------------------------------------------
 PRINT 'Vista SucursalProvincia'
 GO
 
@@ -100,7 +104,7 @@ FROM MAYUSCULAS_SIN_ESPACIOS.Provincias LEFT JOIN MAYUSCULAS_SIN_ESPACIOS.Sucurs
 		LEFT JOIN MAYUSCULAS_SIN_ESPACIOS.TiposSucursal ON Sucursales.Tipo = TiposSucursal.Codigo
 GO
 
-
+--------------------------------------------------------
 PRINT 'Tabla Cliente'
 GO
 
@@ -122,6 +126,7 @@ CREATE TABLE [MAYUSCULAS_SIN_ESPACIOS].[Clientes] (
 	[Habilitado] [tinyint] DEFAULT 1
 )
 
+--------------------------------------------------------
 PRINT 'Indices Clientes'
 GO
 
@@ -137,7 +142,7 @@ CREATE INDEX ClientesPorProvincia
     ON MAYUSCULAS_SIN_ESPACIOS.Clientes (Provincia);
 GO
 
-
+--------------------------------------------------------
 PRINT 'Tabla Empleados'
 GO
 
@@ -155,6 +160,7 @@ CREATE TABLE [MAYUSCULAS_SIN_ESPACIOS].[Empleados] (
 )
 GO
 
+--------------------------------------------------------
 PRINT 'Indices Empleados'
 GO
 
@@ -178,7 +184,7 @@ CREATE INDEX EmpleadosPorTipo
     ON MAYUSCULAS_SIN_ESPACIOS.Empleados (Tipo);
 GO
 
-
+--------------------------------------------------------
 PRINT 'Trigger NuevoEmpleado'
 GO
 
@@ -196,7 +202,7 @@ AS
 	WHERE Clientes.DNI = INSERTED.DNI;
 GO
 
-
+--------------------------------------------------------
 PRINT 'Trigger LosEmpleadosNoPuedenHacerseClientes'
 GO
 
@@ -222,7 +228,7 @@ BEGIN
 END
 GO
 
-
+--------------------------------------------------------
 PRINT 'Insert Clientes'
 GO
 
@@ -233,7 +239,7 @@ FROM GD_ESQUEMA.MAESTRA
 WHERE CLI_DNI IS NOT NULL)
 GO
 
-
+--------------------------------------------------------
 PRINT 'Insert Empleados'
 GO
 
@@ -257,7 +263,7 @@ WHERE EMPLEADO_TIPO = 'Analista' AND SucursalProvincia.Tipo = 'Sede Central'))
 
 GO
 
-
+--------------------------------------------------------
 PRINT 'Tabla Usuarios'
 GO
 
@@ -284,8 +290,7 @@ CREATE INDEX UsuariosPorEmpleado
     ON MAYUSCULAS_SIN_ESPACIOS.Usuarios (Empleado);
 GO
 
-
-
+--------------------------------------------------------
 PRINT 'Insert Usuario admin'
 GO
 
@@ -295,7 +300,7 @@ GO
 INSERT INTO [MAYUSCULAS_SIN_ESPACIOS].[Usuarios] (Nombre, Password, Empleado)
 VALUES ('admin', 'E6B87050BFCB8143FCB8DB0170A4DC9ED00D904DDD3E2A4AD1B1E8DC0FDC9BE7', null);
 
-
+--------------------------------------------------------
 PRINT 'Insert Usuarios de los empleados'
 GO
 
@@ -305,6 +310,7 @@ FROM MAYUSCULAS_SIN_ESPACIOS.Empleados)
 
 GO
 
+--------------------------------------------------------
 PRINT 'Tabla Roles'
 GO
 
@@ -314,7 +320,7 @@ CREATE TABLE [MAYUSCULAS_SIN_ESPACIOS].[Roles] (
 	[Habilitado] [tinyint] DEFAULT 1
 )
 
-
+--------------------------------------------------------
 PRINT 'Indices Roles'
 GO
 
@@ -322,7 +328,7 @@ CREATE INDEX RolesPorNombre
     ON MAYUSCULAS_SIN_ESPACIOS.Roles (Nombre);
 GO
 
-
+--------------------------------------------------------
 PRINT 'Insert Rol Administrador General'
 GO
 
@@ -338,7 +344,7 @@ VALUES ('Administrador General');
 
 GO
 
-
+--------------------------------------------------------
 PRINT 'Tabla Asignaciones'
 GO
 
@@ -352,7 +358,7 @@ CREATE TABLE [MAYUSCULAS_SIN_ESPACIOS].[Asignaciones] (
 	PRIMARY KEY (Usuario, Rol)
 )
 
-
+--------------------------------------------------------
 PRINT 'Insert Asignacion del usuario admin'
 GO
 
@@ -369,12 +375,13 @@ WHERE Usuarios.Nombre = 'admin' AND Roles.Nombre = 'Administrador General')
  * FIXME: podriamos hacer algunas asignaciones mas (un rol por tipo de empleado?)
  */
  
-
+--------------------------------------------------------
 /*
  * Funcionalidades: las posibles funcionalidades que se le pueden asignar
  * a los roles del sistema.
  * Son fijas, definidas por extension en el enunciado del TP.
  */
+
 PRINT 'Tabla Funcionalidades'
 GO
 
@@ -384,7 +391,7 @@ CREATE TABLE [MAYUSCULAS_SIN_ESPACIOS].[Funcionalidades] (
 )
 GO
 
-
+--------------------------------------------------------
 PRINT 'Inserts Funcionalidades'
 GO
 
@@ -402,7 +409,7 @@ INSERT INTO MAYUSCULAS_SIN_ESPACIOS.Funcionalidades ([Descripcion]) VALUES ('Mej
 
 GO
 
-
+--------------------------------------------------------
 PRINT 'Tabla FuncionalidadesRol'
 GO
 
@@ -416,7 +423,7 @@ CREATE TABLE [MAYUSCULAS_SIN_ESPACIOS].[FuncionalidadesRol] (
 	PRIMARY KEY (Rol, Funcionalidad)
 )
 
-
+--------------------------------------------------------
 PRINT 'Insert Funcionalidades del Rol Administrador General'
 GO
 
@@ -430,7 +437,7 @@ WHERE Roles.Nombre = 'Administrador General');
 
 GO
 
-
+--------------------------------------------------------
 PRINT 'Tabla Categorias'
 GO
  
@@ -440,7 +447,7 @@ CREATE TABLE [MAYUSCULAS_SIN_ESPACIOS].[Categorias] (
 	[Padre] [int] NULL DEFAULT NULL FOREIGN KEY REFERENCES [MAYUSCULAS_SIN_ESPACIOS].[Categorias] (Codigo)
 )
 
-
+--------------------------------------------------------
 PRINT 'Indices Categoria'
 GO
 
@@ -448,7 +455,7 @@ CREATE INDEX CategoriasPorNombre
     ON MAYUSCULAS_SIN_ESPACIOS.Categorias (Nombre);
 GO
 
-
+--------------------------------------------------------
 --Garantizamos 'Make it work'. Las otras dos, veremos.
 PRINT 'Procedure Parse (categorias)'
 GO 
@@ -491,7 +498,7 @@ BEGIN
 END
 GO
 
-
+--------------------------------------------------------
 PRINT 'Insert Categorias'
 GO
 
@@ -506,7 +513,8 @@ begin
 	select @au_id = min( producto_cate ) from gd_esquema.Maestra where producto_cate > @au_id
 end
 GO
- 
+
+--------------------------------------------------------
 PRINT 'TABLA Marcas'
 GO 
 
@@ -520,7 +528,7 @@ CREATE INDEX MarcasPorNombre
     ON MAYUSCULAS_SIN_ESPACIOS.Marcas (Nombre);
 GO
 
-
+--------------------------------------------------------
 PRINT 'Insert Marcas'
 GO
 
@@ -529,10 +537,9 @@ INSERT INTO [MAYUSCULAS_SIN_ESPACIOS].[Marcas](NOMBRE)
   FROM gd_esquema.Maestra
   WHERE PRODUCTO_MARCA IS NOT NULL
 
-
+--------------------------------------------------------
 PRINT 'TABLA PRODUCTOS'
 GO 
-
 
 CREATE TABLE [MAYUSCULAS_SIN_ESPACIOS].[Productos] (
 	[Codigo] [INT] IDENTITY PRIMARY KEY,
@@ -547,7 +554,7 @@ GO
 
 SET IDENTITY_INSERT [MAYUSCULAS_SIN_ESPACIOS].[Productos] ON;
 
-
+--------------------------------------------------------
 PRINT 'Indices Productos'
 GO
 
@@ -563,7 +570,7 @@ CREATE INDEX ProductosPorPrecio
     ON MAYUSCULAS_SIN_ESPACIOS.Productos (Precio);
 GO
 
-
+--------------------------------------------------------
 PRINT 'INSERT Productos'
 GO
 
@@ -597,6 +604,7 @@ END
 SET IDENTITY_INSERT [MAYUSCULAS_SIN_ESPACIOS].[Productos] OFF;
 GO
 
+--------------------------------------------------------
 PRINT 'TABLA FACTURAS'
 GO 
 
@@ -612,7 +620,7 @@ CREATE TABLE [MAYUSCULAS_SIN_ESPACIOS].[Facturas] (
 
 SET IDENTITY_INSERT [MAYUSCULAS_SIN_ESPACIOS].[Facturas] ON;
 
-
+--------------------------------------------------------
 PRINT 'Indices Facturas'
 GO
 
@@ -628,7 +636,7 @@ GO
  * FIXME: seguramente falten indices para las consultas del final del TP
  */
 
-
+--------------------------------------------------------
 PRINT 'Insert Facturas'
 GO
 
@@ -639,7 +647,7 @@ WHERE FACTURA_NRO <> 0)
 
 GO
 
-
+--------------------------------------------------------
 PRINT 'TABLA MOVIMIENTOS STOCKS'
 GO 
 
@@ -655,7 +663,7 @@ CREATE TABLE [MAYUSCULAS_SIN_ESPACIOS].[MovimientosStock] (
 )
 GO
 
-
+--------------------------------------------------------
 PRINT 'Indices MovimientosStock'
 GO
 
@@ -671,7 +679,7 @@ CREATE INDEX MovimientosPorFecha
     ON MAYUSCULAS_SIN_ESPACIOS.MovimientosStock (Fecha);
 GO
 
-
+--------------------------------------------------------
 PRINT 'Insert MovimientosStock (entradas)'
 GO
 
@@ -681,7 +689,7 @@ FROM gd_esquema.Maestra LEFT JOIN MAYUSCULAS_SIN_ESPACIOS.Provincias ON Provinci
 WHERE LLEGADA_STOCK_CANT IS NOT NULL AND LLEGADA_STOCK_CANT <> 0)
 
 
-
+--------------------------------------------------------
 PRINT 'TABLA ITEM FACTURAS'
 GO 
 
@@ -693,7 +701,7 @@ CREATE TABLE [MAYUSCULAS_SIN_ESPACIOS].[ItemsFactura] (
 )
 GO
 
-
+--------------------------------------------------------
 PRINT 'Indices ItemsFacturas'
 GO
 
@@ -710,7 +718,7 @@ CREATE INDEX ItemsPorPrecio
     ON MAYUSCULAS_SIN_ESPACIOS.ItemsFactura (PrecioUnitario);
 GO
 
-
+--------------------------------------------------------
 PRINT 'Trigger ItemVendido'
 GO
 
@@ -730,7 +738,7 @@ BEGIN
 END
 GO
 
-
+--------------------------------------------------------
 PRINT 'Insert ItemsFactura'
 GO
 
@@ -740,7 +748,7 @@ FROM gd_esquema.Maestra
 WHERE FACTURA_NRO <> 0 AND PRODUCTO_NOMBRE IS NOT NULL)
 GO
 
-
+--------------------------------------------------------
 PRINT 'Vista FacturasCompletas'
 GO
 
@@ -754,6 +762,7 @@ GROUP BY Numero, Fecha, Descuento, Cuotas
 
 GO
 
+--------------------------------------------------------
 PRINT 'VISTA STOCKS'
 GO 
 
@@ -763,7 +772,7 @@ FROM MAYUSCULAS_SIN_ESPACIOS.MovimientosStock
 GROUP BY Producto, Sucursal
 GO
 
-
+--------------------------------------------------------
 PRINT 'TABLA PAGOS'
 GO
 
@@ -830,7 +839,7 @@ GROUP BY Facturas.Numero, Facturas.Cuotas
 ORDER BY CuotasPendientes DESC
 */
 
-
+--------------------------------------------------------
 PRINT 'PROCEDURE MODIFINTENTOS '
 GO
 
@@ -844,7 +853,7 @@ END
 
 GO
 
-
+--------------------------------------------------------
 PRINT 'PROCEDURE LOGIN'
 GO
 
@@ -894,10 +903,11 @@ BEGIN
 END
 GO
 
-print ' Procedure Alta Empleado'
+--------------------------------------------------------
+PRINT ' Procedure Alta Empleado'
 GO
 
-create procedure mayusculas_sin_espacios.sp_altaEmpleado (@DNI numeric(8,0), @Nombre nvarchar(30),
+CREATE PROCEDURE mayusculas_sin_espacios.sp_altaEmpleado (@DNI numeric(8,0), @Nombre nvarchar(30),
 					@Apellido nvarchar(30), @Mail nvarchar(255), @Telefono nvarchar(20),
 					@Direccion nvarchar(255), @Provincia tinyint, @Tipo tinyint,@Sucursal tinyint,@habilitado tinyint)
 as
@@ -909,14 +919,14 @@ VALUES (@DNI,@Nombre,@Apellido,@Mail,@Telefono,@Direccion,@Provincia,@Tipo,@Sucu
 end
 GO
 
-
-print ' Procedure Modificacion Empleado'
+--------------------------------------------------------
+PRINT ' Procedure Modificacion Empleado'
 GO
 
-create procedure [MAYUSCULAS_SIN_ESPACIOS].[sp_ModifEmpleados](@DNI numeric(8,0), @Nombre nvarchar(30),
+CREATE PROCEDURE [MAYUSCULAS_SIN_ESPACIOS].[sp_ModifEmpleados](@DNI numeric(8,0), @Nombre nvarchar(30),
 					@Apellido nvarchar(30), @Mail nvarchar(255), @Telefono nvarchar(20),
 					@Direccion nvarchar(255), @habilitado tinyint)
-as
+AS
 begin
 UPDATE  mayusculas_sin_espacios.Empleados
 SET nombre=@Nombre, apellido=@Apellido, mail=@Mail, telefono=@Telefono, direccion=@Direccion, habilitado = @habilitado
@@ -924,13 +934,14 @@ WHERE dni=@dni
 end
 GO
 
-print ' Procedure Alta Cliente'
+--------------------------------------------------------
+PRINT ' Procedure Alta Cliente'
 GO
 
-create procedure mayusculas_sin_espacios.sp_altaCliente (@DNI numeric(8,0), @Nombre nvarchar(30),
+CREATE PROCEDURE mayusculas_sin_espacios.sp_altaCliente (@DNI numeric(8,0), @Nombre nvarchar(30),
 					@Apellido nvarchar(30), @Mail nvarchar(255), @Telefono nvarchar(20),
 					@Direccion nvarchar(255), @Provincia tinyint, @habilitado tinyint)
-as
+AS
 begin
 
 INSERT INTO mayusculas_sin_espacios.Clientes(DNI, Nombre, Apellido, Mail, Telefono, Direccion, Provincia, Habilitado)
@@ -939,14 +950,14 @@ VALUES (@DNI,@Nombre,@Apellido,@Mail,@Telefono,@Direccion,@Provincia,@habilitado
 end
 GO
 
-
-print ' Procedure Modificacion Cliente'
+--------------------------------------------------------
+PRINT ' Procedure Modificacion Cliente'
 GO
 
-create procedure [MAYUSCULAS_SIN_ESPACIOS].[sp_ModifClientes](@DNI numeric(8,0), @Nombre nvarchar(30),
+CREATE PROCEDURE [MAYUSCULAS_SIN_ESPACIOS].[sp_ModifClientes](@DNI numeric(8,0), @Nombre nvarchar(30),
 					@Apellido nvarchar(30), @Mail nvarchar(255), @Telefono nvarchar(20),
 					@Direccion nvarchar(255), @habilitado tinyint)
-as
+AS
 begin
 UPDATE  mayusculas_sin_espacios.Clientes
 SET nombre=@Nombre, apellido=@Apellido, mail=@Mail, telefono=@Telefono, direccion=@Direccion, habilitado = @habilitado
@@ -954,11 +965,11 @@ WHERE dni=@dni
 end
 GO
 
-print 'procedure baja empleado'
-go
+--------------------------------------------------------
+PRINT PROCEDURE Baja Empleado'
+GO
 
-
-create procedure [MAYUSCULAS_SIN_ESPACIOS].[sp_BajaEmpleados](@DNI numeric(8,0), @habilitado tinyint)
+CREATE PROCEDURE [MAYUSCULAS_SIN_ESPACIOS].[sp_BajaEmpleados](@DNI numeric(8,0), @habilitado tinyint)
 as
 begin
 UPDATE  mayusculas_sin_espacios.Empleados
@@ -967,10 +978,11 @@ WHERE dni=@dni
 end
 go
 
-print 'procedure baja Cliente '
+--------------------------------------------------------
+PRINT 'PROCEDURE Baja Cliente '
 go
 
-create procedure [MAYUSCULAS_SIN_ESPACIOS].[sp_BajaClientes](@DNI numeric(8,0), @habilitado tinyint)
+CREATE PROCEDURE [MAYUSCULAS_SIN_ESPACIOS].[sp_BajaClientes](@DNI numeric(8,0), @habilitado tinyint)
 as
 begin
 UPDATE  mayusculas_sin_espacios.Clientes
@@ -979,10 +991,11 @@ WHERE dni=@dni
 end
 go
 
-print 'procedure Asignacion roles'
-go
+--------------------------------------------------------
+PRINT 'PROCEDURE Asignacion Roles'
+GO
 
-create procedure [MAYUSCULAS_SIN_ESPACIOS].[sp_asignacion] 
+CREATE PROCEDURE [MAYUSCULAS_SIN_ESPACIOS].[sp_asignacion] 
 						(@user nvarchar(30),@rol int, @habilitado tinyint)
 as
 begin
@@ -1004,87 +1017,89 @@ else
 end
 GO
 
-
-print 'procedure alta  Usuarios '
-go
-
-
-create procedure [MAYUSCULAS_SIN_ESPACIOS].[sp_altaUsuario] (@Nombre nvarchar(30),
-							@password nvarchar(64),@empleado numeric(8,0), @habilitado tinyint)
-as
-begin
-
-INSERT INTO mayusculas_sin_espacios.Usuarios(Nombre, password, empleado, Habilitado,intentos)
-VALUES (@Nombre,@password,@empleado,@habilitado,'0')
-
-end
+--------------------------------------------------------
+PRINT 'PROCEDURE Alta  Usuarios '
 GO
 
-
-print 'procedure Modificacion Usuarios '
-go
-
-CREATE procedure [MAYUSCULAS_SIN_ESPACIOS].[sp_ModifUsuarios] (@Nombre nvarchar(30),
-							@password nvarchar(64), @habilitado tinyint)
+CREATE PROCEDURE [MAYUSCULAS_SIN_ESPACIOS].[sp_altaUsuario] (@Nombre nvarchar(30),
+							@password nvarchar(64),@empleado numeric(8,0), @habilitado tinyint)
 as
-begin
+BEGIN
+INSERT INTO mayusculas_sin_espacios.Usuarios(Nombre, password, empleado, Habilitado,intentos)
+VALUES (@Nombre,@password,@empleado,@habilitado,'0')
+END
+GO
 
+--------------------------------------------------------
+PRINT 'PROCEDURE Modificacion Usuarios '
+GO
+
+CREATE PROCEDURE [MAYUSCULAS_SIN_ESPACIOS].[sp_ModifUsuarios] (@Nombre nvarchar(30),
+							@password nvarchar(64), @habilitado tinyint)
+AS
+BEGIN
 UPDATE mayusculas_sin_espacios.Usuarios
 SET password=@Password, habilitado=@habilitado, intentos='0'
 where nombre=@nombre
-
-end
+END
 GO
 
 
-print 'procedure BAja Usuarios '
-go
+PRINT 'PROCEDURE Baja Usuarios '
+GO
 
-create procedure [MAYUSCULAS_SIN_ESPACIOS].[sp_BajaUsuarios](@Nombre nvarchar(30), @habilitado tinyint)
-as
-begin
+CREATE PROCEDURE [MAYUSCULAS_SIN_ESPACIOS].[sp_BajaUsuarios](@Nombre nvarchar(30), @habilitado tinyint)
+AS
+BEGIN
 UPDATE  mayusculas_sin_espacios.Usuarios
 SET  habilitado = @habilitado
 WHERE nombre = @Nombre
-end
+END
 GO
 
-print ' procedure facturar '
+--------------------------------------------------------
+PRINT 'PROCEDURE Efectuar Pago'
 GO
 
-create procedure mayusculas_sin_espacios.sp_facturar(@fecha datetime, @descuento int,@cuotas int,
-												 @sucursal int, @vendedor int, @cliente int)
-as
-begin
-
+CREATE PROCEDURE mayusculas_sin_espacios.sp_facturar(@fecha datetime, @descuento int,@cuotas int,
+						 @sucursal int, @vendedor int, @cliente int)
+AS
+BEGIN
 insert into mayusculas_sin_espacios.facturas (fecha,descuento,cuotas,sucursal,vendedor,cliente) 
 values (@fecha,@descuento,@cuotas,@sucursal,@vendedor,@cliente)
 
 return (select numero
 from mayusculas_sin_espacios.facturas
 where (@fecha=fecha and @descuento=descuento and @sucursal=sucursal and @vendedor =vendedor and @cliente =cliente))
+END
 
-end
 
+--------------------------------------------------------
+PRINT 'PROCEDURE Cuotas Faltantes'
+GO
 
-create procedure mayusculas_sin_espacios.sp_faltanCuotas(@factura int)
-as
-begin
+CREATE PROCEDURE mayusculas_sin_espacios.sp_faltanCuotas(@factura int)
+AS
+BEGIN
 declare @pagas int
 declare @total int
 set @pagas = (select count(*)+1 from mayusculas_sin_espacios.pagos where factura = @factura)
 set @total = (select cuotas FROM mayusculas_sin_espacios.facturascompletas where numero=@factura)
 
 select (@total-@pagas)
-return
-end
+END
+GO
 
-create procedure mayusculas_sin_espacios.sp_Pagar(@factura int, @sucursal int,@cuotas int,
-												 @fecha datetime, @cobrador int)
-as
-begin
+--------------------------------------------------------
+PRINT 'PROCEDURE Efectuar Pago'
+GO
+
+CREATE PROCEDURE mayusculas_sin_espacios.sp_Pagar(@factura int, @sucursal int,@cuotas int,
+						 @fecha datetime, @cobrador int)
+AS
+BEGIN
 
 insert into mayusculas_sin_espacios.pagos (factura,sucursal,cuotas,fecha,cobrador) 
 values (@factura,@sucursal,@cuotas,@factura,@cobrador)
 
-end
+END
