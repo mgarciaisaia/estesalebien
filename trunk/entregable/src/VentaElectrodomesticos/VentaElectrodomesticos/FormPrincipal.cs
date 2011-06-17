@@ -39,7 +39,9 @@ namespace VentaElectrodomesticos
             //username = login.USERNAME;
             TiposEmpleado.getInstance();
             
-            username = "admin";
+            username = "cochimoyano";
+            username = "1";
+
             aBMToolStripMenuItem.Enabled = true;
             aBMDeRolToolStripMenuItem.Enabled = true;
             aBMDeUsuarioToolStripMenuItem.Enabled = true;
@@ -132,7 +134,7 @@ namespace VentaElectrodomesticos
 
         private void facturaciónToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            FormFacturacion form = new FormFacturacion();
+            FormFacturacion form = new FormFacturacion(username);
             form.ShowDialog(this);
         }
 
