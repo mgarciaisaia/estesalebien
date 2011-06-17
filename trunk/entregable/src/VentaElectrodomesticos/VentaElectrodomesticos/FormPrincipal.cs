@@ -140,7 +140,7 @@ namespace VentaElectrodomesticos
 
         private void efectuarPagoToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            FormEfectuarPago form = new FormEfectuarPago();
+            FormEfectuarPago form = new FormEfectuarPago(username);
             form.ShowDialog(this);
         }
 
