@@ -58,13 +58,20 @@ namespace VentaElectrodomesticos.MetodosSQL
 
         public SqlDataReader busquedaSQLDataReader(String query)
         {
-            SqlCommand command = new SqlCommand();
-            command.Connection = cnn;
-            command.CommandType = System.Data.CommandType.Text;
-            command.CommandText = query;
-            SqlDataReader reader = command.ExecuteReader();
+            try
+            {
+                SqlCommand command = new SqlCommand();
+                command.Connection = cnn;
+                command.CommandType = System.Data.CommandType.Text;
+                command.CommandText = query;
+                SqlDataReader reader = command.ExecuteReader();
 
-            return reader;
+                return reader;
+            }
+            catch (SqlException ex)
+            {
+                throw ex;
+            }
         }
 
         public Object scalarQuery(String query)

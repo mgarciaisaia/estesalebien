@@ -1049,4 +1049,19 @@ WHERE nombre = @Nombre
 end
 GO
 
+print ' procedure facturar '
+GO
 
+create procedure mayusculas_sin_espacios.sp_facturar(@fecha datetime, @descuento int,@cuotas int,
+												 @sucursal int, @vendedor int, @cliente int)
+as
+begin
+
+insert into mayusculas_sin_espacios.facturas (fecha,descuento,cuotas,sucursal,vendedor,cliente) 
+values (@fecha,@descuento,@cuotas,@sucursal,@vendedor,@cliente)
+
+return (select numero
+from mayusculas_sin_espacios.facturas
+where (@fecha=fecha and @descuento=descuento and @sucursal=sucursal and @vendedor =vendedor and @cliente =cliente))
+
+end

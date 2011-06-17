@@ -203,7 +203,7 @@
             this.btnSeleccionar.UseVisualStyleBackColor = true;
             this.btnSeleccionar.Click += new System.EventHandler(this.btnSeleccionar_Click);
             // 
-            // BuscadorEmpleado
+            // BuscadorProducto
             // 
             this.AcceptButton = this.bBuscar;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -226,9 +226,9 @@
             this.Controls.Add(this.cBusqTipo);
             this.Controls.Add(this.tBusqDNI);
             this.Controls.Add(this.label6);
-            this.Name = "BuscadorEmpleado";
+            this.Name = "BuscadorProducto";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Buscar Empleado";
+            this.Text = "Buscar Producto";
             this.Load += new System.EventHandler(this.BuscadorProducto_Load);
             ((System.ComponentModel.ISupportInitialize)(this.dgEmpleados)).EndInit();
             this.ResumeLayout(false);
