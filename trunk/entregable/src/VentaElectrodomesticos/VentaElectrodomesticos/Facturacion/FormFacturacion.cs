@@ -96,6 +96,7 @@ namespace VentaElectrodomesticos.Facturacion
             if (producto != null)
             {
                 int i = dgProductos.Rows.Count - 1 ;
+                dgProductos.Rows.Add();
                 dgProductos.Rows[i].Cells[0].Value=producto.codigo;
                 dgProductos.Rows[i].Cells[1].Value = producto.precio;
             }
@@ -119,55 +120,111 @@ namespace VentaElectrodomesticos.Facturacion
 
         private bool hayAlgunTextboxVacio(ComboBox cProvincia, ComboBox cSucursal, TextBox tCliente, TextBox tDescuento, ComboBox cCuotas, DataGridView dgProductos)
         {
-            return cProvincia.Text.Equals("") || cSucursal.Text.Equals("") || tCliente.Text.Equals("") || tDescuento.Text.Equals("") || cCuotas.Text.Equals("") || dgProductos.Rows.Count==1 ;
+            return cProvincia.Text.Equals("") || cSucursal.Text.Equals("") || tCliente.Text.Equals("") || tDescuento.Text.Equals("") || cCuotas.Text.Equals("") || dgCompleto(dgProductos);
         }
 
+        private bool dgCompleto(DataGridView dgProductos)
+        {
+            bool incompleto = dgProductos.Rows.Count == 1;
+            int i=0;
+            while ((! incompleto) && (i < dgProductos.Rows.Count-1))
+            {
+                incompleto = (dgProductos.Rows[i].Cells[0].Value ==null) || (dgProductos.Rows[i].Cells[1].Value == null) || (dgProductos.Rows[i].Cells[2].Value == null);
+                i++;
+            }
+            return incompleto;
+        }
         private void bComprar_Click(object sender, EventArgs e)
         {
-            
-            conexion.Open();
-            if (!this.hayAlgunTextboxVacio(cProvincia, cSucursal, tCliente, tDescuento, cCuotas, dgProductos))
+            try
             {
-                String[,] parametros = new String[2, 6];
-                String sp = "mayusculas_sin_espacios.sp_facturar";
-                parametros[0, 0] = "@fecha";
-                parametros[0, 1] = "@descuento";
-                parametros[0, 2] = "@cuotas";
-                parametros[0, 3] = "@sucursal";
-                parametros[0, 4] = "@vendedor";
-                parametros[0, 5] = "@cliente";
-
-                parametros[1, 0] = System.DateTime.Now.ToString();
-                parametros[1, 1] = tDescuento.Text;
-                parametros[1, 2] = (cCuotas.SelectedIndex + 1).ToString();
-                parametros[1, 3] = (cSucursal.SelectedIndex +1).ToString();
-                parametros[1, 4] = dni.ToString();
-                parametros[1, 5] = tCliente.Text;
-                
-                SqlDataReader reader = conexion.ejecutarStoredProcedure(sp, parametros);
-                if (reader.Read())
+                conexion.Open();
+                if (!this.hayAlgunTextboxVacio(cProvincia, cSucursal, tCliente, tDescuento, cCuotas, dgProductos))
                 {
-                    MessageBox.Show("Se ha Facturado.", "Success!");
-                    nrofactura = reader[0].ToString();
-                }
-                reader.Close();
-            }
-            else
-            {
-                MessageBox.Show("Debe completar todos los campos", "Warning!");
-            }
+                    DialogResult op = MessageBox.Show("El importe total es de $" + this.montoTotal(), "Confirmar", MessageBoxButtons.OKCancel);
+                    if (op == DialogResult.OK)
+                    {
+                        String[,] parametros = new String[2, 6];
+                        String sp = "mayusculas_sin_espacios.sp_facturar";
+                        parametros[0, 0] = "@fecha";
+                        parametros[0, 1] = "@descuento";
+                        parametros[0, 2] = "@cuotas";
+                        parametros[0, 3] = "@sucursal";
+                        parametros[0, 4] = "@vendedor";
+                        parametros[0, 5] = "@cliente";
 
-            string sql = "";
-            for (int i = 0; i < dgProductos.Rows.Count - 1; i++)
-            {
-                 sql = "insert into mayusculas_sin_espacios.itemsfactura (factura,producto,preciounitario,cantidad) " +
-                    " values ('" + nrofactura + "','" + dgProductos.Rows[i].Cells[0].Value.ToString() +
-                    "','" + dgProductos.Rows[i].Cells[1].Value.ToString() +
-                    "','" + dgProductos.Rows[i].Cells[2].Value.ToString() + "')";
-                conexion.insertQuery(sql);
+                        parametros[1, 0] = DateTime.Now.ToString();
+                        parametros[1, 1] = tDescuento.Text;
+                        parametros[1, 2] = (cCuotas.SelectedIndex + 1).ToString();
+                        parametros[1, 3] = (cSucursal.SelectedIndex + 1).ToString();
+                        parametros[1, 4] = dni.ToString();
+                        parametros[1, 5] = tCliente.Text;
+                        
+
+                        SqlDataReader reader = conexion.ejecutarStoredProcedure(sp, parametros);
+                        if (reader.Read())
+                        {
+                            nrofactura = reader[0].ToString();
+                            MessageBox.Show("Se ha Facturado - " + nrofactura.ToString(), "Success!");
+                                            
+                        }
+                        reader.Close();
+
+                        string sql = "";
+                        for (int i = 0; i < dgProductos.Rows.Count - 1; i++)
+                        {
+                            sql = "insert into mayusculas_sin_espacios.itemsfactura (factura,producto,preciounitario,cantidad) " +
+                               " values ('" + nrofactura + "','" + dgProductos.Rows[i].Cells[0].Value.ToString() +
+                               "','" + dgProductos.Rows[i].Cells[1].Value.ToString() +
+                               "','" + dgProductos.Rows[i].Cells[2].Value.ToString() + "')";
+                            conexion.insertQuery(sql);
+                            this.limpiarForm();
+                        }
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("Debe completar todos los campos", "Warning!");
+                }
+                
             }
-            MessageBox.Show(nrofactura);
-            conexion.Close();
+            catch (SqlException ex)
+            {
+                MessageBox.Show(ex.Message, "Error!");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.StackTrace, "Error app");
+            }
+            finally
+            {
+                conexion.Close();
+            }
+        }
+        private decimal montoTotal()
+        {
+            decimal total=0;
+            int i = 0;
+            while (i<(dgProductos.Rows.Count - 1))
+            {
+                total += (System.Convert.ToDecimal(dgProductos.Rows[i].Cells[1].Value) * System.Convert.ToDecimal(dgProductos.Rows[i].Cells[2].Value));
+                i++;
+            }
+            return total;
+        }
+
+
+        private void limpiarForm()
+        {
+            cProvincia.Items.Clear();
+            cProvincia.Text = "";
+            cSucursal.Items.Clear();
+            cSucursal.Text = "";
+            tCliente.Text = "";
+            cCuotas.Text = "1";
+            tDescuento.Text = "";
+            dgProductos.Rows.Clear();
+
         }
 
         
