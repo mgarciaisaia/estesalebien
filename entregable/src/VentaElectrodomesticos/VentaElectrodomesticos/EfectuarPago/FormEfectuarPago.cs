@@ -23,7 +23,6 @@ namespace VentaElectrodomesticos.EfectuarPago
         private string[] provincias;
         private string[] sucursales;
         ClaseSQL conexion;
-        private string nrofactura;
         
         
         public FormEfectuarPago(string username)
@@ -99,9 +98,15 @@ namespace VentaElectrodomesticos.EfectuarPago
         private void rellenarComboBoxFactura()
         {
             cFactura.Items.Clear();
+            cFactura.Text = "";
+            
             conexion.Open();
-            SqlDataReader reader = conexion.busquedaSQLDataReader("SELECT vis.numero FROM mayusculas_sin_espacios.facturascompletas as vis left join mayusculas_sin_espacios.facturas as fac on(vis.numero=fac.numero) where cliente='"+tCliente.Text+"' and fac.cuotas > 1 ");
+            String[,] parametros = new String[2, 1];
+            String sp = "mayusculas_sin_espacios.sp_FACTURASPENDIENTES";
+            parametros[0, 0] = "@cliente";
+            parametros[1, 0] = tCliente.Text;
 
+            SqlDataReader reader = conexion.ejecutarStoredProcedure(sp, parametros);
             while (reader.Read())
             {
                 String fact = reader[0].ToString().Trim();
@@ -109,6 +114,7 @@ namespace VentaElectrodomesticos.EfectuarPago
             }
             reader.Close();
             conexion.Close();
+            
         }
 
         private bool hayAlgunTextboxVacio(ComboBox cProvincia, ComboBox cSucursal, TextBox tCliente, ComboBox cFactura, NumericUpDown cCuotas)
@@ -120,59 +126,96 @@ namespace VentaElectrodomesticos.EfectuarPago
         private void cFactura_SelectedIndexChanged(object sender, EventArgs e)
         {
             conexion.Open();
-            String[,] parametros = new String[2, 1];
-            String sp = "mayusculas_sin_espacios.sp_faltanCuotas";
-            parametros[0, 0] = "@factura";
-            parametros[1, 0] = cFactura.Text;
-            
-            SqlDataReader reader = conexion.ejecutarStoredProcedure(sp, parametros);
-
-
+            string query = " select mayusculas_sin_espacios.fun_faltanCuotas ('" +
+                cFactura.Text + "')";
+            SqlDataReader reader = conexion.busquedaSQLDataReader(query);
             if (reader.Read())
             {
-                cCuotas.Minimum = 0;
                 cCuotas.Maximum = System.Convert.ToInt16(reader[0].ToString());
+                cCuotas.Minimum = 1;
             }
             reader.Close();
+
+            query = "select importe, valorcuota FROM mayusculas_sin_espacios.facturascompletas where numero='" +
+                            cFactura.Text + "'";
+            reader = conexion.busquedaSQLDataReader(query);
+            if (reader.Read())
+            {
+                lTotal.Text = reader[0].ToString();
+                lCuota.Text = reader[1].ToString();
+                lCuotas.Text = (decimal.Parse(lCuota.Text)* cCuotas.Value).ToString();
+            }
+            reader.Close();
+
             conexion.Close();
             cCuotas.Enabled = true;
         }
 
-        private void bFacturar_Click(object sender, EventArgs e)
+        private void bPagar_Click(object sender, EventArgs e)
         {
-
-            conexion.Open();
-            if (!this.hayAlgunTextboxVacio(cProvincia, cSucursal, tCliente, cFactura, cCuotas))
+            try
             {
-                String[,] parametros = new String[2, 5];
-                String sp = "mayusculas_sin_espacios.sp_Pagar";
-                parametros[0, 0] = "@factura";
-                parametros[0, 1] = "@sucursal";
-                parametros[0, 2] = "@cuotas";
-                parametros[0, 3] = "@fecha";
-                parametros[0, 4] = "@cobrador";
-
-                parametros[1, 0] = cFactura.Text;
-                parametros[1, 1] = (cSucursal.SelectedIndex +1).ToString();
-                parametros[1, 2] = (cCuotas.Value).ToString();
-                parametros[1, 3] = System.DateTime.Now.ToString();
-                parametros[1, 4] = dni.ToString();
-
-                SqlDataReader reader = conexion.ejecutarStoredProcedure(sp, parametros);
-                if (reader.Read())
+                conexion.Open();
+                if (!this.hayAlgunTextboxVacio(cProvincia, cSucursal, tCliente, cFactura, cCuotas))
                 {
-                    MessageBox.Show("Se ha Pagado.", "Success!");
+                    String[,] parametros = new String[2, 5];
+                    String sp = "mayusculas_sin_espacios.sp_Pagar";
+                    parametros[0, 0] = "@factura";
+                    parametros[0, 1] = "@sucursal";
+                    parametros[0, 2] = "@cuotas";
+                    parametros[0, 3] = "@fecha";
+                    parametros[0, 4] = "@cobrador";
+
+                    parametros[1, 0] = cFactura.Text;
+                    parametros[1, 1] = (cSucursal.SelectedIndex +1).ToString();
+                    parametros[1, 2] = (cCuotas.Value).ToString();
+                    parametros[1, 3] = System.DateTime.Now.ToString();
+                    parametros[1, 4] = dni.ToString();
+
+                    SqlDataReader reader = conexion.ejecutarStoredProcedure(sp, parametros);
+                    if (reader.RecordsAffected>0)
+                    {
+                        MessageBox.Show("Se ha Pagado.", "Success!");
+                        this.limpiarForm();                
+                    }
+                    reader.Close();
                 }
-                reader.Close();
+                else
+                {
+                    MessageBox.Show("Debe completar todos los campos", "Warning!");
+                }
             }
-            else
+            catch (SqlException ex)
             {
-                MessageBox.Show("Debe completar todos los campos", "Warning!");
+                MessageBox.Show(ex.Message, "Error!");
             }
-            conexion.Close();
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.StackTrace, "Error app");
+            }
+            finally
+            {
+                conexion.Close();
+            }
+
         }
 
-        
+        private void limpiarForm()
+        {
+            cProvincia.Text = "";
+            cSucursal.Text = "";
+            tCliente.Text = "";
+            cFactura.Items.Clear();
+            cFactura.Text = "";
+            
+        }
+
+        private void cCuotas_ValueChanged(object sender, EventArgs e)
+        {
+            lCuotas.Text = (decimal.Parse(lCuota.Text) * cCuotas.Value).ToString();
+        }
+
+       
 
     }
 }

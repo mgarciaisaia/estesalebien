@@ -1061,12 +1061,12 @@ GO
 PRINT 'PROCEDURE Efectuar Pago'
 GO
 
-CREATE PROCEDURE mayusculas_sin_espacios.sp_facturar(@fecha datetime, @descuento int,@cuotas int,
+CREATE PROCEDURE mayusculas_sin_espacios.sp_facturar(@fecha datetime, @descuento decimal,@cuotas int,
 						 @sucursal int, @vendedor int, @cliente int)
 AS
 BEGIN
 insert into mayusculas_sin_espacios.facturas (fecha,descuento,cuotas,sucursal,vendedor,cliente) 
-values (@fecha,@descuento,@cuotas,@sucursal,@vendedor,@cliente)
+values (@fecha,@descuento/100,@cuotas,@sucursal,@vendedor,@cliente)
 
 return (select numero
 from mayusculas_sin_espacios.facturas
@@ -1075,20 +1075,33 @@ END
 
 
 --------------------------------------------------------
-PRINT 'PROCEDURE Cuotas Faltantes'
+PRINT 'PROCEDURE FACTURAS PENDIENTES'
 GO
 
-CREATE PROCEDURE mayusculas_sin_espacios.sp_faltanCuotas(@factura int)
+CREATE PROCEDURE mayusculas_sin_espacios.sp_FACTURASPENDIENTES(@cliente int)
 AS
 BEGIN
+SELECT numero
+FROM mayusculas_sin_espacios.facturas
+where CLIENTE = @CLIENTE AND (mayusculas_sin_espacios.fun_faltancuotas (numero)) >0
+END
+
+--------------------------------------------------------
+PRINT 'FUNCION Cuotas Faltantes'
+GO
+
+CREATE FUNCION [MAYUSCULAS_SIN_ESPACIOS].[fun_faltanCuotas](@factura int)
+returns int
+AS
+BEGIN
+
 declare @pagas int
 declare @total int
-set @pagas = (select count(*)+1 from mayusculas_sin_espacios.pagos where factura = @factura)
+set @pagas = (select isnull(sum(cuotas),0)from mayusculas_sin_espacios.pagos where factura = @factura)
 set @total = (select cuotas FROM mayusculas_sin_espacios.facturascompletas where numero=@factura)
 
-select (@total-@pagas)
+return (@total-@pagas)
 END
-GO
 
 --------------------------------------------------------
 PRINT 'PROCEDURE Efectuar Pago'

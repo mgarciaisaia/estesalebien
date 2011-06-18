@@ -40,23 +40,29 @@
             this.cProvincia = new System.Windows.Forms.ComboBox();
             this.cFactura = new System.Windows.Forms.ComboBox();
             this.cCuotas = new System.Windows.Forms.NumericUpDown();
+            this.label6 = new System.Windows.Forms.Label();
+            this.label7 = new System.Windows.Forms.Label();
+            this.label8 = new System.Windows.Forms.Label();
+            this.lCuotas = new System.Windows.Forms.Label();
+            this.lCuota = new System.Windows.Forms.Label();
+            this.lTotal = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.cCuotas)).BeginInit();
             this.SuspendLayout();
             // 
             // bFacturar
             // 
-            this.bFacturar.Location = new System.Drawing.Point(258, 59);
+            this.bFacturar.Location = new System.Drawing.Point(61, 85);
             this.bFacturar.Name = "bFacturar";
-            this.bFacturar.Size = new System.Drawing.Size(114, 33);
+            this.bFacturar.Size = new System.Drawing.Size(143, 33);
             this.bFacturar.TabIndex = 24;
             this.bFacturar.Text = "Pagar";
             this.bFacturar.UseVisualStyleBackColor = true;
-            this.bFacturar.Click += new System.EventHandler(this.bFacturar_Click);
+            this.bFacturar.Click += new System.EventHandler(this.bPagar_Click);
             // 
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(194, 34);
+            this.label5.Location = new System.Drawing.Point(213, 35);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(43, 13);
             this.label5.TabIndex = 22;
@@ -65,7 +71,7 @@
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(192, 8);
+            this.label4.Location = new System.Drawing.Point(210, 8);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(46, 13);
             this.label4.TabIndex = 21;
@@ -73,14 +79,14 @@
             // 
             // tCliente
             // 
-            this.tCliente.Location = new System.Drawing.Point(71, 59);
+            this.tCliente.Location = new System.Drawing.Point(61, 59);
             this.tCliente.Name = "tCliente";
             this.tCliente.Size = new System.Drawing.Size(83, 20);
             this.tCliente.TabIndex = 19;
             // 
             // bBuscarCliente
             // 
-            this.bBuscarCliente.Location = new System.Drawing.Point(160, 57);
+            this.bBuscarCliente.Location = new System.Drawing.Point(150, 57);
             this.bBuscarCliente.Name = "bBuscarCliente";
             this.bBuscarCliente.Size = new System.Drawing.Size(54, 22);
             this.bBuscarCliente.TabIndex = 18;
@@ -118,17 +124,17 @@
             // cSucursal
             // 
             this.cSucursal.FormattingEnabled = true;
-            this.cSucursal.Location = new System.Drawing.Point(71, 32);
+            this.cSucursal.Location = new System.Drawing.Point(61, 32);
             this.cSucursal.Name = "cSucursal";
-            this.cSucursal.Size = new System.Drawing.Size(112, 21);
+            this.cSucursal.Size = new System.Drawing.Size(143, 21);
             this.cSucursal.TabIndex = 14;
             // 
             // cProvincia
             // 
             this.cProvincia.FormattingEnabled = true;
-            this.cProvincia.Location = new System.Drawing.Point(71, 5);
+            this.cProvincia.Location = new System.Drawing.Point(61, 5);
             this.cProvincia.Name = "cProvincia";
-            this.cProvincia.Size = new System.Drawing.Size(112, 21);
+            this.cProvincia.Size = new System.Drawing.Size(143, 21);
             this.cProvincia.TabIndex = 13;
             // 
             // cFactura
@@ -164,12 +170,73 @@
             0,
             0,
             0});
+            this.cCuotas.ValueChanged += new System.EventHandler(this.cCuotas_ValueChanged);
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(255, 59);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(84, 13);
+            this.label6.TabIndex = 27;
+            this.label6.Text = "Factura TOTAL:";
+            // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Location = new System.Drawing.Point(256, 76);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(77, 13);
+            this.label7.TabIndex = 28;
+            this.label7.Text = "Cuota Unitaria:";
+            // 
+            // label8
+            // 
+            this.label8.AutoSize = true;
+            this.label8.Location = new System.Drawing.Point(256, 94);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(70, 13);
+            this.label8.TabIndex = 29;
+            this.label8.Text = "Total Cuotas:";
+            // 
+            // lCuotas
+            // 
+            this.lCuotas.AutoSize = true;
+            this.lCuotas.Location = new System.Drawing.Point(339, 94);
+            this.lCuotas.Name = "lCuotas";
+            this.lCuotas.Size = new System.Drawing.Size(25, 13);
+            this.lCuotas.TabIndex = 32;
+            this.lCuotas.Text = "000";
+            // 
+            // lCuota
+            // 
+            this.lCuota.AutoSize = true;
+            this.lCuota.Location = new System.Drawing.Point(339, 76);
+            this.lCuota.Name = "lCuota";
+            this.lCuota.Size = new System.Drawing.Size(25, 13);
+            this.lCuota.TabIndex = 31;
+            this.lCuota.Text = "000";
+            // 
+            // lTotal
+            // 
+            this.lTotal.AutoSize = true;
+            this.lTotal.Location = new System.Drawing.Point(338, 59);
+            this.lTotal.Name = "lTotal";
+            this.lTotal.Size = new System.Drawing.Size(25, 13);
+            this.lTotal.TabIndex = 30;
+            this.lTotal.Text = "000";
             // 
             // FormEfectuarPago
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(392, 108);
+            this.ClientSize = new System.Drawing.Size(381, 123);
+            this.Controls.Add(this.lCuotas);
+            this.Controls.Add(this.lCuota);
+            this.Controls.Add(this.lTotal);
+            this.Controls.Add(this.label8);
+            this.Controls.Add(this.label7);
+            this.Controls.Add(this.label6);
             this.Controls.Add(this.cCuotas);
             this.Controls.Add(this.cFactura);
             this.Controls.Add(this.bFacturar);
@@ -206,5 +273,11 @@
         private System.Windows.Forms.ComboBox cProvincia;
         private System.Windows.Forms.ComboBox cFactura;
         private System.Windows.Forms.NumericUpDown cCuotas;
+        private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.Label label8;
+        private System.Windows.Forms.Label lCuotas;
+        private System.Windows.Forms.Label lCuota;
+        private System.Windows.Forms.Label lTotal;
     }
 }
