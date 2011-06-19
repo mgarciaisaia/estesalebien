@@ -32,10 +32,6 @@ namespace VentaElectrodomesticos.AbmEmpleado
         private string[] tipos;
         private string[] sucursales;
 
-
-
-
-
         public FormAbmEmpleado()
         {
             InitializeComponent();
@@ -56,6 +52,9 @@ namespace VentaElectrodomesticos.AbmEmpleado
         {
             if (empleado != null)
             {
+                bAgregar.Enabled = false;
+                bModificar.Enabled = true;
+                bEliminar.Enabled = true;
                 tDNI.Text = empleado.dni.ToString();
                 tDNI.Enabled = false;
                 tNombre.Text = empleado.nombre;
@@ -118,6 +117,7 @@ namespace VentaElectrodomesticos.AbmEmpleado
                     if (reader != null)
                     {
                         MessageBox.Show("Se ha dado de alta el cliente.", "Success!");
+                        this.limpiar();
                     }
                 }
                 else
@@ -176,6 +176,7 @@ namespace VentaElectrodomesticos.AbmEmpleado
                     if (reader != null)
                     {
                         MessageBox.Show("Se ha modificado el Empleado.", "Success!");
+                        this.limpiar();
                     }
                 }
                 else
@@ -215,6 +216,7 @@ namespace VentaElectrodomesticos.AbmEmpleado
                     if (reader != null)
                     {
                         MessageBox.Show("Se ha dado de baja el Empleado.", "Success!");
+                        this.limpiar();
                     }
                 }
                 else
@@ -275,21 +277,16 @@ namespace VentaElectrodomesticos.AbmEmpleado
             this.rellenarComboBoxTipo();
             this.rellenarComboBoxProvincia();
             this.rellenarComboBoxSucursal();
-
-            tNombre.Enabled = true;
-            tApellido.Enabled = true;
-            tDireccion.Enabled = true;
-            tMail.Enabled = true;
-            tTelefono.Enabled = true;
-            tDireccion.Enabled = true;
-            cProvincia.Enabled = true;
-            cTipo.Enabled = true;
-            cSucursal.Enabled = true;
-
-
+                       
         }
 
         private void bLimpiarEmpleado_Click(object sender, EventArgs e)
+        {
+            this.limpiar();
+        }
+
+
+        private void limpiar()
         {
             tDNI.Clear();
             tDNI.Enabled = true;
@@ -298,17 +295,25 @@ namespace VentaElectrodomesticos.AbmEmpleado
             tMail.Clear();
             tTelefono.Clear();
             tDireccion.Clear();
-            cProvincia.Items.Clear();
+            cProvincia.Text="";
             cProvincia.Enabled = true;
-            this.rellenarComboBoxProvincia();
-            cSucursal.Items.Clear();
+            cSucursal.Text = "";
             cSucursal.Enabled = true;
-            this.rellenarComboBoxSucursal();
-            cTipo.Items.Clear();
+            cTipo.Text = "";
             cTipo.Enabled = true;
-            this.rellenarComboBoxTipo();
             cHabilitado.Checked = false;
-            
+            bModificar.Enabled = false;
+            bEliminar.Enabled = false;
+            bAgregar.Enabled = true;
+                
+        }
+
+        private void tCliente_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (!(Char.IsNumber(e.KeyChar) || e.KeyChar == 8 || Char.IsControl(e.KeyChar)))
+            {
+                e.Handled = true;
+            }
         }
 
     }

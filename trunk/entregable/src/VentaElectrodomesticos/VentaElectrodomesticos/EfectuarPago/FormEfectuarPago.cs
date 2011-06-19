@@ -36,6 +36,9 @@ namespace VentaElectrodomesticos.EfectuarPago
 
         private void FormEfectuarPago_Load(object sender, EventArgs e)
         {
+            lTotal.Text = "";
+            lCuota.Text = "";
+            lCuotas.Text = "";
             this.rellenarComboBoxProvincia();
             this.rellenarComboBoxSucursal();
 
@@ -141,8 +144,8 @@ namespace VentaElectrodomesticos.EfectuarPago
             reader = conexion.busquedaSQLDataReader(query);
             if (reader.Read())
             {
-                lTotal.Text = reader[0].ToString();
-                lCuota.Text = reader[1].ToString();
+                lTotal.Text = decimal.Round(decimal.Parse(reader[0].ToString()),2).ToString();
+                lCuota.Text = decimal.Round(decimal.Parse(reader[1].ToString()),2).ToString();
                 lCuotas.Text = (decimal.Parse(lCuota.Text)* cCuotas.Value).ToString();
             }
             reader.Close();
@@ -207,6 +210,12 @@ namespace VentaElectrodomesticos.EfectuarPago
             tCliente.Text = "";
             cFactura.Items.Clear();
             cFactura.Text = "";
+            cFactura.Enabled = false;
+            cCuotas.Text = "1";
+            cCuotas.Enabled = false;
+            lTotal.Text = "";
+            lCuota.Text = "";
+            lCuotas.Text = "";
             
         }
 
@@ -215,7 +224,6 @@ namespace VentaElectrodomesticos.EfectuarPago
             lCuotas.Text = (decimal.Parse(lCuota.Text) * cCuotas.Value).ToString();
         }
 
-       
-
+        
     }
 }

@@ -122,13 +122,21 @@ namespace VentaElectrodomesticos.AbmUsuario
 
         private void bLimpiarABM_Click(object sender, EventArgs e)
         {
+            this.limpiar();
+        }
+
+        private void limpiar()
+        {
             tNombre.Clear();
             tNombre.Enabled = true;
             tPassword.Clear();
             tEmpleado.Clear();
             tEmpleado.Enabled = true;
             cHabilitado.Checked = false;
+            
+
             this.rellenarTablaRoles();
+
             
         }
 
@@ -285,11 +293,7 @@ namespace VentaElectrodomesticos.AbmUsuario
             }
         }
 
-        private void button2_Click_1(object sender, EventArgs e)
-        {
-            this.actualizarRoles();
         
-        }
     }
 }
 

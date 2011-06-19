@@ -94,8 +94,8 @@ namespace VentaElectrodomesticos.MetodosSQL
 
         public SqlDataReader ejecutarStoredProcedure(string sp, String[,] parametros)
         {
-            //try
-            //{
+            try
+            {
                 SqlCommand command = new SqlCommand();
                 command.Connection = cnn;
                 command.CommandType = System.Data.CommandType.StoredProcedure;
@@ -107,11 +107,11 @@ namespace VentaElectrodomesticos.MetodosSQL
                     command.Parameters.AddWithValue(parametros[0, i], parametros[1, i]);
                 }
                 return command.ExecuteReader();
-            //}
-            //catch (SqlException ex)
-            //{
-            //    throw ex;
-            //}
+            }
+            catch (SqlException ex)
+            {
+                throw ex;
+            }
         }
 
         public String ejecutarStoredProcedureConRetorno(string sp, String[,] parametros, String retorno)

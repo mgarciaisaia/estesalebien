@@ -7,3 +7,5 @@ Para realizar un reporte sobre los pagos completos se deberian juntar los datos 
 
 Supuer usuario ADMIN... se crea un empleado o se asigna un empleado real.
 
+RECORDATORIO PARA FER:
+	revisar asignacion de rolesen alta de usuario!!!

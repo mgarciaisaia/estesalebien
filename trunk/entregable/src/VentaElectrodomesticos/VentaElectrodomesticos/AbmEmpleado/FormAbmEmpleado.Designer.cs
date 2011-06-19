@@ -91,7 +91,6 @@
             // cTipo
             // 
             this.cTipo.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cTipo.Enabled = false;
             this.cTipo.FormattingEnabled = true;
             this.cTipo.Location = new System.Drawing.Point(240, 104);
             this.cTipo.Name = "cTipo";
@@ -119,7 +118,6 @@
             // 
             // tDireccion
             // 
-            this.tDireccion.Enabled = false;
             this.tDireccion.Location = new System.Drawing.Point(241, 25);
             this.tDireccion.Name = "tDireccion";
             this.tDireccion.Size = new System.Drawing.Size(120, 20);
@@ -136,7 +134,6 @@
             // 
             // tTelefono
             // 
-            this.tTelefono.Enabled = false;
             this.tTelefono.Location = new System.Drawing.Point(55, 128);
             this.tTelefono.Name = "tTelefono";
             this.tTelefono.Size = new System.Drawing.Size(120, 20);
@@ -181,6 +178,7 @@
             // 
             // bEliminar
             // 
+            this.bEliminar.Enabled = false;
             this.bEliminar.Location = new System.Drawing.Point(190, 152);
             this.bEliminar.Name = "bEliminar";
             this.bEliminar.Size = new System.Drawing.Size(75, 23);
@@ -191,6 +189,7 @@
             // 
             // bModificar
             // 
+            this.bModificar.Enabled = false;
             this.bModificar.Location = new System.Drawing.Point(109, 152);
             this.bModificar.Name = "bModificar";
             this.bModificar.Size = new System.Drawing.Size(75, 23);
@@ -212,7 +211,6 @@
             // cSucursal
             // 
             this.cSucursal.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cSucursal.Enabled = false;
             this.cSucursal.FormattingEnabled = true;
             this.cSucursal.Location = new System.Drawing.Point(241, 77);
             this.cSucursal.Name = "cSucursal";
@@ -222,7 +220,6 @@
             // cProvincia
             // 
             this.cProvincia.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cProvincia.Enabled = false;
             this.cProvincia.FormattingEnabled = true;
             this.cProvincia.Location = new System.Drawing.Point(241, 51);
             this.cProvincia.Name = "cProvincia";
@@ -231,7 +228,6 @@
             // 
             // tMail
             // 
-            this.tMail.Enabled = false;
             this.tMail.Location = new System.Drawing.Point(55, 103);
             this.tMail.Name = "tMail";
             this.tMail.Size = new System.Drawing.Size(120, 20);
@@ -248,7 +244,6 @@
             // 
             // tApellido
             // 
-            this.tApellido.Enabled = false;
             this.tApellido.Location = new System.Drawing.Point(55, 77);
             this.tApellido.Name = "tApellido";
             this.tApellido.Size = new System.Drawing.Size(120, 20);
@@ -265,7 +260,6 @@
             // 
             // tNombre
             // 
-            this.tNombre.Enabled = false;
             this.tNombre.Location = new System.Drawing.Point(55, 51);
             this.tNombre.Name = "tNombre";
             this.tNombre.Size = new System.Drawing.Size(120, 20);
@@ -286,6 +280,7 @@
             this.tDNI.Name = "tDNI";
             this.tDNI.Size = new System.Drawing.Size(120, 20);
             this.tDNI.TabIndex = 1;
+            this.tDNI.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.tCliente_KeyPress);
             // 
             // label1
             // 

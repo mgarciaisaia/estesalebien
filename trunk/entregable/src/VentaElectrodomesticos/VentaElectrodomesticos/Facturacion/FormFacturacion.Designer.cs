@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             this.cProvincia = new System.Windows.Forms.ComboBox();
             this.cSucursal = new System.Windows.Forms.ComboBox();
             this.label1 = new System.Windows.Forms.Label();
@@ -50,6 +51,7 @@
             // 
             // cProvincia
             // 
+            this.cProvincia.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cProvincia.FormattingEnabled = true;
             this.cProvincia.Location = new System.Drawing.Point(79, 10);
             this.cProvincia.Name = "cProvincia";
@@ -58,6 +60,7 @@
             // 
             // cSucursal
             // 
+            this.cSucursal.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cSucursal.FormattingEnabled = true;
             this.cSucursal.Location = new System.Drawing.Point(79, 37);
             this.cSucursal.Name = "cSucursal";
@@ -103,6 +106,7 @@
             // 
             // tCliente
             // 
+            this.tCliente.Enabled = false;
             this.tCliente.Location = new System.Drawing.Point(79, 64);
             this.tCliente.Name = "tCliente";
             this.tCliente.Size = new System.Drawing.Size(83, 20);
@@ -114,6 +118,8 @@
             this.tDescuento.Name = "tDescuento";
             this.tDescuento.Size = new System.Drawing.Size(114, 20);
             this.tDescuento.TabIndex = 6;
+            this.tDescuento.Leave += new System.EventHandler(this.tDescuento_Leave);
+            this.tDescuento.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.tDescuento_KeyPress);
             // 
             // label4
             // 
@@ -144,6 +150,7 @@
             // 
             // cCuotas
             // 
+            this.cCuotas.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cCuotas.FormattingEnabled = true;
             this.cCuotas.Items.AddRange(new object[] {
             "1",
@@ -162,7 +169,6 @@
             this.cCuotas.Name = "cCuotas";
             this.cCuotas.Size = new System.Drawing.Size(114, 21);
             this.cCuotas.TabIndex = 10;
-            this.cCuotas.Text = "1";
             // 
             // dgProductos
             // 
@@ -191,6 +197,8 @@
             // 
             // Cantidad
             // 
+            dataGridViewCellStyle1.Format = "N0";
+            this.Cantidad.DefaultCellStyle = dataGridViewCellStyle1;
             this.Cantidad.HeaderText = "Cantidad";
             this.Cantidad.Name = "Cantidad";
             // 
@@ -248,9 +256,9 @@
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.ComboBox cCuotas;
         private System.Windows.Forms.DataGridView dgProductos;
+        private System.Windows.Forms.Button bFacturar;
         private System.Windows.Forms.DataGridViewTextBoxColumn Codigo;
         private System.Windows.Forms.DataGridViewTextBoxColumn Precio;
         private System.Windows.Forms.DataGridViewTextBoxColumn Cantidad;
-        private System.Windows.Forms.Button bFacturar;
     }
 }
