@@ -58,6 +58,7 @@
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.BuscarEmpleado);
             this.groupBox1.Controls.Add(this.label4);
             this.groupBox1.Controls.Add(this.dgRoles);
             this.groupBox1.Controls.Add(this.cHabilitado);
@@ -167,7 +168,6 @@
             // 
             resources.ApplyResources(this, "$this");
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.Controls.Add(this.BuscarEmpleado);
             this.Controls.Add(this.groupBox1);
             this.Name = "FormAbmUsuario";
             this.Load += new System.EventHandler(this.FormAbmUsuario_Load);

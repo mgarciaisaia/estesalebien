@@ -216,9 +216,7 @@ namespace VentaElectrodomesticos.Facturacion
 
         private void limpiarForm()
         {
-            cProvincia.Items.Clear();
             cProvincia.Text = "";
-            cSucursal.Items.Clear();
             cSucursal.Text = "";
             tCliente.Text = "";
             cCuotas.Text = "1";
@@ -227,8 +225,25 @@ namespace VentaElectrodomesticos.Facturacion
 
         }
 
-        
+        private void tDescuento_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (!(Char.IsNumber(e.KeyChar) || e.KeyChar == 8 || Char.IsControl(e.KeyChar)))
+            {
+                e.Handled = true;
+            }
+        }
 
+        private void tDescuento_Leave(object sender, EventArgs e)
+        {
+            if (tDescuento.Text != "")
+                if (int.Parse(tDescuento.Text) >= 30 || int.Parse(tDescuento.Text) <= 0)
+                {
+                    MessageBox.Show(" El descuento debe ser mayor a 0 y menor a 30", "Eror");
+                    tDescuento.Text = "";
+                }
+        }
+
+       
        
     }
 }

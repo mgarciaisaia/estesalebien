@@ -45,6 +45,9 @@ namespace VentaElectrodomesticos.AbmCliente
         {
             if (cliente != null)
             {
+                bAgregar.Enabled = false;
+                bModificar.Enabled = true;
+                bEliminar.Enabled = true;
                 tDNI.Text = cliente.dni.ToString();
                 tDNI.Enabled = false;
                 tNombre.Text = cliente.nombre;
@@ -98,19 +101,15 @@ namespace VentaElectrodomesticos.AbmCliente
         private void FormAbmCliente_Load(object sender, EventArgs e)
         {
             this.rellenarComboBoxProvincia();
-            
-            tNombre.Enabled = true;
-            tApellido.Enabled = true;
-            tDireccion.Enabled = true;
-            tMail.Enabled = true;
-            tTelefono.Enabled = true;
-            tDireccion.Enabled = true;
-            cProvincia.Enabled = true;
-            
-
         }
 
         private void bLimpiarCliente_Click(object sender, EventArgs e)
+        {
+            this.limpiar();
+        }
+
+
+        private void limpiar()
         {
             tDNI.Clear();
             tDNI.Enabled = true;
@@ -119,10 +118,12 @@ namespace VentaElectrodomesticos.AbmCliente
             tMail.Clear();
             tTelefono.Clear();
             tDireccion.Clear();
-            cProvincia.Items.Clear();
+            cProvincia.Text = "";
             cProvincia.Enabled = true;
-            this.rellenarComboBoxProvincia();
             cHabilitado.Checked = false;
+            bAgregar.Enabled = true;
+            bModificar.Enabled = false;
+            bEliminar.Enabled = false;
 
         }
 
@@ -157,6 +158,7 @@ namespace VentaElectrodomesticos.AbmCliente
                     if (reader != null)
                     {
                         MessageBox.Show("Se ha dado de alta el cliente.", "Success!");
+                        this.limpiar();
                     }
                 }
                 else
@@ -215,6 +217,7 @@ namespace VentaElectrodomesticos.AbmCliente
                     if (reader != null)
                     {
                         MessageBox.Show("Se ha modificado el Cliente.", "Success!");
+                        this.limpiar();
                     }
                 }
                 else
@@ -254,7 +257,7 @@ namespace VentaElectrodomesticos.AbmCliente
                     if (reader != null)
                     {
                         MessageBox.Show("Se ha dado de baja el Cliente.", "Success!");
-                        cHabilitado.Checked = false;
+                        this.limpiar();
                     }
                 }
                 else
@@ -274,6 +277,15 @@ namespace VentaElectrodomesticos.AbmCliente
             {
                 conexion.Close();
             }
+        }
+
+        private void tDNI_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (!(Char.IsNumber(e.KeyChar) || e.KeyChar == 8 || Char.IsControl(e.KeyChar)))
+            {
+                e.Handled = true;
+            }
+        
         }
 
     }
