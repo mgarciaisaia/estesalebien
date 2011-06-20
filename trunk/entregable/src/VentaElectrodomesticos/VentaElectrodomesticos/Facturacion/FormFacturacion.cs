@@ -43,7 +43,7 @@ namespace VentaElectrodomesticos.Facturacion
             SqlDataReader reader = conexion.busquedaSQLDataReader("SELECT dni, provincia, tipo, sucursal FROM mayusculas_sin_espacios.Empleados as emp left join mayusculas_sin_espacios.Usuarios as us on (emp.dni=us.empleado) where emp.habilitado='1' and us.nombre='"+user+"' order by 1");
             if (reader.Read())
             {
-                dni = System.Convert.ToInt16(reader["dni"]);
+                dni = System.Convert.ToInt32(reader["dni"]);
                 if (reader["tipo"].ToString() == "2")
                 {
                     cProvincia.SelectedIndex = System.Convert.ToInt16(reader["Provincia"]);

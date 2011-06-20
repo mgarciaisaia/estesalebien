@@ -46,7 +46,7 @@ namespace VentaElectrodomesticos.EfectuarPago
             SqlDataReader reader = conexion.busquedaSQLDataReader("SELECT dni, provincia, tipo, sucursal FROM mayusculas_sin_espacios.Empleados as emp left join mayusculas_sin_espacios.Usuarios as us on (emp.dni=us.empleado) where emp.habilitado='1' and us.nombre='" + user + "' order by 1");
             if (reader.Read())
             {
-                dni = System.Convert.ToInt16(reader["dni"]);
+                dni = System.Convert.ToInt32(reader["dni"]);
                 if (reader["tipo"].ToString() == "2")
                 {
                     cProvincia.SelectedIndex = System.Convert.ToInt16(reader["Provincia"]);
@@ -116,16 +116,14 @@ namespace VentaElectrodomesticos.EfectuarPago
                 cFactura.Items.Add(fact);
             }
             reader.Close();
-            conexion.Close();
-            
+            conexion.Close();            
         }
 
         private bool hayAlgunTextboxVacio(ComboBox cProvincia, ComboBox cSucursal, TextBox tCliente, ComboBox cFactura, NumericUpDown cCuotas)
         {
             return cProvincia.Text.Equals("") || cSucursal.Text.Equals("") || tCliente.Text.Equals("") || cFactura.Text.Equals("") || cCuotas.Text.Equals("0") ;
         }
-
-        
+                
         private void cFactura_SelectedIndexChanged(object sender, EventArgs e)
         {
             conexion.Open();

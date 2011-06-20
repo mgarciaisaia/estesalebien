@@ -285,8 +285,6 @@ namespace VentaElectrodomesticos.AbmCliente
             {
                 e.Handled = true;
             }
-        
         }
-
     }
 }

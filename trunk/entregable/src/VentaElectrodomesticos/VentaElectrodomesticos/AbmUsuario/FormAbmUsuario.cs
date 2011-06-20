@@ -7,6 +7,8 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using System.Security.Cryptography;
+using VentaElectrodomesticos.Utils;
 using VentaElectrodomesticos.Buscadores;
 using VentaElectrodomesticos.Model;
 using VentaElectrodomesticos.MetodosSQL;
@@ -20,10 +22,11 @@ namespace VentaElectrodomesticos.AbmUsuario
         private static int EMPLEADO = 2;
         private static int HABILITADO = 3;
         private string codigoUser ="";
-        
+        private Hasher hasher = new Hasher(new SHA256Managed());
+        private bool passCambio;
+                
 		ClaseSQL conexion;
-		
-		
+				
 		public FormAbmUsuario()
         {
             InitializeComponent();
@@ -33,14 +36,16 @@ namespace VentaElectrodomesticos.AbmUsuario
 
         private void FormAbmUsuario_Load(object sender, EventArgs e)
         {
+            conexion.Open();
             this.rellenarTablaRoles();
+            conexion.Close();
+            passCambio = false;
         }
 
         private void rellenarTablaRoles()
         {
             try
             {
-                conexion.Open();
                 SqlDataReader reader = conexion.busquedaSQLDataReader("SELECT Codigo, Nombre FROM mayusculas_sin_espacios.Roles where habilitado='1' order by 1");
                 DataTable tabla = new DataTable();
                 if (reader.HasRows)
@@ -55,8 +60,6 @@ namespace VentaElectrodomesticos.AbmUsuario
                 dgRoles.Show();
                 
                 reader.Close();
-                
-
             }
             catch (SqlException ex)
             {
@@ -66,17 +69,14 @@ namespace VentaElectrodomesticos.AbmUsuario
             {
                 MessageBox.Show(ex.StackTrace, "Error app");
             }
-            finally
-            {
-                conexion.Close();
-            }
+            
         }
 
         private void BuscarEmpleado_Click(object sender, EventArgs e)
         {
             BuscadorUsuario buscador = new BuscadorUsuario();
             buscador.ShowDialog(this);
-            this.rellenarTablaRoles();
+            //this.rellenarTablaRoles();
             this.cargarEmpleado(buscador.getEmpleado());
         }
 
@@ -95,6 +95,7 @@ namespace VentaElectrodomesticos.AbmUsuario
                     tNombre.Text = reader["nombre"].ToString();
                     tNombre.Enabled = false;
                     tPassword.Text = reader["Password"].ToString();
+                    passCambio = false;
                     cHabilitado.Checked = System.Convert.ToBoolean(reader["habilitado"]);
                     codigoUser = reader["codigo"].ToString();
 
@@ -107,11 +108,18 @@ namespace VentaElectrodomesticos.AbmUsuario
                     String query = "SELECT rol,nombre FROM [GD1C2011].[MAYUSCULAS_SIN_ESPACIOS].[Asignaciones] " +
                             "left join MAYUSCULAS_SIN_ESPACIOS.roles on(rol=codigo) WHERE usuario=" + codigoUser;
                     SqlDataReader rolUser = conexion.busquedaSQLDataReader(query);
-                    int i = 0;
                     while (rolUser.Read())
                     {
-                        i = System.Convert.ToInt32(rolUser["rol"]);
-                        dgRoles.Rows[i - 1].Cells["Seleccion"].Value = true;
+                        bool flag = true;
+                        int i = 0;
+                        while (flag && i<dgRoles.Rows.Count)
+                        {
+                            if (dgRoles.Rows[i].Cells["codigo"].Value.Equals(rolUser["rol"]))
+                                dgRoles.Rows[i].Cells["Seleccion"].Value = true;
+                            
+                            //System.Convert.ToInt32(rolUser["rol"]);
+                            i++;
+                        }
                     }
                     rolUser.Close();
                 }
@@ -122,7 +130,9 @@ namespace VentaElectrodomesticos.AbmUsuario
 
         private void bLimpiarABM_Click(object sender, EventArgs e)
         {
+            conexion.Open();
             this.limpiar();
+            conexion.Close();
         }
 
         private void limpiar()
@@ -133,11 +143,8 @@ namespace VentaElectrodomesticos.AbmUsuario
             tEmpleado.Clear();
             tEmpleado.Enabled = true;
             cHabilitado.Checked = false;
-            
-
             this.rellenarTablaRoles();
-
-            
+            passCambio = false;
         }
 
         private void actualizarRoles()
@@ -173,18 +180,20 @@ namespace VentaElectrodomesticos.AbmUsuario
                     parametros[0, 2] = "@habilitado";
 
                     parametros[1, NOMBRE] = tNombre.Text.ToString();
-                    parametros[1, PASSWORD] = tPassword.Text.ToString();
+                    if (passCambio)
+                        parametros[1, PASSWORD] = hasher.hash(tPassword.Text);
+                    else
+                        parametros[1, PASSWORD] = "null";
                     parametros[1, 2] = System.Convert.ToInt32(cHabilitado.Checked).ToString();
-
+                    
                     SqlDataReader reader = conexion.ejecutarStoredProcedure(sp, parametros);
                     if (reader != null)
                     {
                         reader.Close();
                         this.actualizarRoles();
                         MessageBox.Show("Se ha Modificado el Usuario.", "Success!");
+                        this.limpiar();
                     }
-                    
-
                 }
                 else
                 {
@@ -222,7 +231,9 @@ namespace VentaElectrodomesticos.AbmUsuario
                     SqlDataReader reader = conexion.ejecutarStoredProcedure(sp, parametros);
                     if (reader != null)
                     {
+                        reader.Close();
                         MessageBox.Show("Se ha dado de baja el Usuario.", "Success!");
+                        this.limpiar();
                     }
                 }
                 else
@@ -264,14 +275,17 @@ namespace VentaElectrodomesticos.AbmUsuario
                     parametros[0, HABILITADO] = "@habilitado";
                     
                     parametros[1, NOMBRE] = tNombre.Text.ToString();
-                    parametros[1, PASSWORD] = tPassword.Text.ToString();
+                    parametros[1, PASSWORD] = hasher.hash(tPassword.Text);
                     parametros[1, EMPLEADO] = tEmpleado.Text.ToString();
                     parametros[1, HABILITADO] = System.Convert.ToInt32(cHabilitado.Checked).ToString();
                    
                     SqlDataReader reader = conexion.ejecutarStoredProcedure(sp, parametros);
                     if (reader != null)
                     {
+                        reader.Close();
+                        this.actualizarRoles();
                         MessageBox.Show("Se ha dado de alta el Usuario.", "Success!");
+                        this.limpiar();
                     }
                 }
                 else
@@ -293,162 +307,9 @@ namespace VentaElectrodomesticos.AbmUsuario
             }
         }
 
-        
+        private void tPassword_TextChanged(object sender, EventArgs e)
+        {
+            passCambio = true;
+        }       
     }
 }
-
-
-
-        /*
-        private void BuscarUsuario_Click(object sender, EventArgs e)
-        {
-            BuscadorUsuario buscador = new BuscadorEmpleado();
-            buscador.ShowDialog(this);
-            this.cargarUsuario(buscador.getEmpleado());
-        }
-
-        private void cargarUsuario(Model.Empleado empleado)
-        {
-            if (empleado != null)
-            {
-                tEmpleado.Text = empleado.dni.ToString();
-                tEmpleado.Enabled = false;
-                cHabilitado.Checked = usuario.habilitado;
-            }
-
-        }
-
-     
-        private void bModificar_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                conexion.Open();
-                if (!this.hayAlgunTextboxVacio(tDNI, tNombre, tApellido, tMail, tDireccion, tTelefono, cProvincia, cTipo, cSucursal, cHabilitado))
-                {
-                    String[,] parametros = new String[2, 7];
-                    String sp = "mayusculas_sin_espacios.sp_modifUsuarios";
-                    parametros[0, DNI] = "@DNI";
-                    parametros[0, NOMBRE] = "@Nombre";
-                    parametros[0, APELLIDO] = "@Apellido";
-                    parametros[0, MAIL] = "@Mail";
-                    parametros[0, DIRECCION] = "@direccion";
-                    parametros[0, TELEFONO] = "@telefono";
-                    parametros[0, 6] = "@habilitado";
-
-                    parametros[1, DNI] = tDNI.Text;
-                    parametros[1, NOMBRE] = tNombre.Text;
-                    parametros[1, APELLIDO] = tApellido.Text;
-                    parametros[1, MAIL] = tMail.Text;
-                    parametros[1, DIRECCION] = tDireccion.Text;
-                    parametros[1, TELEFONO] = tTelefono.Text;
-                    parametros[1, 6] = System.Convert.ToInt32(cHabilitado.Checked).ToString();
-
-
-                    SqlDataReader reader = conexion.ejecutarStoredProcedure(sp, parametros);
-                    if (reader != null)
-                    {
-                        MessageBox.Show("Se ha modificado el Usuario.", "Success!");
-                    }
-                }
-                else
-                {
-                    MessageBox.Show("Debe completar todos los campos", "Warning!");
-                }
-            }
-            catch (SqlException ex)
-            {
-                MessageBox.Show(ex.Message, "Error!");
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.StackTrace, "Error app");
-            }
-            finally
-            {
-                conexion.Close();
-            }
-        }
-
-        private void bEliminar_Click(object sender, EventArgs e)
-        {
-            String sql = "DELETE FROM [GD1C2011].[MAYUSCULAS_SIN_ESPACIOS].[Usuarios] " +
-                        "WHERE dni=" + tDNI.Text;
-         
-
-            try
-            {
-                conexion.Open();
-                if (conexion.insertQuery(sql) != 0 )
-                {
-                    MessageBox.Show("Se ha dado de Baja el cliente.", "Success!");
-                }
-                
-            }
-            catch (SqlException ex)
-            {
-                MessageBox.Show(ex.Message, "Error!");
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.StackTrace, "Error app");
-            }
-            finally
-            {
-                conexion.Close();
-            }
-        }
-        
-        
-        private void rellenarComboBoxSucursal()
-        {
-            try
-            {
-                cSucursal.Items.Add("");
-                conexion.Open();
-                SqlDataReader reader = conexion.busquedaSQLDataReader("SELECT nombre, direccion FROM mayusculas_sin_espacios.sucursales left join mayusculas_sin_espacios.provincias on(codigo=provincia) order by provincia");
-
-                while (reader.Read())
-                {
-                    String suc = reader[0].ToString().Trim() + " - " + reader[1].ToString().Trim();
-                    cSucursal.Items.Add(suc);
-
-                }
-                reader.Close();
-
-            }
-            catch (SqlException ex)
-            {
-                MessageBox.Show(ex.Message, "Error!");
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.StackTrace, "Error app");
-            }
-            finally
-            {
-                conexion.Close();
-            }
-        }
-
-
-        private void FormAbmUsuario_Load(object sender, EventArgs e)
-        {
-            this.rellenarComboBoxTipo();
-            this.rellenarComboBoxProvincia();
-            this.rellenarComboBoxSucursal();
-
-            tNombre.Enabled = true;
-            tApellido.Enabled = true;
-            tDireccion.Enabled = true;
-            tMail.Enabled = true;
-            tTelefono.Enabled = true;
-            tDireccion.Enabled = true;
-            cProvincia.Enabled = true;
-            cTipo.Enabled = true;
-            cSucursal.Enabled = true;
-
-
-        }
-
-        */

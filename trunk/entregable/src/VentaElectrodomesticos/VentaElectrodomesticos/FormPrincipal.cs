@@ -35,13 +35,13 @@ namespace VentaElectrodomesticos
         {
             InitializeComponent();
             FormLogin login = new FormLogin();
-            //login.ShowDialog(this);
-            //username = login.USERNAME;
+            login.ShowDialog(this);
+            username = login.USERNAME;
             TiposEmpleado.getInstance();
             
-            username = "cochimoyano";
-            username = "1";
-
+            //username = "cochimoyano";
+            
+            /*
             aBMToolStripMenuItem.Enabled = true;
             aBMDeRolToolStripMenuItem.Enabled = true;
             aBMDeUsuarioToolStripMenuItem.Enabled = true;
@@ -53,10 +53,12 @@ namespace VentaElectrodomesticos
             tableroDeControlToolStripMenuItem.Enabled=true;
             clientesPremiumToolStripMenuItem.Enabled=true;
             mejoresCategoriasToolStripMenuItem.Enabled = true;
+             * */
             
             this.Text += " - " + username;
             foreach (string s in login.FUNCIONES)
             {
+                //MessageBox.Show(s);
                 switch (s)
                 {
                     case "ABM de Empleado":
@@ -166,6 +168,11 @@ namespace VentaElectrodomesticos
         {
             if (username == "")
                 this.Close();
+        }
+
+        private void menuStrip1_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
+        {
+
         }
     }
 }

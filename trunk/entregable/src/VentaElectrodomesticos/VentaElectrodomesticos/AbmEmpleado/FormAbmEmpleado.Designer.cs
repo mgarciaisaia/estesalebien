@@ -95,7 +95,7 @@
             this.cTipo.Location = new System.Drawing.Point(240, 104);
             this.cTipo.Name = "cTipo";
             this.cTipo.Size = new System.Drawing.Size(121, 21);
-            this.cTipo.TabIndex = 35;
+            this.cTipo.TabIndex = 9;
             // 
             // label7
             // 
@@ -112,7 +112,7 @@
             this.cHabilitado.Location = new System.Drawing.Point(241, 130);
             this.cHabilitado.Name = "cHabilitado";
             this.cHabilitado.Size = new System.Drawing.Size(73, 17);
-            this.cHabilitado.TabIndex = 34;
+            this.cHabilitado.TabIndex = 10;
             this.cHabilitado.Text = "Habilitado";
             this.cHabilitado.UseVisualStyleBackColor = true;
             // 
@@ -121,7 +121,7 @@
             this.tDireccion.Location = new System.Drawing.Point(241, 25);
             this.tDireccion.Name = "tDireccion";
             this.tDireccion.Size = new System.Drawing.Size(120, 20);
-            this.tDireccion.TabIndex = 32;
+            this.tDireccion.TabIndex = 6;
             // 
             // label6
             // 
@@ -137,7 +137,7 @@
             this.tTelefono.Location = new System.Drawing.Point(55, 128);
             this.tTelefono.Name = "tTelefono";
             this.tTelefono.Size = new System.Drawing.Size(120, 20);
-            this.tTelefono.TabIndex = 30;
+            this.tTelefono.TabIndex = 5;
             // 
             // label5
             // 
@@ -153,7 +153,7 @@
             this.bLimpiarABM.Location = new System.Drawing.Point(271, 152);
             this.bLimpiarABM.Name = "bLimpiarABM";
             this.bLimpiarABM.Size = new System.Drawing.Size(75, 23);
-            this.bLimpiarABM.TabIndex = 11;
+            this.bLimpiarABM.TabIndex = 15;
             this.bLimpiarABM.Text = "Limpiar";
             this.bLimpiarABM.UseVisualStyleBackColor = true;
             this.bLimpiarABM.Click += new System.EventHandler(this.bLimpiarEmpleado_Click);
@@ -182,7 +182,7 @@
             this.bEliminar.Location = new System.Drawing.Point(190, 152);
             this.bEliminar.Name = "bEliminar";
             this.bEliminar.Size = new System.Drawing.Size(75, 23);
-            this.bEliminar.TabIndex = 10;
+            this.bEliminar.TabIndex = 14;
             this.bEliminar.Text = "Dar baja";
             this.bEliminar.UseVisualStyleBackColor = true;
             this.bEliminar.Click += new System.EventHandler(this.bEliminar_Click);
@@ -193,7 +193,7 @@
             this.bModificar.Location = new System.Drawing.Point(109, 152);
             this.bModificar.Name = "bModificar";
             this.bModificar.Size = new System.Drawing.Size(75, 23);
-            this.bModificar.TabIndex = 9;
+            this.bModificar.TabIndex = 13;
             this.bModificar.Text = "Modificar";
             this.bModificar.UseVisualStyleBackColor = true;
             this.bModificar.Click += new System.EventHandler(this.bModificar_Click);
@@ -203,7 +203,7 @@
             this.bAgregar.Location = new System.Drawing.Point(28, 152);
             this.bAgregar.Name = "bAgregar";
             this.bAgregar.Size = new System.Drawing.Size(75, 23);
-            this.bAgregar.TabIndex = 8;
+            this.bAgregar.TabIndex = 12;
             this.bAgregar.Text = "Agregar";
             this.bAgregar.UseVisualStyleBackColor = true;
             this.bAgregar.Click += new System.EventHandler(this.bAgregar_Click);
@@ -215,7 +215,7 @@
             this.cSucursal.Location = new System.Drawing.Point(241, 77);
             this.cSucursal.Name = "cSucursal";
             this.cSucursal.Size = new System.Drawing.Size(121, 21);
-            this.cSucursal.TabIndex = 7;
+            this.cSucursal.TabIndex = 8;
             // 
             // cProvincia
             // 
@@ -224,14 +224,14 @@
             this.cProvincia.Location = new System.Drawing.Point(241, 51);
             this.cProvincia.Name = "cProvincia";
             this.cProvincia.Size = new System.Drawing.Size(121, 21);
-            this.cProvincia.TabIndex = 6;
+            this.cProvincia.TabIndex = 7;
             // 
             // tMail
             // 
             this.tMail.Location = new System.Drawing.Point(55, 103);
             this.tMail.Name = "tMail";
             this.tMail.Size = new System.Drawing.Size(120, 20);
-            this.tMail.TabIndex = 5;
+            this.tMail.TabIndex = 4;
             // 
             // label4
             // 
@@ -247,7 +247,7 @@
             this.tApellido.Location = new System.Drawing.Point(55, 77);
             this.tApellido.Name = "tApellido";
             this.tApellido.Size = new System.Drawing.Size(120, 20);
-            this.tApellido.TabIndex = 4;
+            this.tApellido.TabIndex = 3;
             // 
             // label3
             // 
@@ -263,7 +263,7 @@
             this.tNombre.Location = new System.Drawing.Point(55, 51);
             this.tNombre.Name = "tNombre";
             this.tNombre.Size = new System.Drawing.Size(120, 20);
-            this.tNombre.TabIndex = 3;
+            this.tNombre.TabIndex = 2;
             // 
             // label2
             // 
@@ -296,7 +296,7 @@
             this.BuscarEmpleado.Location = new System.Drawing.Point(12, 12);
             this.BuscarEmpleado.Name = "BuscarEmpleado";
             this.BuscarEmpleado.Size = new System.Drawing.Size(126, 23);
-            this.BuscarEmpleado.TabIndex = 46;
+            this.BuscarEmpleado.TabIndex = 11;
             this.BuscarEmpleado.Text = "Buscar Empleado";
             this.BuscarEmpleado.UseVisualStyleBackColor = true;
             this.BuscarEmpleado.Click += new System.EventHandler(this.BuscarEmpleado_Click);
