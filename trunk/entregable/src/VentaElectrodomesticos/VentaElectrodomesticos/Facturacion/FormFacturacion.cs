@@ -177,7 +177,7 @@ namespace VentaElectrodomesticos.Facturacion
                                " values ('" + nrofactura + "','" + dgProductos.Rows[i].Cells[0].Value.ToString() +
                                "','" + dgProductos.Rows[i].Cells[1].Value.ToString() +
                                "','" + dgProductos.Rows[i].Cells[2].Value.ToString() + "')";
-                            conexion.insertQuery(sql);
+                            conexion.nonQuery(sql);
                             this.limpiarForm();
                         }
                     }
