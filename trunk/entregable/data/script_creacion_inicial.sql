@@ -768,9 +768,9 @@ GO
  * FacturasCompletas muestra informacion "procesada" de las Facturas: Importe Base, Importe Final (incluye Descuento) y Valor de cada cuota
  */
 CREATE VIEW [MAYUSCULAS_SIN_ESPACIOS].[FacturasCompletas] AS
-SELECT Numero, Fecha, Descuento, Descuento * 100 AS PorcentajeDescuento, Cuotas, SUM(PrecioUnitario * Cantidad) AS MontoBase, SUM(PrecioUnitario * Cantidad) * (1 - Descuento) AS Importe, (SUM(PrecioUnitario * Cantidad) * (1 - Descuento)) / Cuotas AS ValorCuota, Sucursal
+SELECT Numero, Fecha, Descuento, Descuento * 100 AS PorcentajeDescuento, Cuotas, SUM(PrecioUnitario * Cantidad) AS MontoBase, SUM(PrecioUnitario * Cantidad) * (1 - Descuento) AS Importe, (SUM(PrecioUnitario * Cantidad) * (1 - Descuento)) / Cuotas AS ValorCuota, Sucursal, Vendedor, Cliente
 FROM MAYUSCULAS_SIN_ESPACIOS.Facturas LEFT JOIN MAYUSCULAS_SIN_ESPACIOS.ItemsFactura ON ItemsFactura.Factura = Facturas.Numero
-GROUP BY Numero, Sucursal, Fecha, Descuento, Cuotas
+GROUP BY Sucursal, Fecha, Vendedor, Cliente, Numero, Descuento, Cuotas
 
 GO
 
@@ -1140,9 +1140,42 @@ insert into mayusculas_sin_espacios.pagos (factura,sucursal,cuotas,fecha,cobrado
 values (@factura,@sucursal,@cuotas,@factura,@cobrador)
 
 END
+
+GO
+PRINT 'VISTA DeudasPorAnio'
 GO
 
---------------------------------------------------------
+CREATE VIEW MAYUSCULAS_SIN_ESPACIOS.DeudasPorAnio AS
+SELECT Cliente, FacturasCompletas.Sucursal, YEAR(FacturasCompletas.Fecha) AS Anio, SUM(Importe) - SUM(Pagos.Cuotas * FacturasCompletas.ValorCuota) AS DeudaTotal
+FROM MAYUSCULAS_SIN_ESPACIOS.FacturasCompletas
+	LEFT JOIN MAYUSCULAS_SIN_ESPACIOS.Pagos ON FacturasCompletas.Numero = Pagos.Factura
+GROUP BY FacturasCompletas.Sucursal, YEAR(FacturasCompletas.Fecha), Cliente
+
+GO
+
+
+PRINT 'VISTA VendedoresPorAnio'
+GO
+
+CREATE VIEW MAYUSCULAS_SIN_ESPACIOS.VendedoresPorAnio AS
+SELECT Vendedor, FacturasCompletas.Sucursal, YEAR(FacturasCompletas.Fecha) AS Anio, SUM(Importe) AS VentaTotal
+FROM MAYUSCULAS_SIN_ESPACIOS.FacturasCompletas
+GROUP BY FacturasCompletas.Sucursal, YEAR(FacturasCompletas.Fecha), Vendedor
+
+GO
+
+PRINT 'VISTA ProductosPorAnio'
+GO
+
+CREATE VIEW MAYUSCULAS_SIN_ESPACIOS.ProductosPorAnio AS
+SELECT Producto, Sucursal, YEAR(Fecha) AS Anio, SUM(Cantidad) AS Vendidos
+FROM MAYUSCULAS_SIN_ESPACIOS.ItemsFactura
+	JOIN MAYUSCULAS_SIN_ESPACIOS.Facturas ON ItemsFactura.Factura = Facturas.Numero
+GROUP BY Producto, Sucursal, YEAR(Fecha)
+
+GO
+
+
 PRINT 'Procedure Clientes Premium'
 GO
 
@@ -1176,5 +1209,3 @@ group by clientes.dni,clientes.nombre,clientes.apellido
 order by sum(importe)desc
 
 GO
-
-
