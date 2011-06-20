@@ -37,7 +37,10 @@ namespace VentaElectrodomesticos.AsignacionStock
             BuscadorProducto buscadorProductos = new BuscadorProducto();
             buscadorProductos.ShowDialog(this);
             producto = buscadorProductos.getProducto();
-            tProducto.Text = producto.nombre;
+            if (producto != null)
+            {
+                tProducto.Text = producto.nombre;
+            }
         }
 
         private void FormAsignacionStock_Load(object sender, EventArgs e)

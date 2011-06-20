@@ -9,7 +9,7 @@ using System.Data;
 
 namespace VentaElectrodomesticos.DAO
 {
-    class TiposEmpleado : DAO
+    class TiposEmpleado : DAOCache
     {
         public static TiposEmpleado instance;
         public static TiposEmpleado getInstance() {

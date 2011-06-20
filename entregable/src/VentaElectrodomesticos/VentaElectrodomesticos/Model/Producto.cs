@@ -11,7 +11,7 @@ namespace VentaElectrodomesticos.Model
         public String nombre;
         public String descripcion;
         public int categoria;
-		public float precio;
+		public Double precio;
 		public Boolean habilitado;
 		public int marca;
         
@@ -23,7 +23,7 @@ namespace VentaElectrodomesticos.Model
             this.nombre = (String)arrayFields[1];
             this.descripcion = (String)arrayFields[2];
             this.categoria = (int)arrayFields[3];
-            this.precio = (float)arrayFields[4];
+            this.precio = (Double)arrayFields[4];
 			this.habilitado = (byte)arrayFields[5] != 0;
             this.marca = (int)arrayFields[6];
         }

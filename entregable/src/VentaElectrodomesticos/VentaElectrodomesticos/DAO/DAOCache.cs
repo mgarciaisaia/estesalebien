@@ -7,8 +7,9 @@ using System.Data.SqlClient;
 
 namespace VentaElectrodomesticos.DAO
 {
-    abstract class DAO
+    abstract class DAOCache
     {
+        // Moverlo al constructor
         public void initialize()
         {
             ClaseSQL conexion = ClaseSQL.getInstance();

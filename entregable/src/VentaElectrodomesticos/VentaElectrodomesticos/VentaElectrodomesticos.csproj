@@ -129,8 +129,12 @@
     <Compile Include="ClientesPremium\FormClientesPremium.Designer.cs">
       <DependentUpon>FormClientesPremium.cs</DependentUpon>
     </Compile>
-    <Compile Include="DAO\DAO.cs" />
+    <Compile Include="DAO\Categorias.cs" />
+    <Compile Include="DAO\Marcas.cs" />
+    <Compile Include="DAO\DAOCache.cs" />
+    <Compile Include="DAO\Productos.cs" />
     <Compile Include="DAO\Stocks.cs" />
+    <Compile Include="Model\Marca.cs" />
     <Compile Include="Model\Provincia.cs" />
     <Compile Include="DAO\Provincias.cs" />
     <Compile Include="DAO\Sucursales.cs" />
