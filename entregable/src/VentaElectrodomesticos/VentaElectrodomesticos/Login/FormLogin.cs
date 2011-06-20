@@ -19,6 +19,7 @@ namespace VentaElectrodomesticos.Login
 
         private ClaseSQL sql;
         private Hasher hasher = new Hasher(new SHA256Managed());
+        
 
 
         private bool correcto;

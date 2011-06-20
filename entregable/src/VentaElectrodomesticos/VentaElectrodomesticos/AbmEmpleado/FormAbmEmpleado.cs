@@ -76,13 +76,6 @@ namespace VentaElectrodomesticos.AbmEmpleado
 
         private void bAgregar_Click(object sender, EventArgs e)
         {
-            String sql = "INSERT INTO " + ClaseSQL.tableName("Empleados") +
-                " (DNI, Nombre, Apellido, Mail, Telefono, Direccion, Provincia, Tipo, Sucursal)";
-            sql += " VALUES (";
-            sql += "'" + tDNI.Text + "', '" + tNombre.Text + "', '" + tApellido.Text + "', '" + tMail.Text + "'";
-            sql += ", '" + tTelefono.Text + "', '" + tDireccion.Text + "', " + cProvincia.SelectedValue + ", ";
-            sql += cTipo.SelectedValue + ", " + cSucursal.SelectedValue + ");";
-
             try
             {
                 conexion.Open();
@@ -116,7 +109,7 @@ namespace VentaElectrodomesticos.AbmEmpleado
                     SqlDataReader reader = conexion.ejecutarStoredProcedure(sp, parametros);
                     if (reader != null)
                     {
-                        MessageBox.Show("Se ha dado de alta el cliente.", "Success!");
+                        MessageBox.Show("Se ha dado de alta el Empleado.", "Success!");
                         this.limpiar();
                     }
                 }

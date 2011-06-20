@@ -605,7 +605,7 @@ SET IDENTITY_INSERT [MAYUSCULAS_SIN_ESPACIOS].[Productos] OFF;
 GO
 
 --------------------------------------------------------
-PRINT 'TABLA FACTURAS'
+PRINT 'VISTA PRODUCTOS COMPLETOS'
 GO 
 
 CREATE VIEW [MAYUSCULAS_SIN_ESPACIOS].[ProductosCompletos] AS
@@ -613,6 +613,12 @@ SELECT Productos.Codigo, Productos.Nombre, Productos.Descripcion, Productos.Cate
 FROM MAYUSCULAS_SIN_ESPACIOS.Productos
 	LEFT JOIN MAYUSCULAS_SIN_ESPACIOS.Categorias ON Productos.Categoria = Categorias.Codigo
 	LEFT JOIN MAYUSCULAS_SIN_ESPACIOS.Marcas ON Productos.Marca = Marcas.Codigo
+
+GO
+
+--------------------------------------------------------
+PRINT 'TABLA FACTURAS'
+GO
 
 CREATE TABLE [MAYUSCULAS_SIN_ESPACIOS].[Facturas] (
 	[Numero] [int] IDENTITY PRIMARY KEY,
@@ -888,7 +894,7 @@ BEGIN
 								SET @INTENTOS = 0
 								EXEC [MAYUSCULAS_SIN_ESPACIOS].sp_MODIFINTENTOS @USER, @INTENTOS
 							END
-						(SELECT FUN.DESCRIPCION 
+						(SELECT DISTINCT FUN.DESCRIPCION 
 							FROM [MAYUSCULAS_SIN_ESPACIOS].FUNCIONALIDADES AS FUN JOIN  [MAYUSCULAS_SIN_ESPACIOS].FUNCIONALIDADESROL AS FUNROL ON (FUN.CODIGO = FUNROL.FUNCIONALIDAD)
 								JOIN  [MAYUSCULAS_SIN_ESPACIOS].ROLES AS ROL ON (FUNROL.ROL = ROL.CODIGO)
 								JOIN  [MAYUSCULAS_SIN_ESPACIOS].ASIGNACIONES AS ASIG ON (ASIG.ROL = ROL.CODIGO)
@@ -972,7 +978,7 @@ end
 GO
 
 --------------------------------------------------------
-PRINT PROCEDURE Baja Empleado'
+PRINT 'PROCEDURE Baja Empleado'
 GO
 
 CREATE PROCEDURE [MAYUSCULAS_SIN_ESPACIOS].[sp_BajaEmpleados](@DNI numeric(8,0), @habilitado tinyint)
@@ -1044,13 +1050,22 @@ CREATE PROCEDURE [MAYUSCULAS_SIN_ESPACIOS].[sp_ModifUsuarios] (@Nombre nvarchar(
 							@password nvarchar(64), @habilitado tinyint)
 AS
 BEGIN
-UPDATE mayusculas_sin_espacios.Usuarios
-SET password=@Password, habilitado=@habilitado, intentos='0'
-where nombre=@nombre
+if @password ='null'
+begin
+	UPDATE mayusculas_sin_espacios.Usuarios
+	SET habilitado=@habilitado, intentos='0'
+	where nombre=@nombre
+end
+else
+begin
+	UPDATE mayusculas_sin_espacios.Usuarios
+	SET password=@Password, habilitado=@habilitado, intentos='0'
+	where nombre=@nombre
+end
 END
 GO
 
-
+--------------------------------------------------------
 PRINT 'PROCEDURE Baja Usuarios '
 GO
 
@@ -1064,20 +1079,22 @@ END
 GO
 
 --------------------------------------------------------
-PRINT 'PROCEDURE Efectuar Pago'
+PRINT 'PROCEDURE Facturar'
 GO
 
-CREATE PROCEDURE mayusculas_sin_espacios.sp_facturar(@fecha datetime, @descuento decimal,@cuotas int,
-						 @sucursal int, @vendedor int, @cliente int)
-AS
-BEGIN
+CREATE PROCEDURE [MAYUSCULAS_SIN_ESPACIOS].[sp_facturar](@fecha datetime, @descuento decimal,@cuotas int,
+										 @sucursal int, @vendedor int, @cliente int)
+as
+begin
+
 insert into mayusculas_sin_espacios.facturas (fecha,descuento,cuotas,sucursal,vendedor,cliente) 
 values (@fecha,@descuento/100,@cuotas,@sucursal,@vendedor,@cliente)
 
-return (select numero
+select max(numero)
 from mayusculas_sin_espacios.facturas
-where (@fecha=fecha and @descuento=descuento and @sucursal=sucursal and @vendedor =vendedor and @cliente =cliente))
-END
+
+end
+GO
 
 
 --------------------------------------------------------
@@ -1091,12 +1108,13 @@ SELECT numero
 FROM mayusculas_sin_espacios.facturas
 where CLIENTE = @CLIENTE AND (mayusculas_sin_espacios.fun_faltancuotas (numero)) >0
 END
+GO
 
 --------------------------------------------------------
 PRINT 'FUNCION Cuotas Faltantes'
 GO
 
-CREATE FUNCION [MAYUSCULAS_SIN_ESPACIOS].[fun_faltanCuotas](@factura int)
+CREATE FUNCTION [MAYUSCULAS_SIN_ESPACIOS].[fun_faltanCuotas](@factura int)
 returns int
 AS
 BEGIN
@@ -1108,6 +1126,7 @@ set @total = (select cuotas FROM mayusculas_sin_espacios.facturascompletas where
 
 return (@total-@pagas)
 END
+GO
 
 --------------------------------------------------------
 PRINT 'PROCEDURE Efectuar Pago'

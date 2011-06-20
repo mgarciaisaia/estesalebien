@@ -126,7 +126,7 @@
   </data>
   <assembly alias="mscorlib" name="mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
   <data name="BuscarEmpleado.TabIndex" type="System.Int32, mscorlib">
-    <value>48</value>
+    <value>6</value>
   </data>
   <data name="BuscarEmpleado.Text" xml:space="preserve">
     <value>Buscar Empleado</value>
@@ -190,7 +190,7 @@
     <value>218, 125</value>
   </data>
   <data name="dgRoles.TabIndex" type="System.Int32, mscorlib">
-    <value>35</value>
+    <value>5</value>
   </data>
   <data name="&gt;&gt;dgRoles.Name" xml:space="preserve">
     <value>dgRoles</value>
@@ -214,7 +214,7 @@
     <value>73, 17</value>
   </data>
   <data name="cHabilitado.TabIndex" type="System.Int32, mscorlib">
-    <value>34</value>
+    <value>4</value>
   </data>
   <data name="cHabilitado.Text" xml:space="preserve">
     <value>Habilitado</value>
@@ -238,7 +238,7 @@
     <value>75, 23</value>
   </data>
   <data name="bLimpiarABM.TabIndex" type="System.Int32, mscorlib">
-    <value>11</value>
+    <value>10</value>
   </data>
   <data name="bLimpiarABM.Text" xml:space="preserve">
     <value>Limpiar</value>
@@ -262,7 +262,7 @@
     <value>75, 23</value>
   </data>
   <data name="bEliminar.TabIndex" type="System.Int32, mscorlib">
-    <value>10</value>
+    <value>9</value>
   </data>
   <data name="bEliminar.Text" xml:space="preserve">
     <value>Dar baja</value>
@@ -286,7 +286,7 @@
     <value>75, 23</value>
   </data>
   <data name="bModificar.TabIndex" type="System.Int32, mscorlib">
-    <value>9</value>
+    <value>8</value>
   </data>
   <data name="bModificar.Text" xml:space="preserve">
     <value>Modificar</value>
@@ -310,7 +310,7 @@
     <value>75, 23</value>
   </data>
   <data name="bAgregar.TabIndex" type="System.Int32, mscorlib">
-    <value>8</value>
+    <value>7</value>
   </data>
   <data name="bAgregar.Text" xml:space="preserve">
     <value>Agregar</value>
@@ -337,7 +337,7 @@
     <value>96, 20</value>
   </data>
   <data name="tEmpleado.TabIndex" type="System.Int32, mscorlib">
-    <value>4</value>
+    <value>3</value>
   </data>
   <data name="&gt;&gt;tEmpleado.Name" xml:space="preserve">
     <value>tEmpleado</value>
@@ -388,7 +388,7 @@
     <value>96, 20</value>
   </data>
   <data name="tPassword.TabIndex" type="System.Int32, mscorlib">
-    <value>3</value>
+    <value>2</value>
   </data>
   <data name="&gt;&gt;tPassword.Name" xml:space="preserve">
     <value>tPassword</value>

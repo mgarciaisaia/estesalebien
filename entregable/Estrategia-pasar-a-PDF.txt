@@ -6,6 +6,3 @@ La tabla Pagos contiene los pagos de las facturas que tienen mas de 1 cuota.
 Para realizar un reporte sobre los pagos completos se deberian juntar los datos de la tabla PAGOS y la tabla FACTURACION
 
 Supuer usuario ADMIN... se crea un empleado o se asigna un empleado real.
-
-RECORDATORIO PARA FER:
-	revisar asignacion de rolesen alta de usuario!!!

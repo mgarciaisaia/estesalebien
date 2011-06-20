@@ -83,6 +83,7 @@ namespace VentaElectrodomesticos.MetodosSQL
             dt.Load(dr);
             cnn.Close();
             return dt;
+            
         }
 
         public Object scalarQuery(String query)

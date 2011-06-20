@@ -148,6 +148,7 @@
             // 
             resources.ApplyResources(this.tPassword, "tPassword");
             this.tPassword.Name = "tPassword";
+            this.tPassword.TextChanged += new System.EventHandler(this.tPassword_TextChanged);
             // 
             // label2
             // 
