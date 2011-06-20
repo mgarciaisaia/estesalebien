@@ -9,6 +9,7 @@ using System.Windows.Forms;
 using VentaElectrodomesticos.DAO;
 using VentaElectrodomesticos.Model;
 using VentaElectrodomesticos.MetodosSQL;
+using System.Data.SqlClient;
 
 namespace VentaElectrodomesticos.TableroControl
 {
@@ -41,10 +42,10 @@ namespace VentaElectrodomesticos.TableroControl
                 this.totalFacturacion(conexion);
                 this.proporcionFormaDePago(conexion);
                 this.mayorFactura(conexion);
-                /*this.mayorDeudor(conexion);
+                this.mayorDeudor(conexion);
                 this.vendedorDelAnio(conexion);
                 this.productoDelAnio(conexion);
-                this.faltanteDeStock(conexion);*/
+                /*this.faltanteDeStock(conexion);*/
                 Resultados.Enabled = true;
             }
             catch (Exception exception)
@@ -93,6 +94,65 @@ namespace VentaElectrodomesticos.TableroControl
         {
             String query = "SELECT MAX(Importe)" + this.fromFacturas();
             tMayorFactura.Text = conexion.scalarQuery(query).ToString();
+        }
+
+        private void mayorDeudor(ClaseSQL conexion)
+        {
+            String query = "SELECT TOP 1 Cliente FROM " + ClaseSQL.tableName("DeudasPorAnio") + " WHERE Sucursal = " + ((Provincia)cSucursal.SelectedItem).codigo +
+                " AND Anio = " + cAnio.Value + " ORDER BY DeudaTotal DESC";
+            Object idObject = conexion.scalarQuery(query);
+            if (idObject != null)
+            {
+                Decimal idCliente = (Decimal)idObject;
+                query = "SELECT Apellido, Nombre, DNI FROM " + ClaseSQL.tableName("Clientes") + " WHERE DNI = " + idCliente;
+                SqlDataReader reader = conexion.busquedaSQLDataReader(query);
+                reader.Read();
+                tMayorDeudor.Text = ((String)reader[0]).ToUpper() + ", " + (String)reader[1] + " (DNI " + (decimal)reader[2] + ")";
+                reader.Close();
+            }
+            else
+            {
+                tMayorDeudor.Text = "Ninguno";
+            }
+        }
+
+        private void vendedorDelAnio(ClaseSQL conexion)
+        {
+            String query = "SELECT TOP 1 Vendedor FROM " + ClaseSQL.tableName("VendedoresPorAnio") + " WHERE Sucursal = " + ((Provincia)cSucursal.SelectedItem).codigo +
+                " AND Anio = " + cAnio.Value + " ORDER BY VentaTotal DESC";
+            Object idObject = conexion.scalarQuery(query);
+            if (idObject != null)
+            {
+                Decimal idVendedor = (Decimal)idObject;
+                query = "SELECT Apellido, Nombre, DNI FROM " + ClaseSQL.tableName("Empleados") + " WHERE DNI = " + idVendedor;
+                SqlDataReader reader = conexion.busquedaSQLDataReader(query);
+                reader.Read();
+                tVendedorDelAnio.Text = ((String)reader[0]).ToUpper() + ", " + (String)reader[1] + " (DNI " + (decimal)reader[2] + ")";
+                reader.Close();
+            }
+            else
+            {
+                tVendedorDelAnio.Text = "No se efectuaron ventas";
+            }
+        }
+
+        private void productoDelAnio(ClaseSQL conexion)
+        {
+            String query = "SELECT TOP 1 Producto FROM " + ClaseSQL.tableName("ProductosPorAnio") + " WHERE Sucursal = " + ((Provincia)cSucursal.SelectedItem).codigo +
+                " AND Anio = " + cAnio.Value + " ORDER BY Vendidos DESC";
+            Object idObject = conexion.scalarQuery(query);
+            if (idObject != null)
+            {
+                conexion.Close();
+                Producto productoDelAnio = Productos.getInstance().producto(int.Parse(idObject.ToString()));
+                Categoria categoriaDelAnio = Categorias.getInstance().categoria(productoDelAnio.categoria);
+                conexion.Open();
+                tProductoDelAnio.Text = productoDelAnio.codigo + " - " + productoDelAnio.nombre + " (" + categoriaDelAnio.nombre + " - " + categoriaDelAnio.codigo + ")";
+            }
+            else
+            {
+                tVendedorDelAnio.Text = "No se efectuaron ventas";
+            }
         }
 
         private String fromFacturas()

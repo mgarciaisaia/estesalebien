@@ -17,6 +17,22 @@ namespace VentaElectrodomesticos.DAO
             return new Categorias();
         }
 
+        public Categoria categoria(int codigo)
+        {
+            String query = "SELECT Codigo, Nombre, Padre FROM " + ClaseSQL.tableName("Categorias") + " WHERE Codigo = " + codigo;
+            ClaseSQL conexion = ClaseSQL.getInstance();
+            conexion.Open();
+            SqlDataReader reader = conexion.busquedaSQLDataReader(query);
+            if (!reader.HasRows)
+            {
+                throw new Exception("No existe categoria con codigo " + codigo);
+            }
+            reader.Read();
+            Categoria categoria = new Categoria((int)reader["Codigo"], (String)reader["Nombre"], (int)reader["Padre"]);
+            conexion.Close();
+            return categoria;
+        }
+
         private DataTable table()
         {
             String query = "SELECT Codigo, Nombre, Padre FROM " + ClaseSQL.tableName("Categorias");
