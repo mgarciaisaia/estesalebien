@@ -74,19 +74,30 @@ namespace VentaElectrodomesticos.MetodosSQL
             }
         }
 
+        public DataTable selectDataTable(String query)
+        {
+            SqlCommand cmd = new SqlCommand(query, cnn);
+            cnn.Open();
+            SqlDataReader dr = cmd.ExecuteReader();
+            DataTable dt = new DataTable();
+            dt.Load(dr);
+            cnn.Close();
+            return dt;
+        }
+
         public Object scalarQuery(String query)
         {
             SqlCommand command = new SqlCommand(query, cnn);
             return command.ExecuteScalar();
         }
 
-        public int insertQuery(String query)
+        public int nonQuery(String query)
         {
             SqlCommand command = new SqlCommand(query, cnn);
             return command.ExecuteNonQuery();
         }
 
-        public int insertQuery(SqlCommand command)
+        public int nonQuery(SqlCommand command)
         {
             command.Connection = cnn;
             return command.ExecuteNonQuery();
@@ -147,7 +158,7 @@ namespace VentaElectrodomesticos.MetodosSQL
                 SqlCommand command = new SqlCommand();
                 command.Connection = cnn;
                 command.CommandType = System.Data.CommandType.Text;
-                command.CommandText = "SELECT " + func ;
+                command.CommandText = "SELECT " + func + "as functionresult";
                 command.CommandTimeout = 10;
 
                 for (int i = 0; i < parametros.GetLength(1); i++)

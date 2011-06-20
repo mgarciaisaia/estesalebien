@@ -7,7 +7,7 @@ using System.Data.SqlClient;
 
 namespace VentaElectrodomesticos.DAO
 {
-    class Provincias : DAO
+    class Provincias : DAOCache
     {
         public static Provincias instance;
         public static Provincias getInstance() {

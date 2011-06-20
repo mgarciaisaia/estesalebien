@@ -608,6 +608,12 @@ GO
 PRINT 'TABLA FACTURAS'
 GO 
 
+CREATE VIEW [MAYUSCULAS_SIN_ESPACIOS].[ProductosCompletos] AS
+SELECT Productos.Codigo, Productos.Nombre, Productos.Descripcion, Productos.Categoria AS CodigoCategoria, Categorias.Nombre AS Categoria, Productos.Precio, Productos.Marca AS CodigoMarca, Marcas.Nombre AS Marca, Productos.Habilitado
+FROM MAYUSCULAS_SIN_ESPACIOS.Productos
+	LEFT JOIN MAYUSCULAS_SIN_ESPACIOS.Categorias ON Productos.Categoria = Categorias.Codigo
+	LEFT JOIN MAYUSCULAS_SIN_ESPACIOS.Marcas ON Productos.Marca = Marcas.Codigo
+
 CREATE TABLE [MAYUSCULAS_SIN_ESPACIOS].[Facturas] (
 	[Numero] [int] IDENTITY PRIMARY KEY,
 	[Fecha] [datetime],

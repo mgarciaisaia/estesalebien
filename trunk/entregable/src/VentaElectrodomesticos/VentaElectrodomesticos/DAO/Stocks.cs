@@ -10,9 +10,14 @@ namespace VentaElectrodomesticos.DAO
 {
     class Stocks
     {
+        private static Stocks instance;
         public static Stocks getInstance()
         {
-            return new Stocks();
+            if (instance == null)
+            {
+                instance = new Stocks();
+            }
+            return instance;
         }
 
         public int stock(Producto producto, Sucursal sucursal)
@@ -34,7 +39,7 @@ namespace VentaElectrodomesticos.DAO
             SqlCommand command = new SqlCommand(query);
             command.Parameters.AddWithValue("@Date", DateTime.Now);
             conexion.Open();
-            conexion.insertQuery(command);
+            conexion.nonQuery(command);
             conexion.Close();
         }
     }
