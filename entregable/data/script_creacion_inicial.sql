@@ -1078,7 +1078,6 @@ WHERE nombre = @Nombre
 END
 GO
 
---------------------------------------------------------
 -------------------------------------------------------
 PRINT 'PROCEDURE Facturar'
 GO
@@ -1096,22 +1095,6 @@ from mayusculas_sin_espacios.facturas
 
 end
 GO
-
-
-PRINT 'PROCEDURE Efectuar Pago'
-GO
-
-CREATE PROCEDURE mayusculas_sin_espacios.sp_facturar(@fecha datetime, @descuento decimal,@cuotas int,
-						 @sucursal int, @vendedor int, @cliente int)
-AS
-BEGIN
-insert into mayusculas_sin_espacios.facturas (fecha,descuento,cuotas,sucursal,vendedor,cliente) 
-values (@fecha,@descuento/100,@cuotas,@sucursal,@vendedor,@cliente)
-
-return (select numero
-from mayusculas_sin_espacios.facturas
-where (@fecha=fecha and @descuento=descuento and @sucursal=sucursal and @vendedor =vendedor and @cliente =cliente))
-END
 
 --------------------------------------------------------
 PRINT 'PROCEDURE FACTURAS PENDIENTES'
@@ -1157,3 +1140,41 @@ insert into mayusculas_sin_espacios.pagos (factura,sucursal,cuotas,fecha,cobrado
 values (@factura,@sucursal,@cuotas,@factura,@cobrador)
 
 END
+GO
+
+--------------------------------------------------------
+PRINT 'Procedure Clientes Premium'
+GO
+
+CREATE PROCEDURE [MAYUSCULAS_SIN_ESPACIOS].[sp_ClientesPremium] (@sucursal int, @año int)
+AS
+select top(30) clientes.nombre as 'Nombre Cliente',
+				clientes.apellido as 'Apellido Cliente', 
+				clientes.dni as 'DNI Cliente', 
+				sum(importe) as 'Importe Total',
+				(select sum(itemsfactura.cantidad) 
+				from mayusculas_sin_espacios.itemsfactura join mayusculas_sin_espacios.facturascompletas 
+						on (itemsfactura.factura=facturascompletas.numero) join mayusculas_sin_espacios.facturas
+						on(facturas.numero=facturascompletas.numero)
+				where year(facturas.fecha)=@año and facturas.sucursal=@sucursal and clientes.dni= facturas.cliente
+				) as 'Total Productos',
+				(select top (1) facturas.fecha
+				from mayusculas_sin_espacios.facturas
+				where year(facturas.fecha)=@año and facturas.sucursal=@sucursal and clientes.dni= facturas.cliente
+				order by facturas.fecha desc
+				) as 'Fecha Ultima Compra',
+				(select top (1) facturas.vendedor
+				from mayusculas_sin_espacios.facturas
+				where year(facturas.fecha)=@año and facturas.sucursal=@sucursal and clientes.dni= facturas.cliente
+				order by facturas.fecha desc
+				) as 'Empleado Ultima Compra'		
+from mayusculas_sin_espacios.facturascompletas join mayusculas_sin_espacios.facturas
+			on(facturas.numero=facturascompletas.numero) join mayusculas_sin_espacios.clientes
+			on(clientes.dni=facturas.cliente) 
+where year(facturas.fecha)=@año and facturas.sucursal=@sucursal
+group by clientes.dni,clientes.nombre,clientes.apellido
+order by sum(importe)desc
+
+GO
+
+
