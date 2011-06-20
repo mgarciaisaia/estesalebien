@@ -768,9 +768,9 @@ GO
  * FacturasCompletas muestra informacion "procesada" de las Facturas: Importe Base, Importe Final (incluye Descuento) y Valor de cada cuota
  */
 CREATE VIEW [MAYUSCULAS_SIN_ESPACIOS].[FacturasCompletas] AS
-SELECT Numero, Fecha, Descuento, Descuento * 100 AS PorcentajeDescuento, Cuotas, SUM(PrecioUnitario * Cantidad) AS MontoBase, SUM(PrecioUnitario * Cantidad) * (1 - Descuento) AS Importe, (SUM(PrecioUnitario * Cantidad) * (1 - Descuento)) / Cuotas AS ValorCuota
+SELECT Numero, Fecha, Descuento, Descuento * 100 AS PorcentajeDescuento, Cuotas, SUM(PrecioUnitario * Cantidad) AS MontoBase, SUM(PrecioUnitario * Cantidad) * (1 - Descuento) AS Importe, (SUM(PrecioUnitario * Cantidad) * (1 - Descuento)) / Cuotas AS ValorCuota, Sucursal
 FROM MAYUSCULAS_SIN_ESPACIOS.Facturas LEFT JOIN MAYUSCULAS_SIN_ESPACIOS.ItemsFactura ON ItemsFactura.Factura = Facturas.Numero
-GROUP BY Numero, Fecha, Descuento, Cuotas
+GROUP BY Numero, Sucursal, Fecha, Descuento, Cuotas
 
 GO
 
@@ -1079,6 +1079,7 @@ END
 GO
 
 --------------------------------------------------------
+-------------------------------------------------------
 PRINT 'PROCEDURE Facturar'
 GO
 
@@ -1096,6 +1097,21 @@ from mayusculas_sin_espacios.facturas
 end
 GO
 
+
+PRINT 'PROCEDURE Efectuar Pago'
+GO
+
+CREATE PROCEDURE mayusculas_sin_espacios.sp_facturar(@fecha datetime, @descuento decimal,@cuotas int,
+						 @sucursal int, @vendedor int, @cliente int)
+AS
+BEGIN
+insert into mayusculas_sin_espacios.facturas (fecha,descuento,cuotas,sucursal,vendedor,cliente) 
+values (@fecha,@descuento/100,@cuotas,@sucursal,@vendedor,@cliente)
+
+return (select numero
+from mayusculas_sin_espacios.facturas
+where (@fecha=fecha and @descuento=descuento and @sucursal=sucursal and @vendedor =vendedor and @cliente =cliente))
+END
 
 --------------------------------------------------------
 PRINT 'PROCEDURE FACTURAS PENDIENTES'

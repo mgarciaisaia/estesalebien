@@ -10,7 +10,7 @@ namespace VentaElectrodomesticos.DAO
 {
     class Sucursales : DAOCache
     {
-        public static Sucursales instance;
+        private static Sucursales instance;
         public static Sucursales getInstance() {
             if (instance == null)
                 {
