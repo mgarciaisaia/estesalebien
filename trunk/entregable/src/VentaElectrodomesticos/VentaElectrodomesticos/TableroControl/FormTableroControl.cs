@@ -107,5 +107,6 @@ namespace VentaElectrodomesticos.TableroControl
                 throw new Exception("Debe seleccionar alguna sucursal");
             }
         }
+
     }
 }
