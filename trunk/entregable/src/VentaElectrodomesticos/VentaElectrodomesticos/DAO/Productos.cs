@@ -120,8 +120,8 @@ namespace VentaElectrodomesticos.DAO
         {
             try
             {
-                String query = "INSERT INTO " + ClaseSQL.tableName("Productos") + " (Codigo, Nombre, Descripcion, Precio, Marca," +
-                    " Categoria, Habilitado) VALUES (" + codigo + ", '" + nombre + "', '" + descripcion + "', " + precio + ", " + marca +
+                String query = "INSERT INTO " + ClaseSQL.tableName("Productos") + " (Nombre, Descripcion, Precio, Marca," +
+                    " Categoria, Habilitado) VALUES ('" + nombre + "', '" + descripcion + "', " + precio + ", " + marca +
                     ", " + categoria + ", " + (habilitado ? 1 : 0) + ")";
                 ClaseSQL conexion = ClaseSQL.getInstance();
                 conexion.Open();

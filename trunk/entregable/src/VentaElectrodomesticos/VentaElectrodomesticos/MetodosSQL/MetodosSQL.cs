@@ -87,14 +87,22 @@ namespace VentaElectrodomesticos.MetodosSQL
 
         public DataTable selectDataTable(String query)
         {
-            SqlCommand cmd = new SqlCommand(query, cnn);
-            cnn.Open();
-            SqlDataReader dr = cmd.ExecuteReader();
-            DataTable dt = new DataTable();
-            dt.Load(dr);
-            cnn.Close();
-            return dt;
-            
+            try
+            {
+                SqlCommand cmd = new SqlCommand(query, cnn);
+                cnn.Open();
+                SqlDataReader dr = cmd.ExecuteReader();
+                DataTable dt = new DataTable();
+                dt.Load(dr);                
+                return dt;
+            }
+            catch (SqlException ex)
+            {
+                throw ex;
+            }
+            finally
+            { cnn.Close(); }
+
         }
 
         public Object scalarQuery(String query)
