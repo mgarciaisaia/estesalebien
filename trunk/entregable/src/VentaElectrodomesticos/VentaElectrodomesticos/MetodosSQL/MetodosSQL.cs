@@ -74,6 +74,7 @@ namespace VentaElectrodomesticos.MetodosSQL
                 command.Connection = cnn;
                 command.CommandType = System.Data.CommandType.Text;
                 command.CommandText = query;
+                command.CommandTimeout = 100;
                 SqlDataReader reader = command.ExecuteReader();
 
                 return reader;

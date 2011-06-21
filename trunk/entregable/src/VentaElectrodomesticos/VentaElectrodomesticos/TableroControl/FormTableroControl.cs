@@ -164,12 +164,17 @@ namespace VentaElectrodomesticos.TableroControl
             conexion.Close();
             conexion.Open();
             SqlDataReader reader = conexion.busquedaSQLDataReader(query);
-            if (!reader.HasRows)
+            if (!reader.Read())
             {
                 tFaltanteDeStock.Text = "No se encontro producto con faltantes";
             }
-            reader.Read();
-            tFaltanteDeStock.Text = reader["Producto"] + " por " + reader["Dias"] + " dias";
+            else
+            {
+                if (reader["dias"].ToString() != "0")
+                    tFaltanteDeStock.Text = reader["Producto"] + " por " + reader["Dias"] + " dias";
+                else
+                    tFaltanteDeStock.Text = "No se encontro producto con faltantes";
+            }
             reader.Close();
         }
 
