@@ -125,6 +125,7 @@ CREATE TABLE [MAYUSCULAS_SIN_ESPACIOS].[Clientes] (
 	[Provincia] [tinyint] FOREIGN KEY REFERENCES [MAYUSCULAS_SIN_ESPACIOS].[Provincias] (Codigo),
 	[Habilitado] [tinyint] DEFAULT 1
 )
+GO
 
 --------------------------------------------------------
 PRINT 'Indices Clientes'
@@ -299,6 +300,7 @@ GO
  */
 INSERT INTO [MAYUSCULAS_SIN_ESPACIOS].[Usuarios] (Nombre, Password, Empleado)
 VALUES ('admin', 'E6B87050BFCB8143FCB8DB0170A4DC9ED00D904DDD3E2A4AD1B1E8DC0FDC9BE7', null);
+GO
 
 --------------------------------------------------------
 PRINT 'Insert Usuarios de los empleados'
@@ -319,6 +321,7 @@ CREATE TABLE [MAYUSCULAS_SIN_ESPACIOS].[Roles] (
 	[Nombre] [nvarchar] (60),
 	[Habilitado] [tinyint] DEFAULT 1
 )
+GO
 
 --------------------------------------------------------
 PRINT 'Indices Roles'
@@ -357,6 +360,7 @@ CREATE TABLE [MAYUSCULAS_SIN_ESPACIOS].[Asignaciones] (
 	[Rol] [int],
 	PRIMARY KEY (Usuario, Rol)
 )
+GO
 
 --------------------------------------------------------
 PRINT 'Insert Asignacion del usuario admin'
@@ -370,7 +374,7 @@ INSERT INTO [MAYUSCULAS_SIN_ESPACIOS].[Asignaciones] (Usuario, Rol)
 (SELECT TOP 1 Usuarios.Codigo, Roles.Codigo
 FROM MAYUSCULAS_SIN_ESPACIOS.Usuarios, MAYUSCULAS_SIN_ESPACIOS.Roles
 WHERE Usuarios.Nombre = 'admin' AND Roles.Nombre = 'Administrador General')
-
+GO
 /*
  * FIXME: podriamos hacer algunas asignaciones mas (un rol por tipo de empleado?)
  */
@@ -422,6 +426,7 @@ CREATE TABLE [MAYUSCULAS_SIN_ESPACIOS].[FuncionalidadesRol] (
 	[Funcionalidad] [tinyint] REFERENCES [MAYUSCULAS_SIN_ESPACIOS].[Funcionalidades] (Codigo),
 	PRIMARY KEY (Rol, Funcionalidad)
 )
+GO
 
 --------------------------------------------------------
 PRINT 'Insert Funcionalidades del Rol Administrador General'
@@ -434,7 +439,6 @@ INSERT INTO MAYUSCULAS_SIN_ESPACIOS.FuncionalidadesRol ([Rol], [Funcionalidad])
 (SELECT Roles.Codigo, Funcionalidades.Codigo
 FROM MAYUSCULAS_SIN_ESPACIOS.Roles, MAYUSCULAS_SIN_ESPACIOS.Funcionalidades
 WHERE Roles.Nombre = 'Administrador General');
-
 GO
 
 --------------------------------------------------------
@@ -446,6 +450,7 @@ CREATE TABLE [MAYUSCULAS_SIN_ESPACIOS].[Categorias] (
 	[Nombre] [nvarchar](100) NULL,
 	[Padre] [int] NULL DEFAULT NULL FOREIGN KEY REFERENCES [MAYUSCULAS_SIN_ESPACIOS].[Categorias] (Codigo)
 )
+GO
 
 --------------------------------------------------------
 PRINT 'Indices Categoria'
@@ -522,6 +527,7 @@ CREATE TABLE [MAYUSCULAS_SIN_ESPACIOS].[Marcas] (
 	[Codigo] [int] IDENTITY(1,1) PRIMARY KEY,
 	[Nombre] [nvarchar] (30) UNIQUE
  )
+ GO
 
 
 CREATE INDEX MarcasPorNombre
@@ -536,6 +542,7 @@ INSERT INTO [MAYUSCULAS_SIN_ESPACIOS].[Marcas](NOMBRE)
   SELECT DISTINCT PRODUCTO_MARCA
   FROM gd_esquema.Maestra
   WHERE PRODUCTO_MARCA IS NOT NULL
+GO
 
 --------------------------------------------------------
 PRINT 'TABLA PRODUCTOS'
@@ -553,7 +560,7 @@ CREATE TABLE [MAYUSCULAS_SIN_ESPACIOS].[Productos] (
 GO
 
 SET IDENTITY_INSERT [MAYUSCULAS_SIN_ESPACIOS].[Productos] ON;
-
+GO
 --------------------------------------------------------
 PRINT 'Indices Productos'
 GO
@@ -600,6 +607,7 @@ while @@fetch_status = 0
 close CURSORITO
 deallocate CURSORITO
 END
+GO
 
 SET IDENTITY_INSERT [MAYUSCULAS_SIN_ESPACIOS].[Productos] OFF;
 GO
@@ -629,9 +637,10 @@ CREATE TABLE [MAYUSCULAS_SIN_ESPACIOS].[Facturas] (
 	[Vendedor] [numeric] (8, 0) FOREIGN KEY REFERENCES [MAYUSCULAS_SIN_ESPACIOS].[Empleados] (DNI),
 	[Cliente] [numeric] (8,0) FOREIGN KEY REFERENCES [MAYUSCULAS_SIN_ESPACIOS].[Clientes] (DNI)
 )
+GO
 
 SET IDENTITY_INSERT [MAYUSCULAS_SIN_ESPACIOS].[Facturas] ON;
-
+GO
 --------------------------------------------------------
 PRINT 'Indices Facturas'
 GO
@@ -699,7 +708,7 @@ INSERT INTO [MAYUSCULAS_SIN_ESPACIOS].[MovimientosStock] (Producto, Sucursal, Au
 (SELECT CONVERT(INT, SUBSTRING(PRODUCTO_NOMBRE,LEN(PRODUCTO_NOMBRE)-9,10)), Provincias.Codigo, EMPLEADO_DNI, LLEGADA_STOCK_CANT, LLEGADA_STOCK_FECHA
 FROM gd_esquema.Maestra LEFT JOIN MAYUSCULAS_SIN_ESPACIOS.Provincias ON Provincias.Nombre = SUC_PROVINCIA
 WHERE LLEGADA_STOCK_CANT IS NOT NULL AND LLEGADA_STOCK_CANT <> 0)
-
+GO
 
 --------------------------------------------------------
 PRINT 'TABLA ITEM FACTURAS'
