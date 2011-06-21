@@ -37,6 +37,7 @@ namespace VentaElectrodomesticos.Buscadores
         {
             try
             {
+                
                 this.validarBusqueda();
                 String categoria = "";
                 if (tCategoria.SelectedNode != null)
@@ -130,5 +131,8 @@ namespace VentaElectrodomesticos.Buscadores
                 }
             }
         }
+
+
+        
     }
 }

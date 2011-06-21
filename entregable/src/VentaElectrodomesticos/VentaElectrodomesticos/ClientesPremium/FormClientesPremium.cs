@@ -87,58 +87,5 @@ namespace VentaElectrodomesticos.ClientesPremium
             reader.Close();
 
         }
-
-       
-
-
     }
 }
-
-/*
-      
-
-        private void totalVentas(ClaseSQL conexion)
-        {
-            String query = "SELECT COUNT(1)" + this.fromFacturas();
-            Object resultado = conexion.scalarQuery(query);
-            tTotalVentas.Text = resultado.ToString();
-        }
-
-        private void totalFacturacion(ClaseSQL conexion)
-        {
-            String query = "SELECT SUM(Importe)" + this.fromFacturas();
-            Object resultado = conexion.scalarQuery(query);
-            tTotalFacturacion.Text = resultado.ToString();
-        }
-
-        private void proporcionFormaDePago(ClaseSQL conexion)
-        {
-            String query = "SELECT COUNT(1)" + this.fromFacturas() + " AND Cuotas = 1";
-            int cantidadEfectivo = int.Parse(conexion.scalarQuery(query).ToString());
-            query = "SELECT COUNT(1)" + this.fromFacturas() + " AND Cuotas > 1";
-            int cantidadEnCuotas = int.Parse(conexion.scalarQuery(query).ToString());
-            if (cantidadEnCuotas + cantidadEfectivo > 0)
-            {
-                decimal proporcionEfectivo = cantidadEfectivo * 100 / (cantidadEfectivo + cantidadEnCuotas);
-                decimal proporcionEnCuotas = 100 - proporcionEfectivo;
-                tProporcionFormaPago.Text = proporcionEfectivo + "% - " + proporcionEnCuotas + "%";
-            }
-            else
-            {
-                tProporcionFormaPago.Text = "No se facturo ese año";
-            }
-        }
-
-        private void mayorFactura(ClaseSQL conexion)
-        {
-            String query = "SELECT MAX(Importe)" + this.fromFacturas();
-            tMayorFactura.Text = conexion.scalarQuery(query).ToString();
-        }
-
-        
-
-        
-
-    }
-}
-*/

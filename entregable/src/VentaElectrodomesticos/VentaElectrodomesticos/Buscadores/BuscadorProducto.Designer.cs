@@ -147,6 +147,7 @@
             // tCategoria
             // 
             this.tCategoria.FullRowSelect = true;
+            this.tCategoria.HideSelection = false;
             this.tCategoria.Location = new System.Drawing.Point(3, 64);
             this.tCategoria.Name = "tCategoria";
             this.tCategoria.Size = new System.Drawing.Size(185, 267);
