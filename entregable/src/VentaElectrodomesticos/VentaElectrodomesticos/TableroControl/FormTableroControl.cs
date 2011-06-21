@@ -45,7 +45,7 @@ namespace VentaElectrodomesticos.TableroControl
                 this.mayorDeudor(conexion);
                 this.vendedorDelAnio(conexion);
                 this.productoDelAnio(conexion);
-                /*this.faltanteDeStock(conexion);*/
+                this.faltanteDeStock(conexion);
                 Resultados.Enabled = true;
             }
             catch (Exception exception)
@@ -153,6 +153,27 @@ namespace VentaElectrodomesticos.TableroControl
             {
                 tVendedorDelAnio.Text = "No se efectuaron ventas";
             }
+        }
+
+        private void faltanteDeStock(ClaseSQL conexion)
+        {
+            byte sucursal = ((Provincia)cSucursal.SelectedItem).codigo;
+            /*String query = "SELECT TOP 1 Codigo, " + ClaseSQL.tableName("DiasSinStock") + "(Codigo, " + cAnio.Value + ", " + sucursal + ") " +
+                "AS Dias FROM " + ClaseSQL.tableName("Productos") + " ORDER BY " +
+                ClaseSQL.tableName("DiasSinStock") + "(Codigo, " + cAnio.Value + ", " + sucursal + ") DESC";*/
+            String query = "SELECT TOP 1 Producto, Dias FROM " + ClaseSQL.tableName("FaltantesDeStock") + " WHERE Anio = " + cAnio.Value + " AND " +
+                " Sucursal = " + sucursal + " ORDER BY Dias DESC";
+            //Tratamos de estirar el timeout de la query
+            conexion.Close();
+            conexion.Open();
+            SqlDataReader reader = conexion.busquedaSQLDataReader(query);
+            if (!reader.HasRows)
+            {
+                tFaltanteDeStock.Text = "No se encontro producto con faltantes";
+            }
+            reader.Read();
+            tFaltanteDeStock.Text = reader["Producto"] + " por " + reader["Dias"] + " dias";
+            reader.Close();
         }
 
         private String fromFacturas()

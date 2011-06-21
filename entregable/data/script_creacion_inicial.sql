@@ -1261,9 +1261,7 @@ BEGIN
 END
 
 
-/*
-SELECT Producto, YEAR(Fecha), MAYUSCULAS_SIN_ESPACIOS.DiasSinStock(Producto, YEAR(Fecha), Sucursal)
+CREATE VIEW MAYUSCULAS_SIN_ESPACIOS.FaltantesDeStock AS
+SELECT Producto, Sucursal, YEAR(Fecha) AS Anio, MAYUSCULAS_SIN_ESPACIOS.DiasSinStock(Producto, YEAR(Fecha), Sucursal) AS Dias
 FROM MAYUSCULAS_SIN_ESPACIOS.MovimientosStock
 GROUP BY Sucursal, YEAR(Fecha), Producto
-
-*/
