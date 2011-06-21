@@ -771,7 +771,6 @@ CREATE VIEW [MAYUSCULAS_SIN_ESPACIOS].[FacturasCompletas] AS
 SELECT Numero, Fecha, Descuento, Descuento * 100 AS PorcentajeDescuento, Cuotas, SUM(PrecioUnitario * Cantidad) AS MontoBase, SUM(PrecioUnitario * Cantidad) * (1 - Descuento) AS Importe, (SUM(PrecioUnitario * Cantidad) * (1 - Descuento)) / Cuotas AS ValorCuota, Sucursal, Vendedor, Cliente
 FROM MAYUSCULAS_SIN_ESPACIOS.Facturas LEFT JOIN MAYUSCULAS_SIN_ESPACIOS.ItemsFactura ON ItemsFactura.Factura = Facturas.Numero
 GROUP BY Sucursal, Fecha, Vendedor, Cliente, Numero, Descuento, Cuotas
-
 GO
 
 --------------------------------------------------------
@@ -1086,13 +1085,10 @@ CREATE PROCEDURE [MAYUSCULAS_SIN_ESPACIOS].[sp_facturar](@fecha datetime, @descu
 										 @sucursal int, @vendedor int, @cliente int)
 as
 begin
-
 insert into mayusculas_sin_espacios.facturas (fecha,descuento,cuotas,sucursal,vendedor,cliente) 
 values (@fecha,@descuento/100,@cuotas,@sucursal,@vendedor,@cliente)
-
 select max(numero)
 from mayusculas_sin_espacios.facturas
-
 end
 GO
 
@@ -1117,12 +1113,10 @@ CREATE FUNCTION [MAYUSCULAS_SIN_ESPACIOS].[fun_faltanCuotas](@factura int)
 returns int
 AS
 BEGIN
-
 declare @pagas int
 declare @total int
 set @pagas = (select isnull(sum(cuotas),0)from mayusculas_sin_espacios.pagos where factura = @factura)
 set @total = (select cuotas FROM mayusculas_sin_espacios.facturascompletas where numero=@factura)
-
 return (@total-@pagas)
 END
 GO
@@ -1135,13 +1129,12 @@ CREATE PROCEDURE mayusculas_sin_espacios.sp_Pagar(@factura int, @sucursal int,@c
 						 @fecha datetime, @cobrador int)
 AS
 BEGIN
-
 insert into mayusculas_sin_espacios.pagos (factura,sucursal,cuotas,fecha,cobrador) 
 values (@factura,@sucursal,@cuotas,@factura,@cobrador)
-
 END
-
 GO
+
+--------------------------------------------------------
 PRINT 'VISTA DeudasPorAnio'
 GO
 
@@ -1150,10 +1143,9 @@ SELECT Cliente, FacturasCompletas.Sucursal, YEAR(FacturasCompletas.Fecha) AS Ani
 FROM MAYUSCULAS_SIN_ESPACIOS.FacturasCompletas
 	LEFT JOIN MAYUSCULAS_SIN_ESPACIOS.Pagos ON FacturasCompletas.Numero = Pagos.Factura
 GROUP BY FacturasCompletas.Sucursal, YEAR(FacturasCompletas.Fecha), Cliente
-
 GO
 
-
+--------------------------------------------------------
 PRINT 'VISTA VendedoresPorAnio'
 GO
 
@@ -1161,9 +1153,9 @@ CREATE VIEW MAYUSCULAS_SIN_ESPACIOS.VendedoresPorAnio AS
 SELECT Vendedor, FacturasCompletas.Sucursal, YEAR(FacturasCompletas.Fecha) AS Anio, SUM(Importe) AS VentaTotal
 FROM MAYUSCULAS_SIN_ESPACIOS.FacturasCompletas
 GROUP BY FacturasCompletas.Sucursal, YEAR(FacturasCompletas.Fecha), Vendedor
-
 GO
 
+--------------------------------------------------------
 PRINT 'VISTA ProductosPorAnio'
 GO
 
@@ -1172,42 +1164,10 @@ SELECT Producto, Sucursal, YEAR(Fecha) AS Anio, SUM(Cantidad) AS Vendidos
 FROM MAYUSCULAS_SIN_ESPACIOS.ItemsFactura
 	JOIN MAYUSCULAS_SIN_ESPACIOS.Facturas ON ItemsFactura.Factura = Facturas.Numero
 GROUP BY Producto, Sucursal, YEAR(Fecha)
-
 GO
 
-
-PRINT 'Procedure Clientes Premium'
-GO
-
-CREATE PROCEDURE [MAYUSCULAS_SIN_ESPACIOS].[sp_ClientesPremium] (@sucursal int, @año int)
-AS
-select top(30) clientes.nombre as 'Nombre Cliente',
-				clientes.apellido as 'Apellido Cliente', 
-				clientes.dni as 'DNI Cliente', 
-				sum(importe) as 'Importe Total',
-				(select sum(itemsfactura.cantidad) 
-				from mayusculas_sin_espacios.itemsfactura join mayusculas_sin_espacios.facturascompletas 
-						on (itemsfactura.factura=facturascompletas.numero) join mayusculas_sin_espacios.facturas
-						on(facturas.numero=facturascompletas.numero)
-				where year(facturas.fecha)=@año and facturas.sucursal=@sucursal and clientes.dni= facturas.cliente
-				) as 'Total Productos',
-				(select top (1) facturas.fecha
-				from mayusculas_sin_espacios.facturas
-				where year(facturas.fecha)=@año and facturas.sucursal=@sucursal and clientes.dni= facturas.cliente
-				order by facturas.fecha desc
-				) as 'Fecha Ultima Compra',
-				(select top (1) facturas.vendedor
-				from mayusculas_sin_espacios.facturas
-				where year(facturas.fecha)=@año and facturas.sucursal=@sucursal and clientes.dni= facturas.cliente
-				order by facturas.fecha desc
-				) as 'Empleado Ultima Compra'		
-from mayusculas_sin_espacios.facturascompletas join mayusculas_sin_espacios.facturas
-			on(facturas.numero=facturascompletas.numero) join mayusculas_sin_espacios.clientes
-			on(clientes.dni=facturas.cliente) 
-where year(facturas.fecha)=@año and facturas.sucursal=@sucursal
-group by clientes.dni,clientes.nombre,clientes.apellido
-order by sum(importe)desc
-
+--------------------------------------------------------
+PRINT 'Funcion Dias sin stock'
 GO
 
 CREATE FUNCTION [MAYUSCULAS_SIN_ESPACIOS].[DiasSinStock](@CodigoProducto int, @Anio int, @Sucursal tinyint)
@@ -1259,9 +1219,219 @@ BEGIN
 
 	RETURN @Dias
 END
+GO
 
+--------------------------------------------------------
+PRINT 'VISTA FALTANTES DE STOCK'
+GO
 
 CREATE VIEW MAYUSCULAS_SIN_ESPACIOS.FaltantesDeStock AS
 SELECT Producto, Sucursal, YEAR(Fecha) AS Anio, MAYUSCULAS_SIN_ESPACIOS.DiasSinStock(Producto, YEAR(Fecha), Sucursal) AS Dias
 FROM MAYUSCULAS_SIN_ESPACIOS.MovimientosStock
 GROUP BY Sucursal, YEAR(Fecha), Producto
+GO
+
+--------------------------------------------------------
+PRINT 'Procedure Clientes Premium'
+GO
+
+CREATE PROCEDURE [MAYUSCULAS_SIN_ESPACIOS].[sp_ClientesPremium] (@sucursal int, @año int)
+AS
+select top(30) clientes.nombre as 'Nombre Cliente',
+				clientes.apellido as 'Apellido Cliente', 
+				clientes.dni as 'DNI Cliente', 
+				sum(importe) as 'Importe Total',
+				(select sum(itemsfactura.cantidad) 
+				from mayusculas_sin_espacios.itemsfactura join mayusculas_sin_espacios.facturascompletas 
+						on (itemsfactura.factura=facturascompletas.numero) join mayusculas_sin_espacios.facturas
+						on(facturas.numero=facturascompletas.numero)
+				where year(facturas.fecha)=@año and facturas.sucursal=@sucursal and clientes.dni= facturas.cliente
+				) as 'Total Productos',
+				(select top (1) facturas.fecha
+				from mayusculas_sin_espacios.facturas
+				where year(facturas.fecha)=@año and facturas.sucursal=@sucursal and clientes.dni= facturas.cliente
+				order by facturas.fecha desc
+				) as 'Fecha Ultima Compra',
+				(select top (1) facturas.vendedor
+				from mayusculas_sin_espacios.facturas
+				where year(facturas.fecha)=@año and facturas.sucursal=@sucursal and clientes.dni= facturas.cliente
+				order by facturas.fecha desc
+				) as 'Empleado Ultima Compra'		
+from mayusculas_sin_espacios.facturascompletas join mayusculas_sin_espacios.facturas
+			on(facturas.numero=facturascompletas.numero) join mayusculas_sin_espacios.clientes
+			on(clientes.dni=facturas.cliente) 
+where year(facturas.fecha)=@año and facturas.sucursal=@sucursal
+group by clientes.dni,clientes.nombre,clientes.apellido
+order by sum(importe)desc
+GO
+
+--------------------------------------------------------
+PRINT 'Funcion Categorias Hijas'
+GO
+
+CREATE FUNCTION mayusculas_sin_espacios.CatHijas(@id INT)
+RETURNS @Table TABLE(codigo INT,nombre VARCHAR(50),padre INT)
+AS
+BEGIN 
+;WITH ret AS(
+        SELECT  * FROM mayusculas_sin_espacios.categorias WHERE codigo = @ID
+        UNION ALL
+        SELECT  t.* FROM    mayusculas_sin_espacios.categorias t INNER JOIN ret r ON t.padre = r.codigo)
+insert into @table(codigo,nombre,padre)
+SELECT * FROM ret
+return 
+end
+GO
+
+--------------------------------------------------------
+PRINT 'FUNCION TOTAL FACTURADO POR CATEGORIA PADRE'
+GO
+
+CREATE FUNCTION MAYUSCULAS_SIN_ESPACIOS.TOTALFACTURADO(@CODIGO INT,@AÑO INT, @SUCURSAL INT)
+RETURNS DECIMAL 
+AS
+BEGIN
+DECLARE @TABLE TABLE(ID INT, NOMBRE NVARCHAR(50), PADRE INT)
+INSERT INTO @TABLE(ID,NOMBRE,PADRE)
+SELECT * FROM [GD1C2011].[MAYUSCULAS_SIN_ESPACIOS].[CatHijas] (@CODIGO)
+
+DECLARE @TOTAL INT
+SELECT  @TOTAL = SUM(PRECIOUNITARIO*(1-DESCUENTO))
+FROM @TABLE JOIN MAYUSCULAS_SIN_ESPACIOS.PRODUCTOS ON (PRODUCTOS.CATEGORIA=ID) JOIN
+				MAYUSCULAS_SIN_ESPACIOS.ITEMSFACTURA ON (ITEMSFACTURA.PRODUCTO=PRODUCTOS.CODIGO) JOIN
+			MAYUSCULAS_SIN_ESPACIOS.FACTURAS ON (ITEMSFACTURA.FACTURA=FACTURAS.NUMERO)
+WHERE YEAR(FACTURAS.FECHA)=@AÑO AND FACTURAS.SUCURSAL=@SUCURSAL
+RETURN @TOTAL
+END
+GO
+
+--------------------------------------------------------
+PRINT 'PROCEDURE PRODUCTO MAS VENDIDO EN CANTIDAD'
+GO
+
+CREATE PROCEDURE MAYUSCULAS_SIN_ESPACIOS.sp_PRODMASVENDIDO(@CODIGO INT,@AÑO INT, @SUCURSAL INT, @PROD INT OUTPUT,@NOMBRE NVARCHAR(50) OUTPUT)
+AS
+BEGIN
+DECLARE @TABLE TABLE(ID INT, NOMBRE NVARCHAR(50), PADRE INT)
+INSERT INTO @TABLE(ID,NOMBRE,PADRE)
+SELECT * FROM [GD1C2011].[MAYUSCULAS_SIN_ESPACIOS].[CatHijas] (@CODIGO)
+SELECT  TOP (1) @PROD=CODIGO,@NOMBRE=PRODUCTOS.NOMBRE
+FROM @TABLE JOIN MAYUSCULAS_SIN_ESPACIOS.PRODUCTOS ON (PRODUCTOS.CATEGORIA=ID) JOIN
+				MAYUSCULAS_SIN_ESPACIOS.ITEMSFACTURA ON (ITEMSFACTURA.PRODUCTO=PRODUCTOS.CODIGO) JOIN
+			MAYUSCULAS_SIN_ESPACIOS.FACTURAS ON (ITEMSFACTURA.FACTURA=FACTURAS.NUMERO)
+WHERE YEAR(FACTURAS.FECHA)=@AÑO AND FACTURAS.SUCURSAL=@SUCURSAL
+GROUP BY CODIGO,PRODUCTOS.NOMBRE
+ORDER BY SUM(CANTIDAD) DESC
+END
+GO
+
+--------------------------------------------------------
+PRINT 'PROCEDURE PRODUCTO MAS PAGADO EN FACTURACION'
+GO
+
+CREATE PROCEDURE MAYUSCULAS_SIN_ESPACIOS.sp_PRODMASPAGADO(@CODIGO INT,@AÑO INT, @SUCURSAL INT, @PROD INT OUTPUT, @NOMBRE NVARCHAR(50) OUTPUT, @MONTO DECIMAL OUTPUT)
+AS
+BEGIN
+DECLARE @TABLE TABLE(ID INT, NOMBRE NVARCHAR(50), PADRE INT)
+INSERT INTO @TABLE(ID,NOMBRE,PADRE)
+SELECT * FROM [GD1C2011].[MAYUSCULAS_SIN_ESPACIOS].[CatHijas] (@CODIGO)
+DECLARE @MASPAGADO INT
+SELECT  TOP (1) @PROD=CODIGO, @NOMBRE=PRODUCTOS.NOMBRE, @MONTO=SUM(PRECIO*(1-DESCUENTO))
+FROM @TABLE JOIN MAYUSCULAS_SIN_ESPACIOS.PRODUCTOS ON (PRODUCTOS.CATEGORIA=ID) JOIN
+				MAYUSCULAS_SIN_ESPACIOS.ITEMSFACTURA ON (ITEMSFACTURA.PRODUCTO=PRODUCTOS.CODIGO) JOIN
+			MAYUSCULAS_SIN_ESPACIOS.FACTURAS ON (ITEMSFACTURA.FACTURA=FACTURAS.NUMERO)
+WHERE YEAR(FACTURAS.FECHA)=@AÑO AND FACTURAS.SUCURSAL=@SUCURSAL
+GROUP BY CODIGO,PRODUCTOS.NOMBRE
+ORDER BY SUM(PRECIO*(1-DESCUENTO)) DESC
+END
+GO
+
+--------------------------------------------------------
+PRINT 'PROCEDURE PRODUCTO MAS CARO'
+GO
+
+CREATE PROCEDURE MAYUSCULAS_SIN_ESPACIOS.sp_PRODMASCARO(@CODIGO INT,@AÑO INT, @SUCURSAL INT, @PROD INT OUTPUT, @NOMBRE NVARCHAR(50) OUTPUT, @PRECIO DECIMAL OUTPUT)
+AS
+BEGIN
+DECLARE @TABLE TABLE(ID INT, NOMBRE NVARCHAR(50), PADRE INT)
+INSERT INTO @TABLE(ID,NOMBRE,PADRE)
+SELECT * FROM [GD1C2011].[MAYUSCULAS_SIN_ESPACIOS].[CatHijas] (@CODIGO)
+SELECT  TOP (1) @PROD=CODIGO, @NOMBRE=PRODUCTOS.NOMBRE, @PRECIO=MAX(PRECIO)
+FROM @TABLE JOIN MAYUSCULAS_SIN_ESPACIOS.PRODUCTOS ON (PRODUCTOS.CATEGORIA=ID) JOIN
+				MAYUSCULAS_SIN_ESPACIOS.ITEMSFACTURA ON (ITEMSFACTURA.PRODUCTO=PRODUCTOS.CODIGO) JOIN
+			MAYUSCULAS_SIN_ESPACIOS.FACTURAS ON (ITEMSFACTURA.FACTURA=FACTURAS.NUMERO)
+WHERE YEAR(FACTURAS.FECHA)=@AÑO AND FACTURAS.SUCURSAL=@SUCURSAL
+GROUP BY CODIGO,PRODUCTOS.NOMBRE
+ORDER BY MAX(PRECIO) DESC
+END
+GO
+
+--------------------------------------------------------
+PRINT 'PROCEDURE MEJOR EMPLEADO'
+GO
+
+CREATE PROCEDURE MAYUSCULAS_SIN_ESPACIOS.sp_MEJOREMPLEADO(@CODIGO INT,@AÑO INT, @SUCURSAL INT, @NOMBRE NVARCHAR(50) OUTPUT, @APELLIDO NVARCHAR(50) OUTPUT)
+AS
+BEGIN
+DECLARE @TABLE TABLE(ID INT, NOMBRE NVARCHAR(50), PADRE INT)
+INSERT INTO @TABLE(ID,NOMBRE,PADRE)
+SELECT * FROM [GD1C2011].[MAYUSCULAS_SIN_ESPACIOS].[CatHijas] (@CODIGO)
+SELECT  TOP (1) @NOMBRE=EMPLEADOS.NOMBRE,@APELLIDO=EMPLEADOS.APELLIDO
+FROM @TABLE JOIN MAYUSCULAS_SIN_ESPACIOS.PRODUCTOS ON (PRODUCTOS.CATEGORIA=ID) JOIN
+				MAYUSCULAS_SIN_ESPACIOS.ITEMSFACTURA ON (ITEMSFACTURA.PRODUCTO=PRODUCTOS.CODIGO) JOIN
+			MAYUSCULAS_SIN_ESPACIOS.FACTURAS ON (ITEMSFACTURA.FACTURA=FACTURAS.NUMERO)JOIN
+			MAYUSCULAS_SIN_ESPACIOS.EMPLEADOS ON (VENDEDOR=DNI)
+WHERE YEAR(FACTURAS.FECHA)=@AÑO AND FACTURAS.SUCURSAL=@SUCURSAL
+GROUP BY EMPLEADOS.NOMBRE,EMPLEADOS.APELLIDO
+ORDER BY SUM(CANTIDAD) DESC
+END
+GO
+
+--------------------------------------------------------
+PRINT 'PROCEDURE MEJORES CATEGORIAS'
+GO
+
+CREATE PROCEDURE MAYUSCULAS_SIN_ESPACIOS.sp_MEJORESCATEGORIAS(@SUCURSAL INT, @AÑO INT)
+AS
+BEGIN
+DECLARE @CODIGO INT
+DECLARE @CATE NVARCHAR(50)
+DECLARE @PADRE INT
+DECLARE @SUBCOUNT INT
+DECLARE @FACTURADO DECIMAL
+DECLARE @MASVENDIDO INT
+DECLARE @MASVENDIDODESC NVARCHAR(50)
+DECLARE @MASPAGADO INT
+DECLARE @MASPAGADOPRECIO DECIMAL
+DECLARE @MASPAGADODESC NVARCHAR(50)
+DECLARE @MASCARO INT
+DECLARE @MASCAROPRECIO DECIMAL
+DECLARE @MASCARODESC NVARCHAR(50)
+DECLARE @MEJORNOMBRE NVARCHAR(50)
+DECLARE @MEJORAPELLIDO NVARCHAR(50)
+DECLARE @TABLE TABLE(NOMBRE NVARCHAR(50),SUBCAT INT, TOTAL DECIMAL, MASVENDIDO INT, MASVENDIDODESC NVARCHAR(50),
+						MASPAGADO INT, MASPAGADODESC NVARCHAR(50), MASPAGADOPRECIO DECIMAL,
+						MASCARO INT, MASCARODESC NVARCHAR(50), MASCAROPRECIO DECIMAL,
+						MEJORNOMBRE NVARCHAR(50), MEJORAPELLIDO NVARCHAR(50))
+DECLARE curPadres CURSOR for (SELECT  * from mayusculas_sin_espacios.categorias where padre is null)
+open curPadres
+fetch next from curPadres
+into @CODIGO,@CATE,@PADRE
+while @@fetch_status = 0
+  begin
+	SELECT @SUBCOUNT =COUNT(*) FROM [GD1C2011].[MAYUSCULAS_SIN_ESPACIOS].[CatHijas] (@CODIGO)
+	SELECT @FACTURADO = [GD1C2011].[MAYUSCULAS_SIN_ESPACIOS].[TOTALFACTURADO] (@CODIGO,@AÑO,@SUCURSAL)
+	EXEC [GD1C2011].[MAYUSCULAS_SIN_ESPACIOS].[sp_PRODMASVENDIDO] @CODIGO,@AÑO,@SUCURSAL,@MASVENDIDO OUTPUT, @MASVENDIDODESC OUTPUT
+	EXEC [GD1C2011].[MAYUSCULAS_SIN_ESPACIOS].[sp_PRODMASPAGADO] @CODIGO,@AÑO,@SUCURSAL,@MASPAGADO OUTPUT, @MASPAGADODESC OUTPUT, @MASPAGADOPRECIO OUTPUT
+    EXEC [GD1C2011].[MAYUSCULAS_SIN_ESPACIOS].[sp_PRODMASCARO] @CODIGO,@AÑO,@SUCURSAL,@MASCARO OUTPUT, @MASCARODESC OUTPUT, @MASCAROPRECIO OUTPUT
+    EXEC [GD1C2011].[MAYUSCULAS_SIN_ESPACIOS].[sp_MEJOREMPLEADO] @CODIGO,@AÑO,@SUCURSAL,@MEJORNOMBRE OUTPUT, @MEJORAPELLIDO OUTPUT
+    INSERT INTO @TABLE(NOMBRE,SUBCAT, TOTAL, MASVENDIDO, MASVENDIDODESC,MASPAGADO,MASPAGADODESC,MASPAGADOPRECIO,MASCARO,MASCARODESC,MASCAROPRECIO,MEJORNOMBRE,MEJORAPELLIDO)
+	VALUES (@CATE,@SUBCOUNT-1,@FACTURADO, @MASVENDIDO, @MASVENDIDODESC,@MASPAGADO,@MASPAGADODESC,@MASPAGADOPRECIO,@MASCARO,@MASCARODESC,@MASCAROPRECIO,@MEJORNOMBRE,@MEJORAPELLIDO)
+	fetch next from curPadres
+	into @CODIGO,@CATE,@PADRE
+  end
+close curPadres
+deallocate curPadres
+SELECT * FROM @TABLE ORDER BY 3 DESC
+END
+GO
