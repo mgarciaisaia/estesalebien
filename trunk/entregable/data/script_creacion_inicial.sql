@@ -1223,10 +1223,13 @@ BEGIN
 	DECLARE Movimientos CURSOR FOR
 		SELECT Cantidad, Fecha
 		 FROM MAYUSCULAS_SIN_ESPACIOS.MovimientosStock
-		 WHERE Sucursal = @Sucursal AND Producto = @CodigoProducto AND YEAR(Fecha) <= @Anio
+		 WHERE Sucursal = @Sucursal AND Producto = @CodigoProducto AND YEAR(Fecha) = @Anio
 		 ORDER BY Fecha ASC
 
-	SET @Stock = 0
+	SELECT @Stock = SUM(Cantidad) FROM MAYUSCULAS_SIN_ESPACIOS.MovimientosStock WHERE Sucursal = @Sucursal AND Producto = @CodigoProducto AND YEAR(Fecha) < @Anio
+	IF @Stock IS NULL BEGIN
+		SET @Stock = 0
+	END
 	SET @Dias = 0
 	
 	OPEN Movimientos
