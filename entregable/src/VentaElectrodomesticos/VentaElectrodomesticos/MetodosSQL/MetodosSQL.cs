@@ -3,14 +3,15 @@ using System.Collections.Generic;
 using System.Text;
 using System.Data.SqlClient;
 using System.Data;
+using System.Collections.Specialized;
 
 namespace VentaElectrodomesticos.MetodosSQL
 {
     class ClaseSQL
     {
         //FIXME: esto hay que parametrizarlo
-        private static String schema = "MAYUSCULAS_SIN_ESPACIOS";
-        private static string connectString = "Data Source=localhost\\SQLSERVER2005;Initial Catalog=GD1C2011; User ID=gd;Password=gd2011";
+        private static String schema = System.Configuration.ConfigurationSettings.AppSettings.Get("schemaName");
+        private static string connectString = connectionString();
         private SqlConnection cnn;
         private static ClaseSQL instance;
 
@@ -26,6 +27,15 @@ namespace VentaElectrodomesticos.MetodosSQL
                 instance = new ClaseSQL();
             }
             return instance;
+        }
+
+        private static String connectionString()
+        {
+            NameValueCollection settings = System.Configuration.ConfigurationSettings.AppSettings;
+            return "Data Source=" + settings.Get("dbDataSource") +
+                ";Initial Catalog=" + settings.Get("GD1C2011") +
+                "; User ID=" + settings.Get("dbUsername") +
+                ";Password=" + settings.Get("dbPassword");
         }
 
         public void Open()
