@@ -1209,3 +1209,58 @@ group by clientes.dni,clientes.nombre,clientes.apellido
 order by sum(importe)desc
 
 GO
+
+CREATE FUNCTION [MAYUSCULAS_SIN_ESPACIOS].[DiasSinStock](@CodigoProducto int, @Anio int, @Sucursal tinyint)
+RETURNS INT
+AS
+BEGIN
+	DECLARE @Stock INT
+	DECLARE @Dias INT
+	DECLARE @FechaFaltante DATETIME
+	DECLARE @UltimaFecha DATETIME
+	DECLARE @Cantidad INT
+	DECLARE @Fecha DATETIME
+	DECLARE Movimientos CURSOR FOR
+		SELECT Cantidad, Fecha
+		 FROM MAYUSCULAS_SIN_ESPACIOS.MovimientosStock
+		 WHERE Sucursal = @Sucursal AND Producto = @CodigoProducto AND YEAR(Fecha) <= @Anio
+		 ORDER BY Fecha ASC
+
+	SET @Stock = 0
+	SET @Dias = 0
+	
+	OPEN Movimientos
+	SET @FechaFaltante = NULL
+	SET @UltimaFecha = NULL
+	FETCH NEXT FROM Movimientos INTO @Cantidad, @Fecha
+		
+	WHILE @@FETCH_STATUS = 0 BEGIN
+		SET @Stock = @Stock + @Cantidad
+		IF @Stock <= 0 AND @FechaFaltante IS NULL BEGIN
+			SET @FechaFaltante = @Fecha
+		END
+		IF @Stock > 0 AND @FechaFaltante IS NOT NULL BEGIN
+			SET @Dias = @Dias + DATEDIFF(DAY, @FechaFaltante, @Fecha)
+			SET @FechaFaltante = NULL
+		END
+		SET @UltimaFecha = @Fecha
+		FETCH NEXT FROM Movimientos INTO @Cantidad, @Fecha
+	END
+
+	IF @FechaFaltante IS NOT NULL BEGIN
+		SET @Dias = @Dias + DATEDIFF(DAY, @FechaFaltante, @UltimaFecha)
+	END
+
+	CLOSE Movimientos
+	DEALLOCATE Movimientos
+
+	RETURN @Dias
+END
+
+
+/*
+SELECT Producto, YEAR(Fecha), MAYUSCULAS_SIN_ESPACIOS.DiasSinStock(Producto, YEAR(Fecha), Sucursal)
+FROM MAYUSCULAS_SIN_ESPACIOS.MovimientosStock
+GROUP BY Sucursal, YEAR(Fecha), Producto
+
+*/
