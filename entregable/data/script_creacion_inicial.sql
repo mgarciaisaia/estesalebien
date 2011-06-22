@@ -1491,7 +1491,10 @@ PRINT 'Procedure Clientes Premium'
 GO
 
 /*
+ * El procedimiento sp_ClientesPremium recupera la informacion requerida para la ventana homonima.
  * 
+ * Es simplemente un conjunto de subconsultas unidas que muestra los 30 Clientes con mayor importe
+ * comprado en un anio y sucursal determinados.
  */
 CREATE PROCEDURE [MAYUSCULAS_SIN_ESPACIOS].[sp_ClientesPremium] (@sucursal int, @año int)
 AS
@@ -1527,6 +1530,11 @@ GO
 PRINT 'Funcion Categorias Hijas'
 GO
 
+/*
+ * La funcion CatHijas devuelve una subtabla que incluye todos los datos de las Categorias
+ * descendientes de una Categoria dada (tanto las categorias del nivel inmediato inferior como
+ * las de los siguientes inferiores.
+ */
 CREATE FUNCTION mayusculas_sin_espacios.CatHijas(@id INT)
 RETURNS @Table TABLE(codigo INT,nombre VARCHAR(50),padre INT)
 AS
@@ -1545,6 +1553,11 @@ GO
 PRINT 'FUNCION TOTAL FACTURADO POR CATEGORIA PADRE'
 GO
 
+/*
+ * Partiendo de la seleccion de una Categoria y todas sus descendientes, TotalFacturado calcula la
+ * Facturacion total de todos los Productos pertenecientes a esas Categorias en un determinado anio
+ * y sucursal.
+ */
 CREATE FUNCTION MAYUSCULAS_SIN_ESPACIOS.TOTALFACTURADO(@CODIGO INT,@AÑO INT, @SUCURSAL INT)
 RETURNS DECIMAL 
 AS
@@ -1567,6 +1580,10 @@ GO
 PRINT 'PROCEDURE PRODUCTO MAS VENDIDO EN CANTIDAD'
 GO
 
+/*
+ * sp_PRODMASVENDIDO determina el Codigo y Nombre del Producto mas vendido en una familia de
+ * Categorias para un Anio particular en una Sucursal.
+ */
 CREATE PROCEDURE MAYUSCULAS_SIN_ESPACIOS.sp_PRODMASVENDIDO(@CODIGO INT,@AÑO INT, @SUCURSAL INT, @PROD INT OUTPUT,@NOMBRE NVARCHAR(50) OUTPUT)
 AS
 BEGIN
@@ -1587,6 +1604,10 @@ GO
 PRINT 'PROCEDURE PRODUCTO MAS PAGADO EN FACTURACION'
 GO
 
+/*
+ * sp_PRODMASPAGADO determina el Producto con mayor Precio de Venta (incluyendo Descuento) en una
+ * familia de Categorias para una determinada Sucursal y Anio.
+ */
 CREATE PROCEDURE MAYUSCULAS_SIN_ESPACIOS.sp_PRODMASPAGADO(@CODIGO INT,@AÑO INT, @SUCURSAL INT, @PROD INT OUTPUT, @NOMBRE NVARCHAR(50) OUTPUT, @MONTO DECIMAL OUTPUT)
 AS
 BEGIN
@@ -1608,6 +1629,10 @@ GO
 PRINT 'PROCEDURE PRODUCTO MAS CARO'
 GO
 
+/*
+ * sp_PRODMASCARO determina el Producto con mayor Precio Unitario en una familia de Categorias para
+ * una determinada Sucursal y Anio.
+ */
 CREATE PROCEDURE MAYUSCULAS_SIN_ESPACIOS.sp_PRODMASCARO(@CODIGO INT,@AÑO INT, @SUCURSAL INT, @PROD INT OUTPUT, @NOMBRE NVARCHAR(50) OUTPUT, @PRECIO DECIMAL OUTPUT)
 AS
 BEGIN
@@ -1628,6 +1653,10 @@ GO
 PRINT 'PROCEDURE MEJOR EMPLEADO'
 GO
 
+/*
+ * Calcula el Empleado que mas cantidad de Productos vendio de la familia de Categorias en ese Anio
+ * y Sucursal.
+ */
 CREATE PROCEDURE MAYUSCULAS_SIN_ESPACIOS.sp_MEJOREMPLEADO(@CODIGO INT,@AÑO INT, @SUCURSAL INT, @NOMBRE NVARCHAR(50) OUTPUT, @APELLIDO NVARCHAR(50) OUTPUT)
 AS
 BEGIN
@@ -1649,6 +1678,13 @@ GO
 PRINT 'PROCEDURE MEJORES CATEGORIAS'
 GO
 
+/*
+ * sp_MEJORESCATEGORIAS es el procedimiento que recopila toda la informacion a mostrar en la
+ * pantalla de Mejores Categorias.
+ *
+ * Utilizando un cursor para recorrer las Categorias de nivel superior, el procedimiento usa los
+ * procedimientos previamente definidos para recolectar los resultados y finalmente ordenarlos
+ */
 CREATE PROCEDURE MAYUSCULAS_SIN_ESPACIOS.sp_MEJORESCATEGORIAS(@SUCURSAL INT, @AÑO INT)
 AS
 BEGIN
