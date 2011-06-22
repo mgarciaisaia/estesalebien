@@ -32,6 +32,8 @@ namespace VentaElectrodomesticos.AbmRol
         {
             rellenarComboBoxRoles();
             rellenarComboBoxFunciones();
+            toolTip1.SetToolTip(bEliminar, "Seleccione una funcion de la lista para eliminarlo");
+            toolTip1.SetToolTip(bAgregar,"Seleccione un rol y una funcion para agregar a la lista");
         }
         private void rellenarListFunciones()
         {
@@ -197,9 +199,6 @@ namespace VentaElectrodomesticos.AbmRol
             { MessageBox.Show("El campo Nombre es Obligatorio"); }
         }
 
-        private void cFunciones_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            lFunciones.SelectedItems[0].Selected = false;
-        }
+        
     }
 }

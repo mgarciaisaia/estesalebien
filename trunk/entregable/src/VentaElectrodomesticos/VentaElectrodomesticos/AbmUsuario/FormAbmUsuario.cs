@@ -85,7 +85,6 @@ namespace VentaElectrodomesticos.AbmUsuario
             if (empleado != null)
             {
                 tEmpleado.Text = empleado.dni.ToString();
-                tEmpleado.Enabled = false;
                 String sql = "SELECT codigo,nombre, password, habilitado FROM [GD1C2011].[MAYUSCULAS_SIN_ESPACIOS].[Usuarios] " +
                         "WHERE empleado=" + tEmpleado.Text;
                 conexion.Open();
@@ -141,7 +140,6 @@ namespace VentaElectrodomesticos.AbmUsuario
             tNombre.Enabled = true;
             tPassword.Clear();
             tEmpleado.Clear();
-            tEmpleado.Enabled = true;
             cHabilitado.Checked = false;
             this.rellenarTablaRoles();
             passCambio = false;

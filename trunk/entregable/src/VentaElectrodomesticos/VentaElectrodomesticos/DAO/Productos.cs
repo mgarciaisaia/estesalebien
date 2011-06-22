@@ -94,7 +94,8 @@ namespace VentaElectrodomesticos.DAO
                 " Codigo = " + codigo;
             ClaseSQL conexion = ClaseSQL.getInstance();
             conexion.Open();
-            conexion.nonQuery(query);
+            if (conexion.nonQuery(query) != 0)
+                System.Windows.Forms.MessageBox.Show("Baja Correcta");
             conexion.Close();
         }
 
@@ -107,8 +108,9 @@ namespace VentaElectrodomesticos.DAO
                     " WHERE Codigo = " + codigo;
                 ClaseSQL conexion = ClaseSQL.getInstance();
                 conexion.Open();
-                conexion.nonQuery(query);
-                conexion.Close();
+                if (conexion.nonQuery(query) != 0)
+                    System.Windows.Forms.MessageBox.Show("Modificacion Correcta");
+                conexion.Close();                
             }
             catch (Exception exception)
             {
@@ -125,7 +127,8 @@ namespace VentaElectrodomesticos.DAO
                     ", " + categoria + ", " + (habilitado ? 1 : 0) + ")";
                 ClaseSQL conexion = ClaseSQL.getInstance();
                 conexion.Open();
-                conexion.nonQuery(query);
+                if (conexion.nonQuery(query) != 0)
+                    System.Windows.Forms.MessageBox.Show("Alta Correcta");
                 conexion.Close();
             }
             catch (Exception exception)
