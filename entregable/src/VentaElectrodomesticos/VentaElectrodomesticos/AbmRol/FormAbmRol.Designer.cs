@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.lFunciones = new System.Windows.Forms.ListView();
             this.cRoles = new System.Windows.Forms.ComboBox();
@@ -39,6 +40,7 @@
             this.bAgregar = new System.Windows.Forms.Button();
             this.label2 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
+            this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -89,7 +91,6 @@
             this.cFunciones.Name = "cFunciones";
             this.cFunciones.Size = new System.Drawing.Size(128, 21);
             this.cFunciones.TabIndex = 37;
-            this.cFunciones.SelectedIndexChanged += new System.EventHandler(this.cFunciones_SelectedIndexChanged);
             // 
             // label4
             // 
@@ -125,6 +126,7 @@
             // 
             // bEliminar
             // 
+            this.bEliminar.AccessibleDescription = "";
             this.bEliminar.ImeMode = System.Windows.Forms.ImeMode.NoControl;
             this.bEliminar.Location = new System.Drawing.Point(18, 147);
             this.bEliminar.Name = "bEliminar";
@@ -194,5 +196,6 @@
         private System.Windows.Forms.ComboBox cRoles;
         private System.Windows.Forms.ListView lFunciones;
         private System.Windows.Forms.Button bEliminar;
+        private System.Windows.Forms.ToolTip toolTip1;
     }
 }

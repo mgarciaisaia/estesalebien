@@ -153,6 +153,7 @@
             // 
             // bEliminar
             // 
+            this.bEliminar.Enabled = false;
             this.bEliminar.Location = new System.Drawing.Point(195, 130);
             this.bEliminar.Name = "bEliminar";
             this.bEliminar.Size = new System.Drawing.Size(75, 23);
@@ -163,6 +164,7 @@
             // 
             // bModificar
             // 
+            this.bModificar.Enabled = false;
             this.bModificar.Location = new System.Drawing.Point(114, 130);
             this.bModificar.Name = "bModificar";
             this.bModificar.Size = new System.Drawing.Size(75, 23);
