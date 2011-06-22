@@ -4,7 +4,7 @@ GO
 
 -- Genero el Schema
 /**
- * Chequeo la existencia del schema antes de crearlo. Deberia pensar en eliminar las tablas y otros objetos tambien.
+ * Chequeo la existencia del schema antes de crearlo.
  */
 IF NOT EXISTS(SELECT 1 FROM information_schema.schemata WHERE
 schema_name='MAYUSCULAS_SIN_ESPACIOS')
@@ -12,6 +12,22 @@ EXEC ('create schema MAYUSCULAS_SIN_ESPACIOS AUTHORIZATION gd');
 GO
 
 --------------------------------------------------------
+
+/*
+ * NOTA: los tildes y demas caracteres no ASCII-standar fueron omitidos deliberadamente a fin de
+ * evitar problemas de codificacion en el versionado de los archivos
+ */
+
+/*
+ * La normalizacion de la tabla Maestra de datos genero la aparicion de varias tablas 'simples'
+ * como las Provincias, Tipos de Empleados, Tipos de Sucursal y las Sucursales.
+ *
+ * Los unicos campos que estas tablas poseen son su identificador (generalmente, un codigo
+ * numerico autogenerado) y el nombre o descripcion de la entidad modelada.
+ *
+ * Estas coinciden, ademas, en ser inmutables a lo largo de la vida del sistema.
+ */
+
 PRINT 'Tabla Provincias'
 GO
 
@@ -24,6 +40,11 @@ GO
 --------------------------------------------------------
 PRINT 'Insert Provincias'
 GO
+
+/*
+ * Las provincias existentes son los 24 posibles valores del campo SUC_PROVINCIA de la tabla
+ * Maestra.
+ */
 
 INSERT INTO MAYUSCULAS_SIN_ESPACIOS.Provincias ([Nombre])
 (SELECT DISTINCT SUC_PROVINCIA
@@ -45,6 +66,9 @@ GO
 PRINT 'Insert TipoEmpleado'
 GO
 
+/*
+ * Existen solo dos tipos de empleados
+ */
 INSERT INTO MAYUSCULAS_SIN_ESPACIOS.TiposEmpleado ([Descripcion])
 (SELECT DISTINCT EMPLEADO_TIPO
 FROM gd_esquema.Maestra)
@@ -65,6 +89,9 @@ GO
 PRINT 'Insert TipoSucursal'
 GO
 
+/*
+ * Las Sucursales pueden ser de tipo Sucursal o Casa Central
+ */
 INSERT INTO MAYUSCULAS_SIN_ESPACIOS.TiposSucursal ([Descripcion])
 (SELECT DISTINCT SUC_TIPO
 FROM gd_esquema.Maestra)
@@ -75,6 +102,10 @@ GO
 PRINT 'Tabla Sucursales'
 GO
 
+/*
+ * Existe una Sucursal por cada provincia, y cada provincia tiene una unica sucursal, por lo que
+ * conocer la Provincia es suficiente para identificar a una Sucursal.
+ */
 CREATE TABLE [MAYUSCULAS_SIN_ESPACIOS].[Sucursales] (
 	[Provincia] [tinyint] PRIMARY KEY REFERENCES [MAYUSCULAS_SIN_ESPACIOS].[Provincias] (Codigo),
 	[Tipo] [tinyint] REFERENCES [MAYUSCULAS_SIN_ESPACIOS].[TiposSucursal] (Codigo),
@@ -98,6 +129,11 @@ GO
 PRINT 'Vista SucursalProvincia'
 GO
 
+/*
+ * La vista SucursalProvincia es una version menos normalizada de la relacion
+ * Provincia-Sucursal-TipoSucursal que simplifica el acceso a la informacion "de negocio" de las
+ * Sucursales.
+ */
 CREATE VIEW [MAYUSCULAS_SIN_ESPACIOS].[SucursalProvincia] AS
 SELECT Provincias.Codigo AS Codigo, Provincias.Nombre AS Provincia, TiposSucursal.Descripcion AS Tipo, Sucursales.Direccion AS Direccion, Sucursales.Telefono AS Telefono
 FROM MAYUSCULAS_SIN_ESPACIOS.Provincias LEFT JOIN MAYUSCULAS_SIN_ESPACIOS.Sucursales ON Provincias.Codigo = Sucursales.Provincia
@@ -109,11 +145,19 @@ PRINT 'Tabla Cliente'
 GO
 
 /*
- * DNI como varchar no tiene sentido, por eso la declaro numeric (y, ademas, lo hago compartir tipo con
- * el DNI del Empleado, para la restriccion de los duplicados).
+ * Los Clientes del sistema (al igual que varias entidades mas) tienen la propiedad de estar
+ * Habilitados o no, y de ello depende la posibilidad de realizar determinadas acciones en el
+ * mismo.
+ */
+
+/*
+ * Se modifico el tipo de datos original del campo DNI (varchar) a un tipo numerico porque los
+ * caracteres no-numericos no tienen sentido alguno en un DNI, y unificar el tipo del DNI de los
+ * Clientes con el de los Empleados facilita la aplicacion de las restricciones de DNI entre ambos.
  *
- * Lo de "respetar los tipos de datos" del enunciado pareciera que hablaba de tipos a nivel conceptual
- * en lugar de nivel implementacion, segun el mail de Miguel Lopez del 28 de Mayo
+ * Cabe destacar que la modificacion es simplemente a nivel de representacion, ya que, si bien
+ * eran almacenados como una cadena de caracteres, los DNIs originales de los Clientes eran todos
+ * numericos.
  */
 CREATE TABLE [MAYUSCULAS_SIN_ESPACIOS].[Clientes] (
 	[DNI] [numeric] (8, 0) PRIMARY KEY,
@@ -125,12 +169,23 @@ CREATE TABLE [MAYUSCULAS_SIN_ESPACIOS].[Clientes] (
 	[Provincia] [tinyint] FOREIGN KEY REFERENCES [MAYUSCULAS_SIN_ESPACIOS].[Provincias] (Codigo),
 	[Habilitado] [tinyint] DEFAULT 1
 )
+
 GO
+
+/*
+ * Los datos de la tabla Clientes se cargan mas adelante para verificar las restricciones respecto
+ * de la duplicacion de DNIs con los Empleados de la empresa.
+ */
 
 --------------------------------------------------------
 PRINT 'Indices Clientes'
 GO
 
+/*
+ * Sobre la tabla Clientes (al igual que para todas las otras tablas de la base de datos) se crean
+ * indices para los campos por los cuales se realizaran las busquedas desde el sistema, a fin de
+ * acelerar las mismas.
+ */
 CREATE INDEX ClientesPorNombre
     ON MAYUSCULAS_SIN_ESPACIOS.Clientes (Nombre); 
 GO
@@ -147,6 +202,9 @@ GO
 PRINT 'Tabla Empleados'
 GO
 
+/*
+ * La tabla Empleados almacena los datos sobre los Empleados del sistema.
+ */
 CREATE TABLE [MAYUSCULAS_SIN_ESPACIOS].[Empleados] (
 	[DNI] [numeric](8, 0) PRIMARY KEY,
 	[Nombre] [nvarchar] (30),
@@ -160,6 +218,17 @@ CREATE TABLE [MAYUSCULAS_SIN_ESPACIOS].[Empleados] (
 	[Habilitado] [tinyint] DEFAULT 1
 )
 GO
+
+/*
+ * Un modelo alternativo podria haber consistido en una tabla que almacenara datos de Personas,
+ * entendiendo como Persona tanto a los Clientes como a los Empleados, dado que los datos de cada
+ * uno coinciden en su mayoria, y tablas adicionales que representaran los datos particulares de
+ * cada tipo.
+ *
+ * Esta alternativa simplificaria el control de duplicados de los DNIs entre entidades de una y
+ * otra naturaleza, pero como contrapartida complejizaria el manejo de las trancisiones de tipos
+ * (los Clientes que se convierten en Empleados, y la prohibición de venta a los Empleados).
+ */
 
 --------------------------------------------------------
 PRINT 'Indices Empleados'
@@ -190,9 +259,10 @@ PRINT 'Trigger NuevoEmpleado'
 GO
 
 /*
- * Cuando hago un INSERT de Empleado, deshabilito el Cliente con el mismo DNI.
+ * En cada Alta de un Empleado, el trigger NuevoEmpleado se encarga de deshabilitar a todo Cliente
+ * que tuviera el mismo DNI que el nuevo Empleado, cumpliendo asi la restriccion de no vender a los
+ * empleados de la empresa.
  */
-
 CREATE TRIGGER [MAYUSCULAS_SIN_ESPACIOS].[NuevoEmpleado]
 ON MAYUSCULAS_SIN_ESPACIOS.Empleados
 AFTER INSERT
@@ -208,7 +278,8 @@ PRINT 'Trigger LosEmpleadosNoPuedenHacerseClientes'
 GO
 
 /*
- * Cuando hago INSERT de un Cliente, si ya existe un Empleado con ese DNI, prevengo el INSERT
+ * El trigger LosEmpleadosNoPuedenHacerseClientes deshacen el alta de un Cliente en caso de
+ * detectar que el mismo ya es Empleado de la empresa.
  */
 CREATE TRIGGER [MAYUSCULAS_SIN_ESPACIOS].[LosEmpleadosNoPuedenHacerseClientes]
 ON MAYUSCULAS_SIN_ESPACIOS.Clientes
@@ -233,6 +304,10 @@ GO
 PRINT 'Insert Clientes'
 GO
 
+/*
+ * La base Maestra no cuenta con informacion sobre Telefono, Direccion ni Provincia de residencia
+ * de los Clientes existentes.
+ */
 INSERT INTO [MAYUSCULAS_SIN_ESPACIOS].[Clientes]([DNI],[NOMBRE],[APELLIDO],[MAIL],[Telefono],[Direccion],
 											[Provincia],[Habilitado])
 (SELECT DISTINCT [CLI_DNI] ,[CLI_NOMBRE] ,[CLI_APELLIDO] ,[CLI_MAIL],null,null,null,1
@@ -245,7 +320,11 @@ PRINT 'Insert Empleados'
 GO
 
 /*
- * Este UNION lo cambiaria por una funcion que relacione empleado con sucursal, o por un CASE en el SELECT, pero el UNION es una locura
+ * Los Empleados de tipo Vendedor tienen asignada como Sucursal aquella en la que realizan sus
+ * ventas.
+ *
+ * Los Empleados Analistas, en cambio, tienen como Sucursal asignada aquella cuyo Tipo sea Sede
+ * Central.
  */
 INSERT INTO MAYUSCULAS_SIN_ESPACIOS.Empleados ([DNI], [Nombre], [Apellido], [Mail], [Direccion], [Telefono], [Provincia], [Tipo], [Sucursal])
 ((SELECT DISTINCT Maestra.EMPLEADO_DNI, Maestra.EMPLEADO_NOMBRE, Maestra.EMPLEADO_APELLIDO, Maestra.EMPLEADO_MAIL, Maestra.EMPLEADO_DIR, '', Provincias.Codigo, TiposEmpleado.Codigo, SucursalProvincia.Codigo
@@ -264,14 +343,28 @@ WHERE EMPLEADO_TIPO = 'Analista' AND SucursalProvincia.Tipo = 'Sede Central'))
 
 GO
 
+/*
+ * Un metodo mas eficiente de realizar estas inserciones de datos podria haber sido delegando en
+ * una funcion auxiliar o un CASE dentro del SELECT la tarea de determinal la Sucursal de un
+ * Empleado a partir de su Tipo, evitando asi hacer el UNION entre dos consultas.
+ */
+
 --------------------------------------------------------
 PRINT 'Tabla Usuarios'
 GO
 
+
 /*
- * Agregamos un Codigo de usuario porque nos parece poco feliz tener una PRIMARY KEY que sea un String de 30 caracteres
+ * Los Empleados se identifican en el sistema mediante un Usuario.
  *
- * El password default es 'password'
+ * Si bien el Nombre de cada Usuario en el sistema es unico e inmodificable, se prefirio usar un
+ * codigo autogenerado numerico como identificador por cuestiones de performance en las busquedas
+ * y relaciones.
+ */
+/*
+ * El password inicial por defecto de los Usuarios es 'password' (sin las comillas).
+ * Los passwords se almacenan codificados en SHA256, en su representacion hexadecimal, con los
+ * caracteres alfabeticos en mayusculas, y sin guiones ni separadores entre bytes.
  */
 CREATE TABLE [MAYUSCULAS_SIN_ESPACIOS].[Usuarios] (
 	[Codigo] [int] IDENTITY(1,1) PRIMARY KEY,
@@ -295,8 +388,10 @@ GO
 PRINT 'Insert Usuario admin'
 GO
 
+
 /*
- * El usuario 'admin' no tiene ningun empleado asignado
+ * El Usuario 'admin' es un Usuario especial dentro del sistema que no esta asignado a ningun
+ * Empleado. Su password inicial es 'w23e' (sin las comillas).
  */
 INSERT INTO [MAYUSCULAS_SIN_ESPACIOS].[Usuarios] (Nombre, Password, Empleado)
 VALUES ('admin', 'E6B87050BFCB8143FCB8DB0170A4DC9ED00D904DDD3E2A4AD1B1E8DC0FDC9BE7', null);
@@ -306,6 +401,11 @@ GO
 PRINT 'Insert Usuarios de los empleados'
 GO
 
+/*
+ * La migracion de datos tambien genera automaticamente un Usuario para cada Empleado del sistema.
+ * El nombre de usuario se genera convirtiendo a minusculas la concatenacion del nombre y apellido
+ * de cada Empleado, y eliminando los espacios existentes.
+ */
 INSERT INTO [MAYUSCULAS_SIN_ESPACIOS].[Usuarios] (Nombre, Empleado)
 (SELECT REPLACE(LOWER(Nombre + Apellido), ' ','') AS Username, DNI
 FROM MAYUSCULAS_SIN_ESPACIOS.Empleados)
@@ -316,6 +416,10 @@ GO
 PRINT 'Tabla Roles'
 GO
 
+/*
+ * Los Roles del sistema son conjuntos de funcionalidades que pueden realizar los Usuarios a
+ * quienes estan asignados.
+ */
 CREATE TABLE [MAYUSCULAS_SIN_ESPACIOS].[Roles] (
 	[Codigo] [int] IDENTITY(1, 1) PRIMARY KEY,
 	[Nombre] [nvarchar] (60),
@@ -336,24 +440,28 @@ PRINT 'Insert Rol Administrador General'
 GO
 
 /*
- * Rol pre-creado ("Administrador General") para el usuario que crea el script ("admin")
+ * Existe un rol 'Administrador General' que sera asignado al Usuario especial 'admin'
  */
 INSERT INTO MAYUSCULAS_SIN_ESPACIOS.Roles ([Nombre])
 VALUES ('Administrador General');
 
-/*
- * FIXME: tal vez habria que crear algunos Roles mas preseteados (lo decian en algun mail, creo)
- */
-
 GO
+
+/*
+ * Tambien se podrian haber creado algunos otros Roles basicos para asignarles a los Usuarios de
+ * los Empleados del sistema, posiblemente asignados segun su Tipo.
+ */
 
 --------------------------------------------------------
 PRINT 'Tabla Asignaciones'
 GO
 
 /*
- * Jamas vamos a hacer una busqueda por la "PRIMARY KEY", pero un UNIQUE compuesto permitiria
- * que alguno de los dos valores sea nulo
+ * Si bien no existe motivo de negocio para que las Asignaciones tengan una Clave Primaria, se
+ * decidio usarla en lugar de una restriccion UNIQUE porque esta ultima permite que alguno de
+ * los dos valores sea nulo, hecho que no queremos permitir en nuestro sistema.
+ *
+ * Este mismo criterio se utilizo en otras entidades asociativas.
  */
 CREATE TABLE [MAYUSCULAS_SIN_ESPACIOS].[Asignaciones] (
 	[Usuario] [int],
@@ -367,7 +475,7 @@ PRINT 'Insert Asignacion del usuario admin'
 GO
 
 /*
- * El usuario admin tiene el rol Administrador General
+ * El Usuario especial 'admin' tiene pre-asignado el rol 'Administrador General'
  */
 
 INSERT INTO [MAYUSCULAS_SIN_ESPACIOS].[Asignaciones] (Usuario, Rol)
@@ -375,15 +483,13 @@ INSERT INTO [MAYUSCULAS_SIN_ESPACIOS].[Asignaciones] (Usuario, Rol)
 FROM MAYUSCULAS_SIN_ESPACIOS.Usuarios, MAYUSCULAS_SIN_ESPACIOS.Roles
 WHERE Usuarios.Nombre = 'admin' AND Roles.Nombre = 'Administrador General')
 GO
+
+
 /*
- * FIXME: podriamos hacer algunas asignaciones mas (un rol por tipo de empleado?)
- */
- 
---------------------------------------------------------
-/*
- * Funcionalidades: las posibles funcionalidades que se le pueden asignar
- * a los roles del sistema.
- * Son fijas, definidas por extension en el enunciado del TP.
+ * Las posibles Funcionalidades que conforman cada Rol del sistema definen a que acciones del
+ * sistema tienen acceso los Usuarios que tienen asignado ese Rol.
+ *
+ * Las distintas Funcionalidades son fijas, definidas por extension en el enunciado del TP.
  */
 
 PRINT 'Tabla Funcionalidades'
@@ -418,8 +524,7 @@ PRINT 'Tabla FuncionalidadesRol'
 GO
 
 /*
- * Jamas vamos a hacer una busqueda por la "PRIMARY KEY", pero un UNIQUE compuesto permitiria
- * que alguno de los dos valores sea nulo
+ * FuncionalidadesRol determina que Funcionalidad esta incluida en cada Rol
  */
 CREATE TABLE [MAYUSCULAS_SIN_ESPACIOS].[FuncionalidadesRol] (
 	[Rol] [int] REFERENCES [MAYUSCULAS_SIN_ESPACIOS].[Roles] (Codigo),
@@ -433,18 +538,23 @@ PRINT 'Insert Funcionalidades del Rol Administrador General'
 GO
 
 /*
- * Le asignamos todas las funcionalidades al rol pre-creado
+ * El Rol 'Administrador General' incluye todas las Funcionalidades del sistema
  */
 INSERT INTO MAYUSCULAS_SIN_ESPACIOS.FuncionalidadesRol ([Rol], [Funcionalidad])
 (SELECT Roles.Codigo, Funcionalidades.Codigo
 FROM MAYUSCULAS_SIN_ESPACIOS.Roles, MAYUSCULAS_SIN_ESPACIOS.Funcionalidades
 WHERE Roles.Nombre = 'Administrador General');
+
 GO
 
 --------------------------------------------------------
 PRINT 'Tabla Categorias'
 GO
- 
+
+/*
+ * La tabla Categorias representa las diferentes Categorias de los Productos del sistema, junto a
+ * su jerarquia (establecida a traves de la relacion mediante el campo Padre).
+ */
 CREATE TABLE [MAYUSCULAS_SIN_ESPACIOS].[Categorias] (
 	[Codigo] [int] IDENTITY(1,1) PRIMARY KEY,
 	[Nombre] [nvarchar](100) NULL,
@@ -461,7 +571,11 @@ CREATE INDEX CategoriasPorNombre
 GO
 
 --------------------------------------------------------
---Garantizamos 'Make it work'. Las otras dos, veremos.
+/*
+ * El procedimiento Parse es el encargado de procesar las cadenas de caracteres que representan
+ * a las Categorias en la tabla Maestra y almacenarlas de forma normalizada en el nuevo modelo de
+ * datos.
+ */
 PRINT 'Procedure Parse (categorias)'
 GO 
 
@@ -508,7 +622,7 @@ PRINT 'Insert Categorias'
 GO
 
 /*
- *  Inserta todas las categorias
+ * Se ejecuta la insercion de la Categoria de cada Producto de la tabla Maestra.
  */
 declare @au_id nvarchar(100)
 select distinct @au_id =  min( producto_cate ) from gd_esquema.Maestra
@@ -527,7 +641,7 @@ CREATE TABLE [MAYUSCULAS_SIN_ESPACIOS].[Marcas] (
 	[Codigo] [int] IDENTITY(1,1) PRIMARY KEY,
 	[Nombre] [nvarchar] (30) UNIQUE
  )
- GO
+GO
 
 
 CREATE INDEX MarcasPorNombre
@@ -543,11 +657,14 @@ INSERT INTO [MAYUSCULAS_SIN_ESPACIOS].[Marcas](NOMBRE)
   FROM gd_esquema.Maestra
   WHERE PRODUCTO_MARCA IS NOT NULL
 GO
-
 --------------------------------------------------------
 PRINT 'TABLA PRODUCTOS'
 GO 
 
+/*
+ * Se garantiza que el Precio de cada Producto sea mayor a 0 como determinan las reglas del
+ * negocio.
+ */
 CREATE TABLE [MAYUSCULAS_SIN_ESPACIOS].[Productos] (
 	[Codigo] [INT] IDENTITY PRIMARY KEY,
 	[Nombre] [nvarchar] (100),
@@ -559,8 +676,13 @@ CREATE TABLE [MAYUSCULAS_SIN_ESPACIOS].[Productos] (
  )
 GO
 
+/*
+ * Activar IDENTITY_INSERT permite determinar el identificador del Producto en las altas en que se
+ * desee, mientras que en el resto el mismo sera autogenerado.
+ */
 SET IDENTITY_INSERT [MAYUSCULAS_SIN_ESPACIOS].[Productos] ON;
 GO
+
 --------------------------------------------------------
 PRINT 'Indices Productos'
 GO
@@ -581,6 +703,13 @@ GO
 PRINT 'INSERT Productos'
 GO
 
+/*
+ * Para dar de alta los Productos del sistema se recorre la tabla Maestra mediante un cursor, y se
+ * utilizan los procedimientos creados previamente para determinar las entidades con las que deben
+ * establecerse las relaciones.
+ *
+ * El codigo de los Productos migrados se extrae del antiguo Nombre del Producto.
+ */
 BEGIN
 DECLARE @cod int
 DECLARE @CODIGO INT
@@ -609,6 +738,9 @@ deallocate CURSORITO
 END
 GO
 
+/*
+ * Se desactiva la insercion de Productos con identificadores arbitrarios
+ */
 SET IDENTITY_INSERT [MAYUSCULAS_SIN_ESPACIOS].[Productos] OFF;
 GO
 
@@ -616,6 +748,11 @@ GO
 PRINT 'VISTA PRODUCTOS COMPLETOS'
 GO 
 
+/*
+ * La vista ProductosCompletos muestra una version menos normalizada pero mas completa de los datos
+ * de negocio de los Productos, mediante el aprovechamiento de las relaciones establecidas con las
+ * Categorias y Marcas.
+ */
 CREATE VIEW [MAYUSCULAS_SIN_ESPACIOS].[ProductosCompletos] AS
 SELECT Productos.Codigo, Productos.Nombre, Productos.Descripcion, Productos.Categoria AS CodigoCategoria, Categorias.Nombre AS Categoria, Productos.Precio, Productos.Marca AS CodigoMarca, Marcas.Nombre AS Marca, Productos.Habilitado
 FROM MAYUSCULAS_SIN_ESPACIOS.Productos
@@ -628,6 +765,10 @@ GO
 PRINT 'TABLA FACTURAS'
 GO
 
+/*
+ * Los Numeros de Factura se generan automaticamente, y la numeracion es compartida por todas las
+ * Sucursales del sistema.
+ */
 CREATE TABLE [MAYUSCULAS_SIN_ESPACIOS].[Facturas] (
 	[Numero] [int] IDENTITY PRIMARY KEY,
 	[Fecha] [datetime],
@@ -641,6 +782,7 @@ GO
 
 SET IDENTITY_INSERT [MAYUSCULAS_SIN_ESPACIOS].[Facturas] ON;
 GO
+
 --------------------------------------------------------
 PRINT 'Indices Facturas'
 GO
@@ -652,10 +794,6 @@ GO
 CREATE INDEX FacturasPorFecha
     ON MAYUSCULAS_SIN_ESPACIOS.Facturas (Fecha);
 GO
-
-/*
- * FIXME: seguramente falten indices para las consultas del final del TP
- */
 
 --------------------------------------------------------
 PRINT 'Insert Facturas'
@@ -672,17 +810,27 @@ GO
 PRINT 'TABLA MOVIMIENTOS STOCKS'
 GO 
 
+
 /*
- * Un MovimientoStock con Cantidad negativa representa una salida
+ * MovmientosStock almacena el historial de entradas y salidas de Stock realizadas en la empresa.
+ *
+ * Las Entradas de Stock tienen una Cantidad positvia, con el Analista responsable en su campo
+ * Auditor, mientras que las Salidas tienen Cantidad negativa, y su Auditor es el Vendedor que
+ * realizo la venta.
  */
 CREATE TABLE [MAYUSCULAS_SIN_ESPACIOS].[MovimientosStock] (
 	[Producto] [int] NOT NULL FOREIGN KEY REFERENCES [MAYUSCULAS_SIN_ESPACIOS].[Productos] (Codigo),
 	[Sucursal] [tinyint] NOT NULL FOREIGN KEY REFERENCES [MAYUSCULAS_SIN_ESPACIOS].[Sucursales] (Provincia),
-	[Auditor] [numeric](8,0) NOT NULL FOREIGN KEY REFERENCES [MAYUSCULAS_SIN_ESPACIOS].[Empleados] (DNI), --CHECK Auditor.Tipo.Descripcion = Analista
+	[Auditor] [numeric](8,0) NOT NULL FOREIGN KEY REFERENCES [MAYUSCULAS_SIN_ESPACIOS].[Empleados] (DNI),
 	[Cantidad] [int] NOT NULL,
 	[Fecha] [datetime]
 )
 GO
+
+/*
+ * Probablemente hubiera sido mas conveniente llamar 'Empleado' al campo Auditor, ya que
+ * es mas representativo para ambos tipos de Movimiento.
+ */
 
 --------------------------------------------------------
 PRINT 'Indices MovimientosStock'
@@ -704,16 +852,23 @@ GO
 PRINT 'Insert MovimientosStock (entradas)'
 GO
 
+/*
+ * Se insertan todas las Llegadas de Stock de la tabla Maestra como Entradas de Stock.
+ */
 INSERT INTO [MAYUSCULAS_SIN_ESPACIOS].[MovimientosStock] (Producto, Sucursal, Auditor, Cantidad, Fecha)
 (SELECT CONVERT(INT, SUBSTRING(PRODUCTO_NOMBRE,LEN(PRODUCTO_NOMBRE)-9,10)), Provincias.Codigo, EMPLEADO_DNI, LLEGADA_STOCK_CANT, LLEGADA_STOCK_FECHA
 FROM gd_esquema.Maestra LEFT JOIN MAYUSCULAS_SIN_ESPACIOS.Provincias ON Provincias.Nombre = SUC_PROVINCIA
 WHERE LLEGADA_STOCK_CANT IS NOT NULL AND LLEGADA_STOCK_CANT <> 0)
 GO
 
+
 --------------------------------------------------------
 PRINT 'TABLA ITEM FACTURAS'
 GO 
 
+/*
+ * ItemsFactura representa el detalle de las Facturas existentes en el sistema.
+ */
 CREATE TABLE [MAYUSCULAS_SIN_ESPACIOS].[ItemsFactura] (
 	[Factura] [int] NOT NULL FOREIGN KEY REFERENCES [MAYUSCULAS_SIN_ESPACIOS].[Facturas] (Numero),
 	[Producto] [int] NOT NULL FOREIGN KEY REFERENCES [MAYUSCULAS_SIN_ESPACIOS].[Productos] (Codigo),
@@ -743,10 +898,11 @@ GO
 PRINT 'Trigger ItemVendido'
 GO
 
-/*
- * Al vender un producto, registro la salida del stock correspondiente
- */
 
+/*
+ * El trigger ItemVendido genera la Salida de Stock correspondiente para cada Venta realizada
+ * en el sistema.
+ */
 CREATE TRIGGER [MAYUSCULAS_SIN_ESPACIOS].[ItemVendido]
 ON MAYUSCULAS_SIN_ESPACIOS.ItemsFactura
 AFTER INSERT
@@ -763,6 +919,9 @@ GO
 PRINT 'Insert ItemsFactura'
 GO
 
+/*
+ * Se cargan todos los detalles de facturacion de la tabla Maestra en el nuevo modelo.
+ */
 INSERT INTO [MAYUSCULAS_SIN_ESPACIOS].[ItemsFactura] (Factura, Producto, PrecioUnitario, Cantidad)
 (SELECT FACTURA_NRO, CONVERT(int, SUBSTRING(PRODUCTO_NOMBRE,LEN(PRODUCTO_NOMBRE)-9,10)), PRODUCTO_PRECIO, PRODUCTO_CANT
 FROM gd_esquema.Maestra
@@ -776,6 +935,11 @@ GO
 /*
  * FacturasCompletas muestra informacion "procesada" de las Facturas: Importe Base, Importe Final (incluye Descuento) y Valor de cada cuota
  */
+/*
+ * La vista FacturasCompletas muestra informacion de conveniencia ya procesada de las Facturas
+ * (como ser su Importe Base, Importe Final o Valor de cada Cuota) a fin de simplificar las
+ * consultas.
+ */
 CREATE VIEW [MAYUSCULAS_SIN_ESPACIOS].[FacturasCompletas] AS
 SELECT Numero, Fecha, Descuento, Descuento * 100 AS PorcentajeDescuento, Cuotas, SUM(PrecioUnitario * Cantidad) AS MontoBase, SUM(PrecioUnitario * Cantidad) * (1 - Descuento) AS Importe, (SUM(PrecioUnitario * Cantidad) * (1 - Descuento)) / Cuotas AS ValorCuota, Sucursal, Vendedor, Cliente
 FROM MAYUSCULAS_SIN_ESPACIOS.Facturas LEFT JOIN MAYUSCULAS_SIN_ESPACIOS.ItemsFactura ON ItemsFactura.Factura = Facturas.Numero
@@ -786,6 +950,10 @@ GO
 PRINT 'VISTA STOCKS'
 GO 
 
+/*
+ * La vista Stocks es un resumen que muestra el Stock actual de cada Producto del sistema para
+ * cada Sucursal.
+ */
 CREATE VIEW [MAYUSCULAS_SIN_ESPACIOS].[Stocks] AS
 SELECT Producto, Sucursal, SUM(Cantidad) AS Cantidad
 FROM MAYUSCULAS_SIN_ESPACIOS.MovimientosStock
@@ -797,6 +965,12 @@ PRINT 'TABLA PAGOS'
 GO
 
 
+/*
+ * Cada Pago del sistema esta relacionado con una Factura, y se almacena la cantidad de Cuotas que
+ * se abonan en cada operacion.
+ *
+ * Dado que no existen elementos que dependan de los Pagos, estos no poseen Clave Primaria.
+ */
 CREATE TABLE [MAYUSCULAS_SIN_ESPACIOS].[Pagos] (
 	[Factura] [int] NOT NULL FOREIGN KEY REFERENCES [MAYUSCULAS_SIN_ESPACIOS].[Facturas] (Numero),
 	[Sucursal] [tinyint] NOT NULL FOREIGN KEY REFERENCES [MAYUSCULAS_SIN_ESPACIOS].[Sucursales] (Provincia),
@@ -807,6 +981,10 @@ CREATE TABLE [MAYUSCULAS_SIN_ESPACIOS].[Pagos] (
 GO
 
 
+/*
+ * El trigger NoPagarMasCuotasDeLasQueHay evita que se cobren mas Cuotas de las que corresponde a
+ * cada Factura, deshaciendo la operacion en caso de error.
+ */
 CREATE TRIGGER [MAYUSCULAS_SIN_ESPACIOS].[NoPagarMasCuotasDeLasQueHay]
 ON MAYUSCULAS_SIN_ESPACIOS.Pagos
 AFTER INSERT
@@ -840,6 +1018,9 @@ END
 GO
 
 
+/*
+ * Se dan de alta los Pagos previamente registrados en el sistema anterior.
+ */
 INSERT INTO [MAYUSCULAS_SIN_ESPACIOS].[Pagos] (Factura, Sucursal, Cuotas, Fecha, Cobrador)
 (SELECT FACTURA_NRO, Provincias.Codigo, PAGO_MONTO / FacturasCompletas.ValorCuota, PAGO_FECHA, PAGO_EMPLEADO_DNI
 FROM gd_esquema.Maestra	LEFT JOIN MAYUSCULAS_SIN_ESPACIOS.Provincias ON Provincias.Nombre = SUC_PROVINCIA
@@ -848,21 +1029,14 @@ WHERE PAGO_MONTO IS NOT NULL AND PAGO_MONTO <> 0)
 
 GO
 
-/*
- * FIXME: mirar por si sirve
- */
-
-/*
-SELECT Facturas.Numero, Facturas.Cuotas, SUM(Pagos.Cuotas) AS CuotasPagas, Facturas.Cuotas - SUM(Pagos.Cuotas) AS CuotasPendientes
-FROM MAYUSCULAS_SIN_ESPACIOS.Facturas LEFT JOIN MAYUSCULAS_SIN_ESPACIOS.Pagos ON Pagos.Factura = Facturas.Numero
-GROUP BY Facturas.Numero, Facturas.Cuotas
-ORDER BY CuotasPendientes DESC
-*/
-
 --------------------------------------------------------
 PRINT 'PROCEDURE MODIFINTENTOS '
 GO
 
+/*
+ * sp_MODIFINTENTOS actualiza la cantidad de intentos de inicio de sesion consecutivos de un
+ * Usuario que fallaron.
+ */
 CREATE PROCEDURE [MAYUSCULAS_SIN_ESPACIOS].[sp_MODIFINTENTOS] (@USERNAME NVARCHAR(20), @INTENTOS INT)
 AS
 BEGIN
@@ -877,6 +1051,17 @@ GO
 PRINT 'PROCEDURE LOGIN'
 GO
 
+/*
+ * sp_LOGIN es el procedimiento encargado de verificar los datos de inicio de sesion provistos por
+ * el Usuario del sistema.
+ *
+ * En caso de un intento de identificacion erroneo, se recurre al procedimiento anterior para
+ * actualizar la cantidad de intentos fallidos realizados y, de haber alcanzado el limite maximo,
+ * deshabilita el Usuario.
+ *
+ * En caso de exito, el procedimiento reinicia el contador de intentos fallidos, y devuelve el
+ * listado de Funcionalidades a las que puede acceder el Usuario.
+ */
 CREATE PROCEDURE [MAYUSCULAS_SIN_ESPACIOS].[sp_LOGIN] (@USERNAME NVARCHAR(20), @PASS NVARCHAR(65))
 AS
 BEGIN
@@ -927,6 +1112,10 @@ GO
 PRINT ' Procedure Alta Empleado'
 GO
 
+/*
+ * El procedimiento sp_altaEmpleado genera el nuevo Empleado en la tabla correspondiente.
+ */
+
 CREATE PROCEDURE mayusculas_sin_espacios.sp_altaEmpleado (@DNI numeric(8,0), @Nombre nvarchar(30),
 					@Apellido nvarchar(30), @Mail nvarchar(255), @Telefono nvarchar(20),
 					@Direccion nvarchar(255), @Provincia tinyint, @Tipo tinyint,@Sucursal tinyint,@habilitado tinyint)
@@ -943,6 +1132,10 @@ GO
 PRINT ' Procedure Modificacion Empleado'
 GO
 
+/*
+ * Modificacion de los Empleados existentes.
+ */
+
 CREATE PROCEDURE [MAYUSCULAS_SIN_ESPACIOS].[sp_ModifEmpleados](@DNI numeric(8,0), @Nombre nvarchar(30),
 					@Apellido nvarchar(30), @Mail nvarchar(255), @Telefono nvarchar(20),
 					@Direccion nvarchar(255), @habilitado tinyint)
@@ -958,6 +1151,9 @@ GO
 PRINT ' Procedure Alta Cliente'
 GO
 
+/*
+ * Generacion de nuevos Clientes.
+ */
 CREATE PROCEDURE mayusculas_sin_espacios.sp_altaCliente (@DNI numeric(8,0), @Nombre nvarchar(30),
 					@Apellido nvarchar(30), @Mail nvarchar(255), @Telefono nvarchar(20),
 					@Direccion nvarchar(255), @Provincia tinyint, @habilitado tinyint)
@@ -974,6 +1170,9 @@ GO
 PRINT ' Procedure Modificacion Cliente'
 GO
 
+/*
+ * Modificacion de los Clientes existentes.
+ */
 CREATE PROCEDURE [MAYUSCULAS_SIN_ESPACIOS].[sp_ModifClientes](@DNI numeric(8,0), @Nombre nvarchar(30),
 					@Apellido nvarchar(30), @Mail nvarchar(255), @Telefono nvarchar(20),
 					@Direccion nvarchar(255), @habilitado tinyint)
@@ -989,6 +1188,10 @@ GO
 PRINT 'PROCEDURE Baja Empleado'
 GO
 
+/*
+ * La eliminacion de Empleados (asi como la de otras entidades del modelo) se realiza de forma
+ * logica a traves del campo Habilitado, para evitar perder la informacion registrada del mismo.
+ */
 CREATE PROCEDURE [MAYUSCULAS_SIN_ESPACIOS].[sp_BajaEmpleados](@DNI numeric(8,0), @habilitado tinyint)
 as
 begin
@@ -1015,6 +1218,10 @@ go
 PRINT 'PROCEDURE Asignacion Roles'
 GO
 
+/*
+ * Se genera la asignacion de un Rol a un determinado Usuario, verificando que la asignacion no
+ * este duplicada, y se controla el alta y eliminacion de las Asignaciones existentes.
+ */
 CREATE PROCEDURE [MAYUSCULAS_SIN_ESPACIOS].[sp_asignacion] 
 						(@user nvarchar(30),@rol int, @habilitado tinyint)
 as
@@ -1090,6 +1297,9 @@ GO
 PRINT 'PROCEDURE Facturar'
 GO
 
+/*
+ * Al Facturar se genera la Factura correspondiente en el sistema.
+ */
 CREATE PROCEDURE [MAYUSCULAS_SIN_ESPACIOS].[sp_facturar](@fecha datetime, @descuento decimal,@cuotas int,
 										 @sucursal int, @vendedor int, @cliente int)
 as
@@ -1118,6 +1328,9 @@ GO
 PRINT 'FUNCION Cuotas Faltantes'
 GO
 
+/*
+ * fun_faltanCuotas calcula la cantidad de Cuotas pendientes de Pago para una determinada Factura
+ */
 CREATE FUNCTION [MAYUSCULAS_SIN_ESPACIOS].[fun_faltanCuotas](@factura int)
 returns int
 AS
@@ -1134,6 +1347,9 @@ GO
 PRINT 'PROCEDURE Efectuar Pago'
 GO
 
+/*
+ * sp_Pagar registra el Pago de una o mas Cuotas para una Factura determinada.
+ */
 CREATE PROCEDURE mayusculas_sin_espacios.sp_Pagar(@factura int, @sucursal int,@cuotas int,
 						 @fecha datetime, @cobrador int)
 AS
@@ -1147,6 +1363,10 @@ GO
 PRINT 'VISTA DeudasPorAnio'
 GO
 
+/*
+ * La vista DeudasPorAnio resume el endeudamiento de cada Cliente en cada Sucursal a lo largo de
+ * los Anios.
+ */
 CREATE VIEW MAYUSCULAS_SIN_ESPACIOS.DeudasPorAnio AS
 SELECT Cliente, FacturasCompletas.Sucursal, YEAR(FacturasCompletas.Fecha) AS Anio, SUM(Importe) - SUM(Pagos.Cuotas * FacturasCompletas.ValorCuota) AS DeudaTotal
 FROM MAYUSCULAS_SIN_ESPACIOS.FacturasCompletas
@@ -1158,6 +1378,10 @@ GO
 PRINT 'VISTA VendedoresPorAnio'
 GO
 
+/*
+ * VendedoresPorAnio sumariza el Importe facturado por cada Empleado en cada Anio, discriminado por
+ * cada Sucursal.
+ */
 CREATE VIEW MAYUSCULAS_SIN_ESPACIOS.VendedoresPorAnio AS
 SELECT Vendedor, FacturasCompletas.Sucursal, YEAR(FacturasCompletas.Fecha) AS Anio, SUM(Importe) AS VentaTotal
 FROM MAYUSCULAS_SIN_ESPACIOS.FacturasCompletas
@@ -1168,6 +1392,10 @@ GO
 PRINT 'VISTA ProductosPorAnio'
 GO
 
+/*
+ * ProductosPorAnio muestra la cantidad de Unidades vendidas de cada Producto anualmente, por cada
+ * Sucursal.
+ */
 CREATE VIEW MAYUSCULAS_SIN_ESPACIOS.ProductosPorAnio AS
 SELECT Producto, Sucursal, YEAR(Fecha) AS Anio, SUM(Cantidad) AS Vendidos
 FROM MAYUSCULAS_SIN_ESPACIOS.ItemsFactura
@@ -1179,6 +1407,20 @@ GO
 PRINT 'Funcion Dias sin stock'
 GO
 
+/*
+ * DiasSinStock es una funcion que calcula la cantidad de Dias que un Producto estuvo falto de
+ * Stock en un determinado Anio, para una Sucursal dada.
+ *
+ * El resultado se obtiene efectuando ordenadamente el calculo del Stock acumulado para cada
+ * Movimiento, y almacenando la fecha de inicio de faltante cuando corresponde.
+ *
+ * Al detectar un paso a Stock positivo tras un faltante, se acumula la cantidad de dias
+ * transcurridos entre el comienzo del faltante y la entrada que lo compenso, y ese valor
+ * es el que se devuelve al finalizar.
+ *
+ * Si tras recorrer todos los movimientos se detecta que el Producto termino con Stock faltante,
+ * se contabilizan tambien todos los dias restantes.
+ */
 CREATE FUNCTION [MAYUSCULAS_SIN_ESPACIOS].[DiasSinStock](@CodigoProducto int, @Anio int, @Sucursal tinyint)
 RETURNS INT
 AS
@@ -1234,6 +1476,10 @@ GO
 PRINT 'VISTA FALTANTES DE STOCK'
 GO
 
+/*
+ * FaltantesDeStock relaciona cada Producto con la cantidad de DiasSinStock del mismo en cada
+ * Sucursal en cada Anio.
+ */
 CREATE VIEW MAYUSCULAS_SIN_ESPACIOS.FaltantesDeStock AS
 SELECT Producto, Sucursal, YEAR(Fecha) AS Anio, MAYUSCULAS_SIN_ESPACIOS.DiasSinStock(Producto, YEAR(Fecha), Sucursal) AS Dias
 FROM MAYUSCULAS_SIN_ESPACIOS.MovimientosStock
@@ -1244,6 +1490,9 @@ GO
 PRINT 'Procedure Clientes Premium'
 GO
 
+/*
+ * 
+ */
 CREATE PROCEDURE [MAYUSCULAS_SIN_ESPACIOS].[sp_ClientesPremium] (@sucursal int, @año int)
 AS
 select top(30) clientes.nombre as 'Nombre Cliente',
