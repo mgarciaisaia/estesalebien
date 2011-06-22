@@ -9,7 +9,6 @@ namespace VentaElectrodomesticos.MetodosSQL
 {
     class ClaseSQL
     {
-        //FIXME: esto hay que parametrizarlo
         private static String schema = System.Configuration.ConfigurationSettings.AppSettings.Get("schemaName");
         private static string connectString = connectionString();
         private SqlConnection cnn;
