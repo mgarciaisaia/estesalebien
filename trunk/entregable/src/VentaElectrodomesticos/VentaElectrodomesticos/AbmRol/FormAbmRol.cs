@@ -60,6 +60,7 @@ namespace VentaElectrodomesticos.AbmRol
         private void rellenarComboBoxRoles()
         {
             conexion.Open();
+            cRoles.Items.Clear();
             cRoles.Items.Add(new Rol());
             String query = "select codigo, nombre, habilitado from mayusculas_sin_espacios.roles";
             SqlDataReader readerRol = conexion.busquedaSQLDataReader(query);
