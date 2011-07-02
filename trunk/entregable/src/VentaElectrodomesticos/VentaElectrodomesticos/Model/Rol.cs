@@ -7,11 +7,22 @@ namespace VentaElectrodomesticos.Model
 {
     public class Rol
     {
-        public int codigo;
-        public String nombre;
-        public Boolean habilitado;
+        public int codigo { get; set; }
+        public String nombre { get; set; }
+        public Boolean habilitado {get; set; }
 		
-        public Rol() { }
+        public Rol() {
+            this.codigo = 0;
+            this.nombre = "";
+            this.habilitado = false;
+        }
+
+        public Rol(int codigo, String nombre, Boolean habilitado)
+        {
+            this.codigo = codigo;
+            this.nombre = nombre;
+            this.habilitado = habilitado;
+        }
 
         public Rol(Object[] arrayFields)
         {
