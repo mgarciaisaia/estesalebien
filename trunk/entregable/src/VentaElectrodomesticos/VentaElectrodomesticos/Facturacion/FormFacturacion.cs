@@ -55,6 +55,10 @@ namespace VentaElectrodomesticos.Facturacion
 
             reader.Close();
             conexion.Close();
+            if (dni <= 0)
+            {
+                MessageBox.Show("Su usuario actual no esta asociado a ningun empleado, por lo que no podra efectuar ninguna Factura.\nPara facturar, por favor inicie sesion con su usuario asociado.", "Atencion", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
         }
 
         private void rellenarComboBoxProvincia()
@@ -144,7 +148,7 @@ namespace VentaElectrodomesticos.Facturacion
                     DialogResult op = MessageBox.Show("El importe total es de $" + this.montoTotal(), "Confirmar", MessageBoxButtons.OKCancel);
                     if (op == DialogResult.OK)
                     {
-                        String[,] parametros = new String[2, 6];
+                        Object[,] parametros = new Object[2, 6];
                         String sp = "mayusculas_sin_espacios.sp_facturar";
                         parametros[0, 0] = "@fecha";
                         parametros[0, 1] = "@descuento";
@@ -153,7 +157,7 @@ namespace VentaElectrodomesticos.Facturacion
                         parametros[0, 4] = "@vendedor";
                         parametros[0, 5] = "@cliente";
 
-                        parametros[1, 0] = DateTime.Now.ToString();
+                        parametros[1, 0] = DateTime.Now;
                         parametros[1, 1] = tDescuento.Text;
                         parametros[1, 2] = (cCuotas.SelectedIndex + 1).ToString();
                         parametros[1, 3] = (cSucursal.SelectedIndex + 1).ToString();
