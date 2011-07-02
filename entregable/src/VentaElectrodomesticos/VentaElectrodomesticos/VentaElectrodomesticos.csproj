@@ -130,6 +130,7 @@
       <DependentUpon>FormClientesPremium.cs</DependentUpon>
     </Compile>
     <Compile Include="DAO\Categorias.cs" />
+    <Compile Include="DAO\Roles.cs" />
     <Compile Include="DAO\Funcionalidades.cs" />
     <Compile Include="DAO\Marcas.cs" />
     <Compile Include="DAO\DAOCache.cs" />
@@ -139,6 +140,7 @@
     <Compile Include="Model\Funcionalidad.cs" />
     <Compile Include="Model\Marca.cs" />
     <Compile Include="Model\Provincia.cs" />
+	<Compile Include="Model\Rol.cs" />
     <Compile Include="DAO\Provincias.cs" />
     <Compile Include="DAO\Sucursales.cs" />
     <Compile Include="DAO\TiposEmpleado.cs" />
