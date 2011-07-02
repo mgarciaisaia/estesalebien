@@ -58,6 +58,10 @@ namespace VentaElectrodomesticos.EfectuarPago
 
             reader.Close();
             conexion.Close();
+            if (dni <= 0)
+            {
+                MessageBox.Show("El usuario actual es de administracion (no esta asociado a ningun empleado), por lo que no podra registrar Pagos.\nPara registrar pagos, por favor inicie sesion con su usuario asociado.", "Atencion", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
         }
 
         private void rellenarComboBoxProvincia()
@@ -159,7 +163,7 @@ namespace VentaElectrodomesticos.EfectuarPago
                 conexion.Open();
                 if (!this.hayAlgunTextboxVacio(cProvincia, cSucursal, tCliente, cFactura, cCuotas))
                 {
-                    String[,] parametros = new String[2, 5];
+                    Object[,] parametros = new Object[2, 5];
                     String sp = "mayusculas_sin_espacios.sp_Pagar";
                     parametros[0, 0] = "@factura";
                     parametros[0, 1] = "@sucursal";
@@ -168,10 +172,10 @@ namespace VentaElectrodomesticos.EfectuarPago
                     parametros[0, 4] = "@cobrador";
 
                     parametros[1, 0] = cFactura.Text;
-                    parametros[1, 1] = (cSucursal.SelectedIndex +1).ToString();
-                    parametros[1, 2] = (cCuotas.Value).ToString();
-                    parametros[1, 3] = System.DateTime.Now.ToString();
-                    parametros[1, 4] = dni.ToString();
+                    parametros[1, 1] = cSucursal.SelectedIndex +1;
+                    parametros[1, 2] = cCuotas.Value;
+                    parametros[1, 3] = DateTime.Now;
+                    parametros[1, 4] = dni;
 
                     SqlDataReader reader = conexion.ejecutarStoredProcedure(sp, parametros);
                     if (reader.RecordsAffected>0)

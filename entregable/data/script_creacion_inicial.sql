@@ -1355,7 +1355,7 @@ CREATE PROCEDURE mayusculas_sin_espacios.sp_Pagar(@factura int, @sucursal int,@c
 AS
 BEGIN
 insert into mayusculas_sin_espacios.pagos (factura,sucursal,cuotas,fecha,cobrador) 
-values (@factura,@sucursal,@cuotas,@factura,@cobrador)
+values (@factura,@sucursal,@cuotas,@fecha,@cobrador)
 END
 GO
 
