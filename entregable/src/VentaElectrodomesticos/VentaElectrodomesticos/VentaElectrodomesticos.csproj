@@ -130,11 +130,13 @@
       <DependentUpon>FormClientesPremium.cs</DependentUpon>
     </Compile>
     <Compile Include="DAO\Categorias.cs" />
+    <Compile Include="DAO\Funcionalidades.cs" />
     <Compile Include="DAO\Marcas.cs" />
     <Compile Include="DAO\DAOCache.cs" />
     <Compile Include="DAO\Productos.cs" />
     <Compile Include="DAO\Stocks.cs" />
     <Compile Include="Model\Categoria.cs" />
+    <Compile Include="Model\Funcionalidad.cs" />
     <Compile Include="Model\Marca.cs" />
     <Compile Include="Model\Provincia.cs" />
     <Compile Include="DAO\Provincias.cs" />

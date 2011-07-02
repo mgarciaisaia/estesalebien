@@ -17,14 +17,12 @@ namespace VentaElectrodomesticos.AbmRol
     public partial class FormAbmRol : Form
     {
         ClaseSQL conexion;
-        private string[] funciones;
         private string[,] roles;
         
         public FormAbmRol()
         {
             InitializeComponent();
             conexion = ClaseSQL.getInstance();
-            funciones = new string[12];
             roles = new string[20,2];
         }
 
@@ -43,25 +41,19 @@ namespace VentaElectrodomesticos.AbmRol
             SqlDataReader reader = conexion.busquedaSQLDataReader(query);
             while (reader.Read())
             {
-                lFunciones.Items.Add(funciones[int.Parse(reader[0].ToString())]);
+                lFunciones.Items.Add(Funcionalidades.getInstance().funcionalidad((byte)reader[0]).descripcion);
             }
             reader.Close();
         }
 
         private void rellenarComboBoxFunciones()
         {
-            conexion.Open();
-            cFunciones.Items.Add("");
-            string query = "select codigo, descripcion from mayusculas_sin_espacios.funcionalidades";
-            SqlDataReader readerFun = conexion.busquedaSQLDataReader(query);
-            while (readerFun.Read())
-            {
-                cFunciones.Items.Add(readerFun[1].ToString());
-                funciones[int.Parse(readerFun[0].ToString())] = readerFun[1].ToString();
+            cFunciones.Items.Clear();
+            foreach(Funcionalidad funcionalidad in Funcionalidades.getInstance().list()) {
+                cFunciones.Items.Add(funcionalidad);
             }
-            readerFun.Close();
-            conexion.Close();
-
+            cFunciones.DisplayMember = "descripcion";
+            cFunciones.ValueMember = "codigo";
         }
         private void rellenarComboBoxRoles()
         {
@@ -98,13 +90,6 @@ namespace VentaElectrodomesticos.AbmRol
             {i++;}
             return i;
         }
-        private int posicionFuncion(string funcion)
-        {
-            int i = 0;
-            while (funcion != funciones[i] && i < 11)
-            { i++; }
-            return i;
-        }
 
         private void bLimpiarABM_Click(object sender, EventArgs e)
         {
@@ -128,18 +113,19 @@ namespace VentaElectrodomesticos.AbmRol
                 conexion.Open();
                 if (posicionRol(cRoles.Text) == 19 && cFunciones.Text!="")
                 {
-                    string query = "insert into mayusculas_sin_espacios.roles(nombre,habilitado) values ('" + cRoles.Text + "'," + System.Convert.ToInt32(cHabilitado.Checked).ToString() + ")";
-                    SqlDataReader reader = conexion.busquedaSQLDataReader(query);
-                    if (reader != null)
+                    string query = "insert into mayusculas_sin_espacios.roles(nombre,habilitado) values ('" + cRoles.Text + "'," + (cHabilitado.Checked ? 1 : 0) + ")";
+                    if (conexion.nonQuery(query) > 0)
                     {
                         MessageBox.Show("Se agrego el Rol Correctamente", "Alta");
                     }
-                    reader.Close();
+                    conexion.Close();
+                    this.rellenarComboBoxRoles();
+                    conexion.Open();
                 }
                 
                 if (cFunciones.Text != "" && (lFunciones.FindItemWithText(cFunciones.Text))==null)
                 {
-                    string query = "insert into mayusculas_sin_espacios.funcionalidadesRol(rol,funcionalidad) values ('" + posicionRol(cRoles.Text) + "','" + posicionFuncion(cFunciones.Text) + "')";
+                    string query = "insert into mayusculas_sin_espacios.funcionalidadesRol(rol,funcionalidad) values (" + posicionRol(cRoles.Text) + "," + ((Funcionalidad)cFunciones.Items[cFunciones.SelectedIndex]).codigo + ")";
                     SqlDataReader reader = conexion.busquedaSQLDataReader(query);
                     if (reader != null)
                     {
@@ -182,7 +168,7 @@ namespace VentaElectrodomesticos.AbmRol
                 //Eliminar seleccionando una funcion de la lista de funciones asignadas
                 if (lFunciones.SelectedItems.Count != 0)
                 {
-                    string query = "delete mayusculas_sin_espacios.funcionalidadesRol where rol='" + posicionRol(cRoles.Text) + "' and funcionalidad='" + posicionFuncion(lFunciones.SelectedItems[0].Text) + "'";
+                    string query = "delete mayusculas_sin_espacios.funcionalidadesRol where rol=" + posicionRol(cRoles.Text) + " and funcionalidad=" + Funcionalidades.getInstance().funcionalidad(lFunciones.SelectedItems[0].Text).codigo;
                     SqlDataReader reader = conexion.busquedaSQLDataReader(query);
                     if (reader != null)
                     {
