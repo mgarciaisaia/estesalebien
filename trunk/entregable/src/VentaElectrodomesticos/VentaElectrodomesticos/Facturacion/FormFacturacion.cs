@@ -57,7 +57,7 @@ namespace VentaElectrodomesticos.Facturacion
             conexion.Close();
             if (dni <= 0)
             {
-                MessageBox.Show("Su usuario actual no esta asociado a ningun empleado, por lo que no podra efectuar ninguna Factura.\nPara facturar, por favor inicie sesion con su usuario asociado.", "Atencion", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("El usuario actual es de administracion (no esta asociado a ningun empleado), por lo que no podra efectuar ninguna Factura.\nPara facturar, por favor inicie sesion con su usuario asociado.", "Atencion", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
 
