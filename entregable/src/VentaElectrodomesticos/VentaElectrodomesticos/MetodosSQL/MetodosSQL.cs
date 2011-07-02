@@ -144,6 +144,28 @@ namespace VentaElectrodomesticos.MetodosSQL
             }
         }
 
+        public SqlDataReader ejecutarStoredProcedure(string sp, Object[,] parametros)
+        {
+            try
+            {
+                SqlCommand command = new SqlCommand();
+                command.Connection = cnn;
+                command.CommandType = System.Data.CommandType.StoredProcedure;
+                command.CommandText = sp;
+                command.CommandTimeout = 10;
+
+                for (int i = 0; i < parametros.GetLength(1); i++)
+                {
+                    command.Parameters.AddWithValue(parametros[0, i].ToString(), parametros[1, i]);
+                }
+                return command.ExecuteReader();
+            }
+            catch (SqlException ex)
+            {
+                throw ex;
+            }
+        }
+
         public String ejecutarStoredProcedureConRetorno(string sp, String[,] parametros, String retorno)
         {
             try
